@@ -212,6 +212,11 @@ export function getRequiredDocumentsData(params: {
       "4. 試験免除情報がある場合は > [!TIP] で強調表示する\n" +
       "5. total_documents と skipped_count をサマリーとして冒頭に表示\n" +
       "6. 次のステップとして validate_application_data でデータ検証を提案する",
+    _next_actions: [
+      { tool: "calculate_deadlines", reason: "期限を計算して提出スケジュールを作成" },
+      { tool: "validate_application_data", reason: "申請データの整合性チェック" },
+      { tool: "generate_intake_sheet", reason: "クライアント向け入力シートを生成" },
+    ],
   };
 }
 

@@ -146,6 +146,11 @@ export function registerDetermineApplication(server: McpServer) {
               "3. typical_processing_days を「通常〇〜〇日で処理」と自然な日本語で伝える\n" +
               "4. 次のステップとして get_required_documents を呼ぶことを提案（pattern_id を引き継ぐ）\n" +
               "5. 申請中の就労ルール（work_during_application）を必ず注意喚起する",
+            _next_actions: [
+              { tool: "get_required_documents", reason: "必要書類リストを取得", params: { pattern_id: patternId } },
+              { tool: "calculate_deadlines", reason: "期限を計算（在留期限が分かれば）" },
+              { tool: "validate_application_data", reason: "申請データの整合性チェック" },
+            ],
           }, null, 2),
         }],
       };

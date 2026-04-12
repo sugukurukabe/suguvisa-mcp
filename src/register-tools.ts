@@ -17,9 +17,10 @@ import { registerGenerateAnnualReportCsv } from "./tools/generate-annual-report-
 import { registerGenerateAnnualReportOffline } from "./tools/generate-annual-report-offline.js";
 import { registerLogVisaAction } from "./tools/log-visa-action.js";
 import { registerGetVisaAuditLogs } from "./tools/get-visa-audit-logs.js";
+import { registerCompleteVisaGuide } from "./tools/complete-visa-guide.js";
 
 /**
- * 全15ツール + 6プロンプトを McpServer に登録する共通関数。
+ * 全19ツール + 7プロンプト + 6リソースを McpServer に登録する共通関数。
  * stdio (index.ts) と HTTP (server.ts) の両方から呼ばれる。
  */
 export function registerAllTools(server: McpServer): void {
@@ -50,6 +51,9 @@ export function registerAllTools(server: McpServer): void {
   // === 情報系 ===
   registerLawUpdates(server);              // 法改正情報
   registerSearchLegalDocs(server);         // 法務ドキュメントRAG検索
+
+  // === インテントベース統合ツール ===
+  registerCompleteVisaGuide(server);        // ワンショット完全ガイド（判定+書類+期限の統合）
 
   // === MCP Prompts（定型シナリオ） ===
   registerPrompts(server);

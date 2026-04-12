@@ -179,7 +179,11 @@ export function calculateDeadlinesData(
     status: "ok", 
     today: fmt(today), 
     deadlines,
-    _ai_summary_guidelines: ai_guidelines
+    _ai_summary_guidelines: ai_guidelines,
+    _next_actions: [
+      { tool: "get_required_documents", reason: "必要書類リストを確認し、準備を開始" },
+      { tool: "generate_intake_sheet", reason: "クライアント向け入力シートを生成" },
+    ],
   };
 }
 
