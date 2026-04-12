@@ -1,5 +1,7 @@
 import { z } from "zod";
-import * as codes from "./isa-codes.json";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const codes = require("./isa-codes.json");
 
 // ────────────────────────────────────────────────────────
 // 自動変換ユーティリティ（ユーザビリティ改善 v0.4.0）
