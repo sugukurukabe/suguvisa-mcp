@@ -16,11 +16,12 @@ import { registerAllTools } from "./register-tools.js";
 import { apiKeyAuth } from "./middleware/auth.js";
 import { logUsage } from "./middleware/usage-logger.js";
 import type { AuthRequest } from "./middleware/auth.js";
-import { apiRateLimiter } from "./middleware/rate-limiter.js";
+import { apiRateLimiter, checkToolAccess } from "./middleware/rate-limiter.js";
 
 // REST API & Plugin Meta routes
 import toolsRestRouter from "./routes/tools-rest.js";
 import pluginMetaRouter from "./routes/plugin-meta.js";
+import tenantRouter from "./routes/tenant.js";
 
 const app = express();
 app.use(express.json());
@@ -39,13 +40,16 @@ app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
     server: "suguvisa-mcp",
-    version: "0.2.0",
+    version: "0.3.0",
     modes: {
       mcp: "/mcp (Claude.ai Remote MCP)",
       rest: "/api/v1/tools/* (GPT Actions / REST API)",
+      tenant: "/api/v1/tenant/* (SaaS Management)",
       standalone: process.env.ENABLE_STANDALONE_CHAT === "true" ? "enabled" : "disabled",
     },
-    tools: 15,
+    tools: 19,
+    prompts: 7,
+    resources: 6,
   });
 });
 
@@ -54,6 +58,9 @@ app.use(pluginMetaRouter);
 
 // ─── REST API (GPT Actions / External) ───
 app.use("/api/v1/tools", toolsRestRouter);
+
+// ─── Tenant Management API ───
+app.use("/api/v1/tenant", tenantRouter);
 
 // ─── Legacy REST endpoint (backward compat) ───
 import { determinePattern } from "./tools/determine-application.js";
@@ -78,9 +85,22 @@ app.post("/mcp", async (req: AuthRequest, res) => {
   const toolName = isToolCall ? req.body?.params?.name : "unknown_tool";
 
   try {
+    // プランベースのツールアクセス制御
+    if (isToolCall && toolName) {
+      const access = checkToolAccess(toolName, req.tenant?.subscription_plan);
+      if (!access.allowed) {
+        res.status(403).json({
+          jsonrpc: "2.0",
+          error: { code: -32003, message: access.reason || "Tool not available on your plan" },
+          id: req.body?.id || null,
+        });
+        return;
+      }
+    }
+
     const server = new McpServer({
       name: "suguvisa-mcp",
-      version: "0.2.0",
+      version: "0.3.0",
       description: "特定技能ビザ申請の専門MCPサーバー（Claude & GPT デュアルプラグイン）",
     });
 
@@ -202,9 +222,10 @@ if (process.env.ENABLE_STANDALONE_CHAT === "true") {
 // ─── サーバー起動 ───
 const PORT = parseInt(process.env.PORT || "3000", 10);
 app.listen(PORT, "0.0.0.0", () => {
-  console.error(`🛂 SuguVisa Dual Plugin Server v0.2.0 listening on port ${PORT}`);
+  console.error(`🛂 SuguVisa Dual Plugin Server v0.3.0 listening on port ${PORT}`);
   console.error(`   MCP endpoint (Claude):   http://localhost:${PORT}/mcp`);
   console.error(`   REST API (GPT Actions):  http://localhost:${PORT}/api/v1/tools/`);
+  console.error(`   Tenant Management:       http://localhost:${PORT}/api/v1/tenant/`);
   console.error(`   OpenAPI spec:            http://localhost:${PORT}/openapi.yaml`);
   console.error(`   Plugin manifest:         http://localhost:${PORT}/.well-known/ai-plugin.json`);
   console.error(`   Health check:            http://localhost:${PORT}/health`);

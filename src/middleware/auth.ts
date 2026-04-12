@@ -50,7 +50,6 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
   }
 
   // 1. ローカル API Key によるバイパス認証 (単一ユーザー/開発環境向け)
-  console.log("Auth debug - Token:", token, "Expected:", localApiKey);
   if (localApiKey && token === localApiKey) {
     req.tenant = {
       id: "local-dev-tenant",
@@ -61,7 +60,7 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
     return;
   }
 
-  console.log("Auth debug - Passed through local bypass");
+
 
   // 2. SaaS モード: データベース(Supabase)からテナント情報を照合
   if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
