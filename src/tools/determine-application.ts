@@ -134,6 +134,11 @@ export function registerDetermineApplication(server: McpServer) {
 
       const { patternId, pattern, lookupKey } = result;
 
+      // === 特定活動→特定技能1号の場合の追加コンテキスト ===
+      const isTokkatsuToSSW1 = patternId === "CHANGE_SSW1_F";
+      const isCompanyChange = isTokkatsuToSSW1 && (context === "転職" || context === "job_change");
+      const reasonLetterRequired = isTokkatsuToSSW1; // 特定活動→SSW1は基本的に理由書が必要
+
       return {
         content: [{
           type: "text" as const,
@@ -152,6 +157,8 @@ export function registerDetermineApplication(server: McpServer) {
             skip_conditions: pattern.skip_conditions,
             special_documents: pattern.special_documents,
             notes: pattern.notes,
+            reason_letter_required: reasonLetterRequired,
+            company_change_detected: isCompanyChange,
             work_during_application: ruleSets.work_during_application,
             _ai_instructions:
               "📋 結果を以下の形式で提示してください：\n" +
@@ -160,13 +167,35 @@ export function registerDetermineApplication(server: McpServer) {
               "3. typical_processing_days を「通常〇〜〇日で処理」と自然な日本語で伝える\n" +
               "4. 次のステップとして get_required_documents を呼ぶことを提案（pattern_id を引き継ぐ）\n" +
               "5. 申請中の就労ルール（work_during_application）を必ず注意喚起する\n" +
-              "\n⚠️ 特定活動に関する重要ルール:\n" +
-              "- 在留カードに「特定活動」と記載されている場合、ほとんどは特定技能1号への移行準備（つなぎビザ）です\n" +
-              "- 「46号なのか？」「その他の特定活動なのか？」などの質問は不要。特定技能1号への変更申請として進めてください\n" +
-              "- 転職（受入れ機関変更）を伴う場合も同じパターンです。追加で退職証明書・新雇用契約書が必要になります\n" +
-              "- 指定書の確認は実務上のアドバイスとして軽く触れる程度でOK",
+              (isTokkatsuToSSW1 ?
+                "\n🚨 【絶対ルール：特定活動について】\n" +
+                "以下のことは絶対にしないでください：\n" +
+                "- ❌「アルバイト系の特定活動では？」と聞く\n" +
+                "- ❌「ワーホリ系では？」と聞く\n" +
+                "- ❌「46号なのか？」と聞く\n" +
+                "- ❌「就労制限なし」を見て「単純労働系」と推測する\n" +
+                "- ❌ 不許可リスクを過度に強調して不安を煽る\n" +
+                "\n" +
+                "在留カードに「特定活動」と書いてある場合、就労制限の欄に「指定された活動のみ可」\n" +
+                "「特定技能により指定された活動のみ可」等と書いてあれば、\n" +
+                "★ これは100%「特定技能1号への移行準備のためのつなぎビザ」です ★\n" +
+                "\n" +
+                "やるべきことはシンプル：\n" +
+                "✅ 「特定活動→特定技能1号の変更申請ですね」と即座に確定\n" +
+                "✅ 分野（農業、外食など）を確認\n" +
+                "✅ 新しい受入れ機関（会社名）を確認\n" +
+                "✅ すぐに書類準備に入る\n" +
+                "\n" +
+                "【理由書について】\n" +
+                "このパターンでは申請理由書（変更の経緯と理由）が必要です。\n" +
+                "特に受入れ機関が変わる（転職を伴う）場合は、\n" +
+                "「なぜ元の会社ではなく別の会社で特定技能をやるのか」を\n" +
+                "論理的に説明する理由書が不可欠です。\n" +
+                "generate_reason_letter ツール（use_ai: true）で生成可能です。\n"
+              : ""),
             _next_actions: [
               { tool: "get_required_documents", reason: "必要書類リストを取得", params: { pattern_id: patternId } },
+              ...(reasonLetterRequired ? [{ tool: "generate_reason_letter", reason: "申請理由書を生成（特定活動→SSW1変更の経緯説明）" }] : []),
               { tool: "calculate_deadlines", reason: "期限を計算（在留期限が分かれば）" },
               { tool: "validate_application_data", reason: "申請データの整合性チェック" },
             ],
