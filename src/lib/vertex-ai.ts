@@ -6,7 +6,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const PROJECT_ID = process.env.GCP_PROJECT_ID || "mcp-service-492010";
 const LOCATION = process.env.VERTEX_AI_LOCATION || "us-central1";
-const MODEL_ID = process.env.VERTEX_AI_MODEL || "gemini-2.0-flash";
+const MODEL_ID = process.env.VERTEX_AI_MODEL || "gemini-2.5-pro";
+const FLASH_MODEL_ID = process.env.VERTEX_AI_FLASH_MODEL || "gemini-2.5-flash";
 
 let genAI: GoogleGenAI | null = null;
 
@@ -27,7 +28,7 @@ function getGenAI(): GoogleGenAI {
 export async function generateText(prompt: string, useFlash = false): Promise<string> {
   const ai = getGenAI();
   const result = await ai.models.generateContent({
-    model: useFlash ? "gemini-2.0-flash" : MODEL_ID,
+    model: useFlash ? FLASH_MODEL_ID : MODEL_ID,
     contents: prompt,
     config: {
       temperature: 0.3,  // 法務文書は正確性重視
