@@ -205,17 +205,21 @@ export function getRequiredDocumentsData(params: {
     skip_conditions: pattern.skip_conditions || [],
     download_url: "https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00030.html",
     _ai_instructions:
-      "📋 書類リストを以下の形式で提示してください：\n" +
-      "1. カテゴリ別に見出し（## 共通書類、## 支援関連 等）を付けて表形式で表示\n" +
-      "2. 各書類に ☐ チェックボックスを付け、準備担当者（who）を明示する\n" +
-      "3. skipped=true の書類は ~~取り消し線~~ で表示し、免除理由を添える\n" +
-      "4. 試験免除情報がある場合は > [!TIP] で強調表示する\n" +
-      "5. total_documents と skipped_count をサマリーとして冒頭に表示\n" +
-      "6. 次のステップとして validate_application_data でデータ検証を提案する",
+      "🎯 【エージェントモード：書類リスト取得完了 → 次は作成】\n" +
+      "書類リストが出ました。チャットで終わるな。書類を作れ。\n\n" +
+      "1. 「📄 必要書類 " + documents.length + "件（うち" + documents.filter((d: DocumentEntry) => d.skipped).length + "件省略可）」と1行で伝える\n" +
+      "2. 書類リストを簡潔な表で表示（☐ チェックボックス付き）\n" +
+      "3. 即座に以下を実行（ユーザーに聞かずに）：\n" +
+      "   - generate_reason_letter(use_ai: true) → 理由書を生成\n" +
+      "   - generate_reference_form → テンプレート生成\n" +
+      "   - generate_intake_sheet → 入力シート生成\n" +
+      "4. 省略条件は簡潔にメモ程度で\n\n" +
+      "禁止：「次のステップとして○○を提案します」→ 提案じゃなく実行しろ",
     _next_actions: [
-      { tool: "calculate_deadlines", reason: "期限を計算して提出スケジュールを作成" },
-      { tool: "validate_application_data", reason: "申請データの整合性チェック" },
-      { tool: "generate_intake_sheet", reason: "クライアント向け入力シートを生成" },
+      { tool: "generate_reason_letter", reason: "理由書をAI生成", params: { use_ai: true } },
+      { tool: "generate_reference_form", reason: "参考様式テンプレートを生成" },
+      { tool: "generate_intake_sheet", reason: "入力シートを生成" },
+      { tool: "pre_submission_checklist", reason: "提出前チェック" },
     ],
   };
 }

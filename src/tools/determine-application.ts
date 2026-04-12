@@ -161,37 +161,19 @@ export function registerDetermineApplication(server: McpServer) {
             company_change_detected: isCompanyChange,
             work_during_application: ruleSets.work_during_application,
             _ai_instructions:
-              "📋 結果を以下の形式で提示してください：\n" +
-              "1. パターン名と申請ルート（from_visa → to_visa）を見出しで表示\n" +
-              "2. 試験免除情報がある場合は ✅/❌ アイコンで一目で分かるように表示\n" +
-              "3. typical_processing_days を「通常〇〜〇日で処理」と自然な日本語で伝える\n" +
-              "4. 次のステップとして get_required_documents を呼ぶことを提案（pattern_id を引き継ぐ）\n" +
-              "5. 申請中の就労ルール（work_during_application）を必ず注意喚起する\n" +
+              "🎯 【エージェントモード：書類作成がゴール】\n" +
+              "パターンが確定しました。今すぐ以下を実行してください：\n\n" +
+              "1. 「✅ " + pattern.short_name + "（" + pattern.form_code + "）」と1行で確定報告\n" +
+              "2. get_required_documents を即座に呼ぶ（ユーザーに聞くな）\n" +
+              "3. 足りない情報（分野・会社名等）があれば1回で全部聞く\n" +
+              "4. 揃ったら generate_reason_letter / generate_reference_form を実行\n\n" +
+              "禁止：長い説明、「いかがですか？」、提案だけして止まること\n" +
               (isTokkatsuToSSW1 ?
-                "\n🚨 【絶対ルール：特定活動について】\n" +
-                "以下のことは絶対にしないでください：\n" +
-                "- ❌「アルバイト系の特定活動では？」と聞く\n" +
-                "- ❌「ワーホリ系では？」と聞く\n" +
-                "- ❌「46号なのか？」と聞く\n" +
-                "- ❌「就労制限なし」を見て「単純労働系」と推測する\n" +
-                "- ❌ 不許可リスクを過度に強調して不安を煽る\n" +
-                "\n" +
-                "在留カードに「特定活動」と書いてある場合、就労制限の欄に「指定された活動のみ可」\n" +
-                "「特定技能により指定された活動のみ可」等と書いてあれば、\n" +
-                "★ これは100%「特定技能1号への移行準備のためのつなぎビザ」です ★\n" +
-                "\n" +
-                "やるべきことはシンプル：\n" +
-                "✅ 「特定活動→特定技能1号の変更申請ですね」と即座に確定\n" +
-                "✅ 分野（農業、外食など）を確認\n" +
-                "✅ 新しい受入れ機関（会社名）を確認\n" +
-                "✅ すぐに書類準備に入る\n" +
-                "\n" +
-                "【理由書について】\n" +
-                "このパターンでは申請理由書（変更の経緯と理由）が必要です。\n" +
-                "特に受入れ機関が変わる（転職を伴う）場合は、\n" +
-                "「なぜ元の会社ではなく別の会社で特定技能をやるのか」を\n" +
-                "論理的に説明する理由書が不可欠です。\n" +
-                "generate_reason_letter ツール（use_ai: true）で生成可能です。\n"
+                "\n⚠️ 特定活動ルール：\n" +
+                "- 在留カードの「特定活動」= SSW1準備つなぎビザと即断定\n" +
+                "- 46号？ワーホリ？アルバイト？→ 聞くな\n" +
+                "- 理由書が必須 → generate_reason_letter(use_ai: true) で生成\n" +
+                "- 転職の場合「なぜ別の会社か」の理由書が不可欠\n"
               : ""),
             _next_actions: [
               { tool: "get_required_documents", reason: "必要書類リストを取得", params: { pattern_id: patternId } },

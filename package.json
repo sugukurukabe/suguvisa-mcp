@@ -1,6 +1,6 @@
 {
   "name": "@sugukuru/suguvisa-mcp",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "日本の特定技能ビザ申請を完全自動化する業界唯一のAI MCPサーバー。24種のツールで申請パターン自動判定・ワンショット完全ガイド・申請理由書AI生成・提出前最終チェックリスト（都道府県別最低賃金対応・管轄入管局特定）・特定技能2号分野別書類チェックリスト（11分野×3雇用形態対応・インタラクティブUI付き）・参考様式テンプレート生成（雇用契約書/雇用条件書/支援計画書等11様式対応）・法人番号API検索・必要書類リスト（省略条件自動適用）・期限計算（14日届出ルール）・在留カードOCR（申請コード自動変換）・オンライン一括申請CSV/Excel生成・紙申請PDFマッピング・法改正追跡・監査ログを提供。プラン別アクセス制御・テナント管理API搭載。Claude/ChatGPT/Cursor/Windsurfに直接組み込み可能。行政書士・登録支援機関・受入れ機関向け。 | The only AI MCP server that fully automates Japan's Specified Skilled Worker (SSW) visa applications. 24 tools including AI-generated reason letters, pre-submission checklists (min wage + immigration office lookup), SSW2 field-specific document checklists (11 fields × 3 employment types), reference form template generation (11 ISA forms), corporate number API lookup, one-shot guide, residence card OCR with auto code conversion, bulk CSV/Excel, and audit logging.",
   "keywords": [
     "mcp",
