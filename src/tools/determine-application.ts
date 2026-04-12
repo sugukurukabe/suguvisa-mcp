@@ -90,6 +90,20 @@ export function registerDetermineApplication(server: McpServer) {
     },
     { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ from_visa, to_visa, context, has_supervisor_experience }) => {
+      // === 特定活動のスマート推論 ===
+      // 在留カードには単に「特定活動」と記載される。ほとんどの場合は特定技能1号への
+      // 移行準備（つなぎビザ）なので、to_visa が未指定 or 特定技能系でない場合は
+      // 自動的に「特定技能1号への変更申請」として処理する。
+      if (from_visa === "特定活動" || from_visa.includes("特定活動")) {
+        // from_visa の正規化 — 「特定活動（46号）」「特定活動（特定技能準備）」等 → 「特定活動」
+        from_visa = "特定活動";
+        
+        // to_visa が指定されていない、または「特定活動」のままの場合 → 特定技能1号を推定
+        if (!to_visa || to_visa === "特定活動" || to_visa === from_visa) {
+          to_visa = "特定技能1号";
+        }
+      }
+
       // 特定技能2号への変更・更新希望だが、実務経験が不足している場合の救済措置（特定活動へのフォールバック）
       if (to_visa === "特定技能2号" && has_supervisor_experience === false) {
         to_visa = "特定活動";
@@ -145,7 +159,12 @@ export function registerDetermineApplication(server: McpServer) {
               "2. 試験免除情報がある場合は ✅/❌ アイコンで一目で分かるように表示\n" +
               "3. typical_processing_days を「通常〇〜〇日で処理」と自然な日本語で伝える\n" +
               "4. 次のステップとして get_required_documents を呼ぶことを提案（pattern_id を引き継ぐ）\n" +
-              "5. 申請中の就労ルール（work_during_application）を必ず注意喚起する",
+              "5. 申請中の就労ルール（work_during_application）を必ず注意喚起する\n" +
+              "\n⚠️ 特定活動に関する重要ルール:\n" +
+              "- 在留カードに「特定活動」と記載されている場合、ほとんどは特定技能1号への移行準備（つなぎビザ）です\n" +
+              "- 「46号なのか？」「その他の特定活動なのか？」などの質問は不要。特定技能1号への変更申請として進めてください\n" +
+              "- 転職（受入れ機関変更）を伴う場合も同じパターンです。追加で退職証明書・新雇用契約書が必要になります\n" +
+              "- 指定書の確認は実務上のアドバイスとして軽く触れる程度でOK",
             _next_actions: [
               { tool: "get_required_documents", reason: "必要書類リストを取得", params: { pattern_id: patternId } },
               { tool: "calculate_deadlines", reason: "期限を計算（在留期限が分かれば）" },
