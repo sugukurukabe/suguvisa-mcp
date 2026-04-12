@@ -1,6 +1,77 @@
 import { z } from "zod";
 import * as codes from "./isa-codes.json";
 
+// ────────────────────────────────────────────────────────
+// 自動変換ユーティリティ（ユーザビリティ改善 v0.4.0）
+// ────────────────────────────────────────────────────────
+
+/** 国名→国籍コード自動変換 (例: 'インドネシア' → 'IDN') */
+const nationalityNameToCode: Record<string, string> = {};
+for (const [code, name] of Object.entries((codes as any).nationality_codes || {})) {
+  nationalityNameToCode[String(name)] = code;
+  nationalityNameToCode[String(name).toLowerCase()] = code;
+}
+// 英語名も対応
+const enNationalityMap: Record<string, string> = {
+  indonesia: "IDN", vietnam: "VNM", philippines: "PHL", china: "CHN",
+  korea: "KOR", myanmar: "MMR", nepal: "NPL", thailand: "THA",
+  cambodia: "KHM", mongolia: "MNG", "sri lanka": "LKA", india: "IND",
+  usa: "USA", "united states": "USA",
+};
+Object.assign(nationalityNameToCode, enNationalityMap);
+
+export const resolveNationalityCode = (val: string): string => {
+  const v = val.trim();
+  // Already a 3-letter code
+  if (/^[A-Z]{3}$/.test(v)) return v;
+  // Lookup by name
+  return nationalityNameToCode[v] || nationalityNameToCode[v.toLowerCase()] || v;
+};
+
+/** 分野名→分野コード自動変換 (例: '農業' → '0100') */
+const fieldNameToCode: Record<string, string> = {};
+for (const [code, name] of Object.entries((codes as any).industry_field_codes || {})) {
+  fieldNameToCode[String(name)] = code;
+}
+const enFieldMap: Record<string, string> = {
+  agriculture: "0100", fishing: "0200", construction: "0300",
+  "food manufacturing": "0400", "food service": "0500",
+  manufacturing: "0600", shipbuilding: "0700", "auto maintenance": "0800",
+  aviation: "0900", accommodation: "1000", "nursing care": "1100",
+  cleaning: "1200", "auto transport": "1300", railway: "1400",
+};
+Object.assign(fieldNameToCode, enFieldMap);
+
+export const resolveIndustryFieldCode = (val: string): string => {
+  const v = val.trim();
+  if (/^\d{4}$/.test(v)) return v;
+  return fieldNameToCode[v] || fieldNameToCode[v.toLowerCase()] || v;
+};
+
+/** パターンIDまたはコンテキストから申請種別を自動推定 */
+export const resolveApplicationType = (val: string): string => {
+  const v = val.trim();
+  if (/^[123]$/.test(v)) return v;
+  const lower = v.toLowerCase();
+  if (lower.includes("認定") || lower.includes("coe") || lower.includes("grant")) return "1";
+  if (lower.includes("更新") || lower.includes("renewal") || lower.includes("renew")) return "2";
+  if (lower.includes("変更") || lower.includes("change")) return "3";
+  return v;
+};
+
+/** 氏名自動分割 (例: 'GILANG PERMANA' → { family: 'PERMANA', given: 'GILANG' }) */
+export const splitRomajiName = (fullName: string): { family: string; given: string } => {
+  const parts = fullName.trim().toUpperCase().split(/\s+/);
+  if (parts.length === 0) return { family: "", given: "" };
+  if (parts.length === 1) return { family: parts[0], given: "" };
+  // Convention: last part = family name, rest = given name(s)
+  // (This matches Indonesian/SEA naming conventions)
+  return {
+    family: parts[parts.length - 1],
+    given: parts.slice(0, -1).join(" "),
+  };
+};
+
 // ユーティリティ: 全角英数字記号を半角に変換
 export const toHankaku = (val?: string): string => {
   if (!val) return "";
@@ -61,12 +132,12 @@ export const parseDateString = (val?: string): string => {
 };
 
 export const officialCsvSchema = z.object({
-  application_type: z.enum(["1", "2", "3"]).describe("申請種別 (1:認定, 2:更新, 3:変更)。エラー時：システムが自動判定できなかった可能性があります。「認定、更新、変更のどれですか？」とユーザーに確認してください。"),
+  application_type: z.string().transform(resolveApplicationType).refine(v => /^[123]$/.test(v), "申請種別は 1(認定), 2(更新), 3(変更) のいずれかです。'認定','更新','変更','change','renewal','coe' でも自動判定します。").describe("申請種別 (1:認定, 2:更新, 3:変更)。'認定', '変更', 'change' などの文字列でも自動変換されます。"),
   
   family_name_romaji: z.string().transform(sanitizeRomaji).refine(v => v.length > 0, "氏（ローマ字）は必須です").describe("氏（ローマ字）大文字"),
   given_name_romaji: z.string().transform(sanitizeRomaji).refine(v => v.length > 0, "名（ローマ字）は必須です").describe("名（ローマ字）大文字"),
   
-  nationality_code: z.string().transform(toHankaku).transform(v => v.toUpperCase()).refine(v => /^[A-Z]{3}$/.test(v), "国籍コードは3桁のアルファベットである必要があります").describe("国籍コード (3桁アルファベット, 例: IDN)"),
+  nationality_code: z.string().transform(toHankaku).transform(resolveNationalityCode).transform(v => v.toUpperCase()).refine(v => /^[A-Z]{3}$/.test(v), "国籍コードは3桁のアルファベットである必要があります。'インドネシア', 'Indonesia' 等の国名でも自動変換されます。").describe("国籍コードまたは国名（例: 'IDN', 'インドネシア', 'Indonesia'）。自動変換されます。"),
   
   date_of_birth: z.string().transform(parseDateString).refine((val) => /^\d{8}$/.test(val), {
     message: "生年月日はYYYYMMDD形式である必要があります",
@@ -97,7 +168,7 @@ export const officialCsvSchema = z.object({
   company_phone: z.string().transform(sanitizePhone).refine(v => v.length > 0, "電話番号は必須です").describe("所属機関電話番号"),
   representative: z.string().min(1).describe("代表者氏名"),
   
-  industry_field_code: z.string().transform(toHankaku).refine(v => /^\d{4}$/.test(v), "分野コードは4桁の半角数字です (例: 0100 for 農業)").describe("指定産業分野コード"),
+  industry_field_code: z.string().transform(toHankaku).transform(resolveIndustryFieldCode).refine(v => /^\d{4}$/.test(v), "分野コードは4桁の半角数字です (例: 0100 for 農業)。'農業', 'agriculture' 等の分野名でも自動変換されます。").describe("産業分野コードまたは分野名（例: '0100', '農業', 'agriculture'）。自動変換されます。"),
   work_description: z.string().min(1).describe("業務区分"),
   
   monthly_salary: z.union([z.number(), z.string()]).transform(v => toHankaku(String(v)).replace(/\D/g, "")).refine(v => v.length > 0, "報酬月額が空または不正です").describe("報酬月額（数字のみ）"),

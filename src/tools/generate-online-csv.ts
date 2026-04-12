@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { officialCsvSchema, OfficialCsvData } from "../data/csv-schema.js";
+import { officialCsvSchema, OfficialCsvData, splitRomajiName, resolveNationalityCode, resolveIndustryFieldCode, resolveApplicationType } from "../data/csv-schema.js";
 
 /**
  * オンライン申請CSV列定義 / Online Application CSV Column Definition
@@ -9,13 +9,49 @@ import { officialCsvSchema, OfficialCsvData } from "../data/csv-schema.js";
  */
 const CSV_COLUMNS = Object.keys(officialCsvSchema.shape) as (keyof OfficialCsvData)[];
 
+/**
+ * 前処理: ユーザーフレンドリーな入力を正式フォーマットに変換
+ * - name_romaji → family_name_romaji + given_name_romaji
+ * - nationality → nationality_code
+ * - industry_field → industry_field_code
+ * - application_type の文字列 → コード
+ */
+function preprocessApplicant(raw: Record<string, any>): Record<string, any> {
+  const data = { ...raw };
+
+  // 氏名フルネームから自動分割
+  if (!data.family_name_romaji && !data.given_name_romaji && (data.name_romaji || data.full_name || data.name)) {
+    const fullName = data.name_romaji || data.full_name || data.name;
+    const { family, given } = splitRomajiName(String(fullName));
+    data.family_name_romaji = family;
+    data.given_name_romaji = given;
+  }
+
+  // 国名から国籍コードに変換
+  if (!data.nationality_code && data.nationality) {
+    data.nationality_code = resolveNationalityCode(String(data.nationality));
+  }
+
+  // 分野名から分野コードに変換
+  if (!data.industry_field_code && data.industry_field) {
+    data.industry_field_code = resolveIndustryFieldCode(String(data.industry_field));
+  }
+
+  // 申請種別の文字列→コード変換
+  if (data.application_type && !/^[123]$/.test(String(data.application_type))) {
+    data.application_type = resolveApplicationType(String(data.application_type));
+  }
+
+  return data;
+}
+
 export function registerGenerateOnlineCsv(server: McpServer) {
   server.tool(
     "generate_online_csv",
-    "【オンライン申請CSV生成】入管オンライン申請システムに直接アップロード可能なCSVデータを生成。日付(YYYYMMDD)・コード値の自動変換、必須フィールドの厳格チェック、複数申請人の一括処理に対応。 / Generates ISA-compatible CSV for online batch submission with strict field validation and auto-formatting.",
+    "【オンライン申請CSV生成】入管オンライン申請システムに直接アップロード可能なCSVデータを生成。国名・分野名・フルネームからの自動変換対応。日付(YYYYMMDD)・コード値の自動変換、必須フィールドの厳格チェック、複数申請人の一括処理に対応。 / Generates ISA-compatible CSV for online batch submission with strict field validation, auto-formatting, and smart field conversion.",
     {
       applicants: z.array(z.record(z.any())).describe(
-        "申請人データの配列。各オブジェクトのキー: " + CSV_COLUMNS.join(", ") + "\n※日付は「2000年7月7日」といった自然言語でもパースを試みますが、エラーが出た場合はYYYYMMDDで再入力してください。"
+        "申請人データの配列。各オブジェクトのキー: " + CSV_COLUMNS.join(", ") + "\n※name_romaji からの氏名自動分割、nationality からの国籍コード自動変換、industry_field からの分野コード自動変換に対応。\n※日付は「2000年7月7日」といった自然言語でもパースを試みます。"
       ),
     },
     { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
@@ -36,7 +72,8 @@ export function registerGenerateOnlineCsv(server: McpServer) {
       const errors: string[] = [];
 
       applicants.forEach((a, index) => {
-        const parsed = officialCsvSchema.safeParse(a);
+        const preprocessed = preprocessApplicant(a);
+        const parsed = officialCsvSchema.safeParse(preprocessed);
         
         if (!parsed.success) {
           const fieldErrors = parsed.error.issues.map(issue => `${issue.path.join(".")}: ${issue.message}`);

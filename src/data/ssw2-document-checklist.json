@@ -1,0 +1,636 @@
+{
+  "_metadata": {
+    "title": "特定技能2号 在留資格認定証明書交付申請 / 在留資格変更許可申請 必要書類一覧",
+    "version": "2026-04-01",
+    "source": "出入国在留管理庁 令和8年4月1日改定",
+    "description": "分野・雇用形態別の必要書類チェックリスト。source=auto_generateはMCPが自動生成可能、source=user_prepareはユーザーが用意する書類。"
+  },
+
+  "fields": {
+    "building_cleaning":   { "name": "ビルクリーニング", "table": "3-1", "has_dispatch": false },
+    "manufacturing":       { "name": "工業製品製造業", "table": "3-2", "has_dispatch": false },
+    "construction":        { "name": "建設", "table": "3-3", "has_dispatch": false },
+    "shipbuilding":        { "name": "造船・舶用工業", "table": "3-4", "has_dispatch": false },
+    "auto_maintenance":    { "name": "自動車整備", "table": "3-5", "has_dispatch": false },
+    "aviation":            { "name": "航空", "table": "3-6", "has_dispatch": false },
+    "accommodation":       { "name": "宿泊", "table": "3-7", "has_dispatch": false },
+    "agriculture":         { "name": "農業", "table": "3-8", "has_dispatch": true },
+    "fishery":             { "name": "漁業", "table": "3-9", "has_dispatch": true },
+    "food_manufacturing":  { "name": "飲食料品製造業", "table": "3-10", "has_dispatch": false },
+    "food_service":        { "name": "外食業", "table": "3-11", "has_dispatch": false }
+  },
+
+  "common_documents": {
+    "title": "共通書類（全分野共通・第1表）",
+    "description": "申請種別（COE交付申請/変更許可申請）に関わらず全申請に必要な書類",
+    "docs": [
+      {
+        "id": "common-1",
+        "no": 1,
+        "name": "申請人名簿",
+        "name_en": "Applicant List",
+        "source": "auto_generate",
+        "form_ref": null,
+        "issuer": null,
+        "skip_condition": null,
+        "description": "申請対象の外国人の氏名・国籍・生年月日等を一覧にした名簿。複数人の同時申請時に必要。",
+        "required_info": ["applicant_name", "nationality", "date_of_birth", "residence_card_number"]
+      },
+      {
+        "id": "common-2",
+        "no": 2,
+        "name": "「特定技能２号」に係る提出書類一覧表",
+        "name_en": "Document Checklist for SSW2",
+        "source": "auto_generate",
+        "form_ref": null,
+        "issuer": null,
+        "skip_condition": null,
+        "description": "COE交付申請用/変更許可申請用のチェックリスト。どの書類を提出するかを一覧で示す。",
+        "required_info": ["application_type"]
+      },
+      {
+        "id": "common-3",
+        "no": 3,
+        "name": "在留資格変更許可申請書 / 在留資格認定証明書交付申請書",
+        "name_en": "Application Form (Form No. 30-5)",
+        "source": "auto_generate",
+        "form_ref": "別記第30号の5様式",
+        "issuer": null,
+        "skip_condition": null,
+        "description": "入管への主申請書。申請人・所属機関の基本情報、活動内容、在留期間を記載。",
+        "required_info": [
+          "applicant_name", "applicant_name_kanji", "nationality", "date_of_birth", "gender",
+          "address_in_japan", "phone", "passport_number", "passport_expiry",
+          "residence_card_number", "current_visa_type", "current_visa_expiry",
+          "desired_period", "purpose_of_entry",
+          "company_name", "company_address", "company_phone", "company_representative",
+          "corporate_number", "job_description", "salary", "contract_period_start", "contract_period_end"
+        ]
+      },
+      {
+        "id": "common-4",
+        "no": 4,
+        "name": "特定技能外国人の報酬に関する説明書",
+        "name_en": "Statement of Remuneration for SSW",
+        "source": "auto_generate",
+        "form_ref": "参考様式第1-4号",
+        "issuer": null,
+        "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+        "description": "外国人の報酬が日本人と同等以上であることを説明する書類。基本給・手当・賞与の内訳と比較対象の日本人従業員の情報を記載。",
+        "required_info": [
+          "applicant_name", "job_title", "basic_salary", "allowances",
+          "bonus", "total_annual_pay", "comparison_japanese_employee_name",
+          "comparison_japanese_salary", "comparison_japanese_job_title",
+          "pay_calculation_method"
+        ]
+      },
+      {
+        "id": "common-5",
+        "no": 5,
+        "name": "特定技能雇用契約書の写し",
+        "name_en": "Copy of SSW Employment Contract",
+        "source": "auto_generate",
+        "form_ref": "参考様式第1-5号",
+        "issuer": null,
+        "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+        "description": "特定技能外国人と所属機関との雇用契約書。業務内容・雇用期間・労働時間・報酬・社会保険等を明記。",
+        "required_info": [
+          "applicant_name", "company_name", "company_representative",
+          "job_description", "work_location", "contract_period_start", "contract_period_end",
+          "working_hours_per_week", "holidays", "salary", "overtime_rate",
+          "social_insurance_coverage", "dismissal_conditions"
+        ]
+      },
+      {
+        "id": "common-6",
+        "no": 6,
+        "name": "雇用条件書の写し",
+        "name_en": "Copy of Employment Conditions Statement",
+        "source": "auto_generate",
+        "form_ref": "参考様式第1-6号",
+        "issuer": null,
+        "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+        "description": "労働基準法に基づく雇用条件の明示書。母国語併記が望ましい。勤務時間・休日・賃金・退職条件等を詳細に記載。",
+        "required_info": [
+          "applicant_name", "company_name", "work_location",
+          "job_description_detail", "contract_period_start", "contract_period_end",
+          "working_hours_start", "working_hours_end", "break_time",
+          "holidays_per_week", "annual_paid_leave", "salary_monthly",
+          "salary_deductions", "overtime_rate", "night_work_rate",
+          "holiday_work_rate", "pay_date", "pay_method",
+          "retirement_rules", "social_insurance_details"
+        ]
+      },
+      {
+        "id": "common-7",
+        "no": 7,
+        "name": "雇用の経緯に係る説明書",
+        "name_en": "Statement on Employment Background",
+        "source": "auto_generate",
+        "form_ref": "参考様式第1-16号",
+        "issuer": null,
+        "skip_condition": null,
+        "description": "外国人の採用経緯（紹介元、求人方法、面接方法）と、保証金・違約金の徴収がないことを説明する書類。",
+        "required_info": [
+          "applicant_name", "recruitment_method", "recruitment_agency_name",
+          "recruitment_agency_address", "recruitment_fee_amount",
+          "no_deposit_guarantee", "no_penalty_clause",
+          "interview_date", "interview_method"
+        ]
+      },
+      {
+        "id": "common-8",
+        "no": 8,
+        "name": "健康診断個人票",
+        "name_en": "Health Examination Form",
+        "source": "user_prepare",
+        "form_ref": "参考様式第1-3号",
+        "issuer": "医療機関",
+        "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+        "description": "受入れ前の健康診断結果。労安法に基づく11項目の健診を受けた個人票。3ヶ月以内のものが望ましい。",
+        "required_info": ["applicant_name", "examination_date", "medical_institution_name"]
+      },
+      {
+        "id": "common-9",
+        "no": 9,
+        "name": "個人住民税の納税証明書（直近1年度分）",
+        "name_en": "Certificate of Individual Resident Tax Payment",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "市区町村",
+        "skip_condition": null,
+        "description": "申請人の個人住民税の納付状況を証明する書類。全ての納期が経過している直近1年度分のもの。",
+        "required_info": ["applicant_name", "municipality"]
+      },
+      {
+        "id": "common-10",
+        "no": 10,
+        "name": "個人住民税の課税証明書",
+        "name_en": "Certificate of Individual Resident Tax Assessment",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "市区町村",
+        "skip_condition": null,
+        "description": "納税証明書と同一年度の課税状況を示す証明書。給与所得の内容も確認される。",
+        "required_info": ["applicant_name", "municipality"]
+      },
+      {
+        "id": "common-11",
+        "no": 11,
+        "name": "給与所得の源泉徴収票の写し",
+        "name_en": "Copy of Withholding Tax Certificate",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "雇用主",
+        "skip_condition": null,
+        "description": "課税証明書と同一年の源泉徴収票。給与額・控除額の確認に使用。",
+        "required_info": ["applicant_name"]
+      },
+      {
+        "id": "common-12",
+        "no": 12,
+        "name": "医療保険の資格情報 / 資格確認書の写し",
+        "name_en": "Copy of Health Insurance Qualification",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "マイナポータル / 保険者",
+        "skip_condition": null,
+        "description": "マイナポータルからダウンロードした医療保険の資格情報、または資格確認書の写し。健康保険加入状況の確認。",
+        "required_info": ["applicant_name"]
+      },
+      {
+        "id": "common-13",
+        "no": 13,
+        "name": "国民健康保険料（税）納付証明書（直近1年度分）",
+        "name_en": "National Health Insurance Premium Payment Certificate",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "市区町村",
+        "skip_condition": "社会保険加入者（被扶養者含む）の場合は不要",
+        "description": "国保加入者の場合に必要。直近1年度分の保険料納付状況を証明する。",
+        "required_info": ["applicant_name", "municipality"]
+      },
+      {
+        "id": "common-14",
+        "no": 14,
+        "name": "被保険者記録照会回答票",
+        "name_en": "Insured Person Record Inquiry",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "日本年金機構 / 年金事務所",
+        "skip_condition": null,
+        "description": "年金加入記録の照会票。厚生年金・国民年金の加入期間・保険料納付状況を確認。",
+        "required_info": ["applicant_name", "basic_pension_number"]
+      },
+      {
+        "id": "common-15",
+        "no": 15,
+        "name": "被保険者記録照会（納付Ⅱ）/ 国民年金保険料領収証書の写し",
+        "name_en": "Pension Payment Record / Premium Receipts",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "日本年金機構 / 年金事務所",
+        "skip_condition": null,
+        "description": "年金保険料の納付状況を証明。「納付Ⅱ」または申請日の前々月までの24か月分の領収証書。",
+        "required_info": ["applicant_name", "basic_pension_number"]
+      },
+      {
+        "id": "common-16",
+        "no": 16,
+        "name": "前回申請時に履行すべきであった公的義務に係る書類",
+        "name_en": "Documents on Public Obligations from Previous Application",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "各種",
+        "skip_condition": "初回申請の場合不要",
+        "description": "前回申請時に未履行だった税・社会保険等の公的義務がある場合、その履行を証明する書類。",
+        "required_info": ["applicant_name"]
+      },
+      {
+        "id": "common-17",
+        "no": 17,
+        "name": "公的義務履行に関する誓約書",
+        "name_en": "Oath on Public Obligation Compliance",
+        "source": "auto_generate",
+        "form_ref": "参考様式第1-26号",
+        "issuer": null,
+        "skip_condition": null,
+        "description": "税金・社会保険料等の公的義務を今後も適正に履行することを誓約する書類。",
+        "required_info": ["applicant_name", "company_name"]
+      },
+      {
+        "id": "common-18",
+        "no": 18,
+        "name": "技能移転に係る申告書",
+        "name_en": "Declaration on Skill Transfer",
+        "source": "auto_generate",
+        "form_ref": "参考様式第1-10号",
+        "issuer": null,
+        "skip_condition": null,
+        "description": "帰国後の技能移転に関する計画を記載する申告書。母国での技能活用計画を示す。",
+        "required_info": ["applicant_name", "home_country", "skill_transfer_plan"]
+      },
+      {
+        "id": "common-19",
+        "no": 19,
+        "name": "二国間取決において定められた遵守すべき手続に係る書類",
+        "name_en": "Documents on Bilateral Agreement Procedures",
+        "source": "user_prepare",
+        "form_ref": null,
+        "issuer": "送出国の認定機関",
+        "skip_condition": "二国間取決が存在しない国からの申請の場合不要",
+        "description": "出身国との二国間協力覚書（MOC）に基づく手続書類。例：フィリピンのPOEA認定、ベトナムのDOLAB推薦状等。",
+        "required_info": ["applicant_nationality", "sending_country_agency"]
+      }
+    ]
+  },
+
+  "organization_documents": {
+    "corporate": {
+      "title": "所属機関に関する必要書類（法人）・第2表の2",
+      "docs": [
+        {
+          "id": "org-corp-1",
+          "no": 1,
+          "name": "特定技能所属機関概要書",
+          "name_en": "Outline of SSW Accepting Organization",
+          "source": "auto_generate",
+          "form_ref": "参考様式第1-11-1号",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "所属機関の沿革・事業内容・資本金・従業員数・外国人雇用実績等を記載する概要書。",
+          "required_info": ["company_name", "corporate_number", "company_address", "company_phone", "company_representative", "capital", "employee_count", "foreign_employee_count", "business_description", "establishment_date"]
+        },
+        {
+          "id": "org-corp-2",
+          "no": 2,
+          "name": "登記事項証明書",
+          "name_en": "Certificate of Registered Matters",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "法務局",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "法人の登記事項（商号・本店所在地・役員等）を証明する書類。発行後3ヶ月以内のもの。",
+          "required_info": ["company_name"]
+        },
+        {
+          "id": "org-corp-3",
+          "no": 3,
+          "name": "業務執行に関与する役員の住民票の写し",
+          "name_en": "Resident Card Copy of Executive Officers",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "市区町村",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "代表取締役や業務執行役員全員の住民票。マイナンバー記載不要。",
+          "required_info": ["officer_names"]
+        },
+        {
+          "id": "org-corp-4",
+          "no": 4,
+          "name": "特定技能所属機関の役員に関する誓約書",
+          "name_en": "Oath Regarding Officers of SSW Organization",
+          "source": "auto_generate",
+          "form_ref": "参考様式第1-23号",
+          "skip_condition": null,
+          "description": "役員が暴力団関連者でないこと等を誓約する書類。",
+          "required_info": ["company_name", "company_representative", "officer_names"]
+        },
+        {
+          "id": "org-corp-5",
+          "no": 5,
+          "name": "労働保険料等納付証明書（未納なし証明）",
+          "name_en": "Labor Insurance Premium Payment Certificate",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "労働局",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "労災保険・雇用保険の保険料が未納でないことを証明する書類。",
+          "required_info": ["company_name"]
+        },
+        {
+          "id": "org-corp-6",
+          "no": 6,
+          "name": "社会保険料納入状況回答票 / 健保・厚年保険料領収証書の写し",
+          "name_en": "Social Insurance Payment Status / Receipts",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "日本年金機構 / 年金事務所",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "社会保険料（健康保険・厚生年金）の納入状況。回答票か申請日の前々月までの24か月分の領収証書。",
+          "required_info": ["company_name"]
+        },
+        {
+          "id": "org-corp-7",
+          "no": 7,
+          "name": "納税証明書（その３）",
+          "name_en": "Tax Payment Certificate (No. 3)",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "税務署",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "法人税・消費税等に未納がないことを証明する税務署発行の証明書。",
+          "required_info": ["company_name"]
+        },
+        {
+          "id": "org-corp-8",
+          "no": 8,
+          "name": "法人住民税の納税証明書（直近2年度分）",
+          "name_en": "Corporate Resident Tax Certificate (Past 2 years)",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "市区町村",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "法人住民税（道府県民税・市町村民税）の納付証明書。直近2年度分が必要。",
+          "required_info": ["company_name", "municipality"]
+        }
+      ]
+    },
+    "sole_proprietor": {
+      "title": "所属機関に関する必要書類（個人事業主）・第2表の3",
+      "docs": [
+        {
+          "id": "org-sole-1",
+          "no": 1,
+          "name": "特定技能所属機関概要書",
+          "source": "auto_generate",
+          "form_ref": "参考様式第1-11-1号",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "事業の概要・沿革・従業員数等を記載。",
+          "required_info": ["company_name", "company_address", "company_phone", "business_description"]
+        },
+        {
+          "id": "org-sole-2",
+          "no": 2,
+          "name": "個人事業主の住民票の写し",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "市区町村",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "個人事業主本人の住民票。マイナンバー記載不要。",
+          "required_info": ["owner_name"]
+        },
+        {
+          "id": "org-sole-3",
+          "no": 3,
+          "name": "労働保険料等納付証明書（未納なし証明）",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "労働局",
+          "skip_condition": "労働保険の適用事業所の場合のみ",
+          "description": "適用事業所の場合に必要。労災・雇用保険の保険料未納がないことの証明。",
+          "required_info": ["owner_name"]
+        },
+        {
+          "id": "org-sole-4",
+          "no": 4,
+          "name": "社会保険料納入状況回答票 / 保険料領収証書の写し",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "日本年金機構 / 年金事務所",
+          "skip_condition": "健保・厚年の適用事業所の場合のみ",
+          "description": "社保適用事業所の場合に必要。回答票か24か月分の領収証書。",
+          "required_info": ["owner_name"]
+        },
+        {
+          "id": "org-sole-5",
+          "no": 5,
+          "name": "個人事業主の納税証明書（その３）",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "税務署",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "所得税等に未納がないことの証明書。",
+          "required_info": ["owner_name"]
+        },
+        {
+          "id": "org-sole-6",
+          "no": 6,
+          "name": "個人住民税の納税証明書（直近2年度分）",
+          "source": "user_prepare",
+          "form_ref": null,
+          "issuer": "市区町村",
+          "skip_condition": "過去1年以内の申請で提出済み＋内容変更なしの場合省略可",
+          "description": "個人事業主本人の住民税納付証明。直近2年度分。",
+          "required_info": ["owner_name", "municipality"]
+        }
+      ]
+    }
+  },
+
+  "field_specific_documents": {
+    "building_cleaning": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "bc-1", "no": 1, "name": "ビルクリーニング分野特定技能２号評価試験の合格証明書の写し / 技能検定１級の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関", "description": "2号試験または技能検定1級の合格を証明。", "skip_condition": "過去の申請で提出済みの場合省略可" },
+        { "id": "bc-2", "no": 2, "name": "ビルクリーニング分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第2-1号", "description": "所属機関がビルクリーニング分野の基準を遵守することを誓約。" },
+        { "id": "bc-3", "no": 3, "name": "建築物清掃業登録証明書の写し / 建築物環境衛生総合管理業登録証明書の写し", "source": "user_prepare", "issuer": "都道府県", "description": "ビルメンテナンス業の登録を証明する書類。", "skip_condition": "過去1年以内の申請で提出済みの場合省略可" },
+        { "id": "bc-4", "no": 4, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会", "description": "ビルクリーニング分野の協議会に所属していることの証明。" }
+      ]
+    },
+    "manufacturing": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "mf-1", "no": 1, "name": "製造分野特定技能２号評価試験の合格証明書の写し / 技能検定１級の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関", "description": "2号試験または技能検定1級の合格を証明。" },
+        { "id": "mf-2", "no": 2, "name": "工業製品製造業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第3-1号", "description": "所属機関が当該分野の基準を遵守することを誓約。" },
+        { "id": "mf-3", "no": 3, "name": "JAIMの構成員名簿を印刷したもの", "source": "user_prepare", "issuer": "JAIM", "description": "JAIMホームページの構成員名簿に所属機関と就業場所が掲載されていることを示す資料。" }
+      ]
+    },
+    "construction": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "cn-1", "no": 1, "name": "建設分野特定技能２号評価試験の合格証明書の写し / 技能検定１級の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関", "description": "2号試験または技能検定1級の合格を証明。" },
+        { "id": "cn-2", "no": 2, "name": "実務経験に係る申告書 / 建設キャリアアップシステム レベル３の能力評価結果通知書の写し", "source": "user_prepare", "issuer": "建設キャリアアップシステム / 分野参考様式第6-3号", "description": "業務区分に対応するCCUSレベル3判定、または所定の実務経験申告書。" },
+        { "id": "cn-3", "no": 3, "name": "建設分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第6-1号", "description": "建設業法・安全衛生管理等の基準遵守を誓約。" },
+        { "id": "cn-4", "no": 4, "name": "建設分野における２号特定技能外国人特定技能雇用契約の相手方となる本邦の公私の機関に関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第6-2号", "description": "雇用主側の適格性を誓約する書類。" },
+        { "id": "cn-5", "no": 5, "name": "建設業法第３条第１項の許可を受けていることを証する書類", "source": "user_prepare", "issuer": "都道府県 / 国土交通省", "description": "建設業許可証の写し。一般建設業許可・特定建設業許可のいずれか。" },
+        { "id": "cn-6", "no": 6, "name": "建設キャリアアップシステム申請番号又は事業者ＩＤを明らかにする書類", "source": "user_prepare", "issuer": "CCUS", "description": "CCUS登録後に送付されるハガキ・メール等の写し。" },
+        { "id": "cn-7", "no": 7, "name": "JACの会員証の写し / JAC入会建設業者団体の会員証の写し", "source": "user_prepare", "issuer": "JAC", "description": "建設技能人材機構（JAC）またはJAC加入団体の会員であることの証明。" }
+      ]
+    },
+    "shipbuilding": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "sb-1", "no": 1, "name": "造船・舶用工業分野特定技能２号試験の合格証明書の写し / 技能検定１級の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "sb-2", "no": 2, "name": "造船・舶用工業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第7-1号" },
+        { "id": "sb-3", "no": 3, "name": "造船・舶用工業事業者の確認通知書", "source": "user_prepare", "issuer": "国土交通省" },
+        { "id": "sb-4", "no": 4, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ]
+    },
+    "auto_maintenance": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "am-1", "no": 1, "name": "自動車整備分野特定技能２号評価試験の合格証明書の写し / 自動車整備士技能検定２級の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "am-2", "no": 2, "name": "自動車整備分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第8-1号" },
+        { "id": "am-3", "no": 3, "name": "自動車整備分野特定技能協議会入会届出書兼構成員資格証明書 / 構成員資格証明書発行申請書", "source": "user_prepare", "issuer": "協議会" }
+      ]
+    },
+    "aviation": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "av-1", "no": 1, "name": "航空分野特定技能２号評価試験の合格証明書の写し / 航空整備士の資格を有することを証する書類", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "av-2", "no": 2, "name": "航空分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第9-1号" },
+        { "id": "av-3", "no": 3, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ]
+    },
+    "accommodation": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "ac-1", "no": 1, "name": "宿泊分野特定技能２号評価試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "ac-2", "no": 2, "name": "宿泊分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第10-1号" },
+        { "id": "ac-3", "no": 3, "name": "旅館・ホテル営業の営業許可証の写し", "source": "user_prepare", "issuer": "保健所" },
+        { "id": "ac-4", "no": 4, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ]
+    },
+    "agriculture": {
+      "employment_types": ["direct", "dispatch_corporate", "dispatch_individual"],
+      "direct": [
+        { "id": "ag-d-1", "no": 1, "name": "２号農業技能測定試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関", "skip_condition": "過去の申請で提出済みの場合省略可" },
+        { "id": "ag-d-2", "no": 2, "name": "農業分野において直接雇用形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書", "source": "auto_generate", "form_ref": "分野参考様式第11-1号" },
+        { "id": "ag-d-3", "no": 3, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ],
+      "dispatch_corporate": [
+        { "id": "ag-dc-1", "no": 1, "name": "２号農業技能測定試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "ag-dc-2", "no": 2, "name": "農業分野において派遣形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書", "source": "auto_generate", "form_ref": "分野参考様式第11-3号" },
+        { "id": "ag-dc-3", "no": 3, "name": "派遣元が農業関連業務を行っていることの証明書類", "source": "user_prepare", "description": "定款・登記事項証明書・営農証明書・耕作証明書・決算書類等。5パターンの中から該当するもの。" },
+        { "id": "ag-dc-4", "no": 4, "name": "労働者派遣事業許可証の写し", "source": "user_prepare", "issuer": "厚生労働省" },
+        { "id": "ag-dc-5", "no": 5, "name": "派遣計画書", "source": "auto_generate", "form_ref": "参考様式第1-12号" },
+        { "id": "ag-dc-6", "no": 6, "name": "労働者派遣契約書の写し", "source": "user_prepare" },
+        { "id": "ag-dc-7", "no": 7, "name": "就業条件明示書の写し", "source": "auto_generate", "form_ref": "参考様式第1-13号" },
+        { "id": "ag-dc-8", "no": 8, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" },
+        { "id": "ag-dc-9", "no": 9, "name": "派遣先の概要書（農業分野）", "source": "auto_generate", "form_ref": "参考様式第1-14号" },
+        { "id": "ag-dc-10", "no": 10, "name": "派遣先事業者誓約書", "source": "auto_generate", "form_ref": "分野参考様式第11-2号" },
+        { "id": "ag-dc-11", "no": 11, "name": "労働保険料等納付証明書（未納なし証明）", "source": "user_prepare", "issuer": "労働局", "skip_condition": "初回受入れ時のみ" },
+        { "id": "ag-dc-12", "no": 12, "name": "社会保険料納入状況回答票 / 保険料領収証書の写し", "source": "user_prepare", "issuer": "日本年金機構" },
+        { "id": "ag-dc-13", "no": 13, "name": "納税証明書（その３）", "source": "user_prepare", "issuer": "税務署" },
+        { "id": "ag-dc-14", "no": 14, "name": "法人住民税の納税証明書（直近2年度分）", "source": "user_prepare", "issuer": "市区町村" },
+        { "id": "ag-dc-15", "no": 15, "name": "公的義務履行に関する説明書", "source": "auto_generate", "form_ref": "参考様式第1-27号" }
+      ],
+      "dispatch_individual": [
+        { "id": "ag-di-1", "no": 1, "name": "２号農業技能測定試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "ag-di-2", "no": 2, "name": "農業分野において派遣形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書", "source": "auto_generate", "form_ref": "分野参考様式第11-3号" },
+        { "id": "ag-di-3", "no": 3, "name": "派遣元が農業関連業務を行っていることの証明書類", "source": "user_prepare" },
+        { "id": "ag-di-4", "no": 4, "name": "労働者派遣事業許可証の写し", "source": "user_prepare", "issuer": "厚生労働省" },
+        { "id": "ag-di-5", "no": 5, "name": "派遣計画書", "source": "auto_generate", "form_ref": "参考様式第1-12号" },
+        { "id": "ag-di-6", "no": 6, "name": "労働者派遣契約書の写し", "source": "user_prepare" },
+        { "id": "ag-di-7", "no": 7, "name": "就業条件明示書の写し", "source": "auto_generate", "form_ref": "参考様式第1-13号" },
+        { "id": "ag-di-8", "no": 8, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" },
+        { "id": "ag-di-9", "no": 9, "name": "派遣先の概要書（農業分野）", "source": "auto_generate", "form_ref": "参考様式第1-14号" },
+        { "id": "ag-di-10", "no": 10, "name": "派遣先事業者誓約書", "source": "auto_generate", "form_ref": "分野参考様式第11-2号" },
+        { "id": "ag-di-11", "no": 11, "name": "労働保険料等納付証明書（未納なし証明）", "source": "user_prepare", "issuer": "労働局" },
+        { "id": "ag-di-12", "no": 12, "name": "社会保険料納入状況回答票 / 保険料領収証書の写し", "source": "user_prepare" },
+        { "id": "ag-di-13", "no": 13, "name": "個人事業主の納税証明書（その３）", "source": "user_prepare", "issuer": "税務署" },
+        { "id": "ag-di-14", "no": 14, "name": "個人住民税の納税証明書（直近2年度分）", "source": "user_prepare", "issuer": "市区町村" },
+        { "id": "ag-di-15", "no": 15, "name": "公的義務履行に関する説明書", "source": "auto_generate", "form_ref": "参考様式第1-27号" }
+      ]
+    },
+    "fishery": {
+      "employment_types": ["direct", "dispatch_corporate", "dispatch_individual"],
+      "direct": [
+        { "id": "fs-d-1", "no": 1, "name": "２号漁業技能測定試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "fs-d-2", "no": 2, "name": "日本語能力試験（Ｎ３以上）の合格証明書の写し", "source": "user_prepare", "issuer": "日本語能力試験実施委員会" },
+        { "id": "fs-d-3", "no": 3, "name": "漁業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第12-1号" },
+        { "id": "fs-d-4", "no": 4, "name": "漁業の許可証・免許の指令書の写し", "source": "user_prepare", "description": "所属機関が漁業許可/免許を受けている場合。漁協所属の場合は組合発行書類。" },
+        { "id": "fs-d-5", "no": 5, "name": "漁船原簿謄本の写し / 漁船登録票の写し", "source": "user_prepare", "skip_condition": "漁船を使用する場合のみ" },
+        { "id": "fs-d-6", "no": 6, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ],
+      "dispatch_corporate": [
+        { "id": "fs-dc-1", "no": 1, "name": "２号漁業技能測定試験の合格証明書の写し", "source": "user_prepare" },
+        { "id": "fs-dc-2", "no": 2, "name": "日本語能力試験（Ｎ３以上）の合格証明書の写し", "source": "user_prepare" },
+        { "id": "fs-dc-3", "no": 3, "name": "漁業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第12-1号" },
+        { "id": "fs-dc-4", "no": 4, "name": "漁業の許可証・免許の指令書の写し", "source": "user_prepare" },
+        { "id": "fs-dc-5", "no": 5, "name": "漁船原簿謄本の写し / 漁船登録票の写し", "source": "user_prepare", "skip_condition": "漁船を使用する場合のみ" },
+        { "id": "fs-dc-6", "no": 6, "name": "派遣元が漁業関連業務を行っていることの証明書類", "source": "user_prepare" },
+        { "id": "fs-dc-7", "no": 7, "name": "労働者派遣事業許可証の写し", "source": "user_prepare" },
+        { "id": "fs-dc-8", "no": 8, "name": "派遣計画書", "source": "auto_generate", "form_ref": "参考様式第1-12号" },
+        { "id": "fs-dc-9", "no": 9, "name": "労働者派遣契約書の写し", "source": "user_prepare" },
+        { "id": "fs-dc-10", "no": 10, "name": "就業条件明示書の写し", "source": "auto_generate", "form_ref": "参考様式第1-13号" },
+        { "id": "fs-dc-11", "no": 11, "name": "協議会の構成員であることの証明書", "source": "user_prepare" },
+        { "id": "fs-dc-12", "no": 12, "name": "派遣先の概要書（漁業分野）", "source": "auto_generate" },
+        { "id": "fs-dc-13", "no": 13, "name": "労働保険料等納付証明書（未納なし証明）", "source": "user_prepare" },
+        { "id": "fs-dc-14", "no": 14, "name": "社会保険料納入状況回答票 / 保険料領収証書の写し", "source": "user_prepare" },
+        { "id": "fs-dc-15", "no": 15, "name": "納税証明書（その３）", "source": "user_prepare" },
+        { "id": "fs-dc-16", "no": 16, "name": "法人住民税の納税証明書（直近2年度分）", "source": "user_prepare" },
+        { "id": "fs-dc-17", "no": 17, "name": "公的義務履行に関する説明書", "source": "auto_generate", "form_ref": "参考様式第1-27号" }
+      ],
+      "dispatch_individual": [
+        { "id": "fs-di-1", "no": 1, "name": "２号漁業技能測定試験の合格証明書の写し", "source": "user_prepare" },
+        { "id": "fs-di-2", "no": 2, "name": "日本語能力試験（Ｎ３以上）の合格証明書の写し", "source": "user_prepare" },
+        { "id": "fs-di-3", "no": 3, "name": "漁業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第12-1号" },
+        { "id": "fs-di-4", "no": 4, "name": "漁業の許可証・免許の指令書の写し", "source": "user_prepare" },
+        { "id": "fs-di-5", "no": 5, "name": "漁船原簿謄本の写し / 漁船登録票の写し", "source": "user_prepare" },
+        { "id": "fs-di-6", "no": 6, "name": "派遣元が漁業関連業務を行っていることの証明書類", "source": "user_prepare" },
+        { "id": "fs-di-7", "no": 7, "name": "労働者派遣事業許可証の写し", "source": "user_prepare" },
+        { "id": "fs-di-8", "no": 8, "name": "派遣計画書", "source": "auto_generate", "form_ref": "参考様式第1-12号" },
+        { "id": "fs-di-9", "no": 9, "name": "労働者派遣契約書の写し", "source": "user_prepare" },
+        { "id": "fs-di-10", "no": 10, "name": "就業条件明示書の写し", "source": "auto_generate", "form_ref": "参考様式第1-13号" },
+        { "id": "fs-di-11", "no": 11, "name": "協議会の構成員であることの証明書", "source": "user_prepare" },
+        { "id": "fs-di-12", "no": 12, "name": "派遣先の概要書（漁業分野）", "source": "auto_generate" },
+        { "id": "fs-di-13", "no": 13, "name": "労働保険料等納付証明書（未納なし証明）", "source": "user_prepare" },
+        { "id": "fs-di-14", "no": 14, "name": "社会保険料納入状況回答票 / 保険料領収証書の写し", "source": "user_prepare" },
+        { "id": "fs-di-15", "no": 15, "name": "個人事業主の納税証明書（その３）", "source": "user_prepare" },
+        { "id": "fs-di-16", "no": 16, "name": "個人住民税の納税証明書（直近2年度分）", "source": "user_prepare" },
+        { "id": "fs-di-17", "no": 17, "name": "公的義務履行に関する説明書", "source": "auto_generate", "form_ref": "参考様式第1-27号" }
+      ]
+    },
+    "food_manufacturing": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "fm-1", "no": 1, "name": "飲食料品製造業特定技能２号技能測定試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "fm-2", "no": 2, "name": "飲食料品製造業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第13-1号" },
+        { "id": "fm-3", "no": 3, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ]
+    },
+    "food_service": {
+      "employment_types": ["direct"],
+      "direct": [
+        { "id": "fo-1", "no": 1, "name": "外食業特定技能２号技能測定試験の合格証明書の写し", "source": "user_prepare", "issuer": "試験実施機関" },
+        { "id": "fo-2", "no": 2, "name": "日本語能力試験（Ｎ３以上）の合格証明書の写し", "source": "user_prepare", "issuer": "日本語能力試験実施委員会" },
+        { "id": "fo-3", "no": 3, "name": "外食業分野における特定技能外国人の受入れに関する誓約書", "source": "auto_generate", "form_ref": "分野参考様式第14-1号" },
+        { "id": "fo-4", "no": 4, "name": "飲食店営業の営業許可証又は届出書の写し", "source": "user_prepare", "issuer": "保健所" },
+        { "id": "fo-5", "no": 5, "name": "旅館・ホテル営業の営業許可証の写し", "source": "user_prepare", "issuer": "保健所", "skip_condition": "ホテル内レストラン等の場合のみ" },
+        { "id": "fo-6", "no": 6, "name": "風俗営業の営業許可証の写し", "source": "user_prepare", "issuer": "公安委員会", "skip_condition": "風営法上の飲食店の場合のみ" },
+        { "id": "fo-7", "no": 7, "name": "協議会の構成員であることの証明書", "source": "user_prepare", "issuer": "協議会" }
+      ]
+    }
+  }
+}

@@ -1,6 +1,22 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { annualReportCsvSchema, AnnualReportCsvData } from "../data/annual-report-schema.js";
+import { splitRomajiName } from "../data/csv-schema.js";
+
+/**
+ * 前処理: 年次報告用データのユーザーフレンドリー変換
+ */
+function preprocessReport(raw: Record<string, any>): Record<string, any> {
+  const data = { ...raw };
+  // 氏名フルネームから自動分割
+  if (!data.family_name_romaji && !data.given_name_romaji && (data.name_romaji || data.full_name || data.name)) {
+    const fullName = data.name_romaji || data.full_name || data.name;
+    const { family, given } = splitRomajiName(String(fullName));
+    data.family_name_romaji = family;
+    data.given_name_romaji = given;
+  }
+  return data;
+}
 
 const REPORT_CSV_COLUMNS = Object.keys(annualReportCsvSchema.shape) as (keyof AnnualReportCsvData)[];
 
@@ -22,7 +38,8 @@ export async function generateAnnualReportCsvHandler(reports: any[]) {
       const errors: string[] = [];
 
       reports.forEach((reportData, index) => {
-        const parsed = annualReportCsvSchema.safeParse(reportData);
+        const preprocessed = preprocessReport(reportData);
+        const parsed = annualReportCsvSchema.safeParse(preprocessed);
         
         if (!parsed.success) {
           const fieldErrors = parsed.error.issues.map(issue => `${issue.path.join(".")}: ${issue.message}`);

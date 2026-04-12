@@ -79,11 +79,51 @@ export async function parseResidenceCardHandler({
     .filter((k) => !k.startsWith("_"))
     .length;
 
+  // ── 申請用データへの自動変換 ──
+  const { resolveNationalityCode, splitRomajiName } = await import("../data/csv-schema.js");
+
+  const forApplication: Record<string, string | null> = {};
+
+  // 性別コード変換: 男→1, 女→2
+  if (parsed.gender) {
+    if (/男|Male/i.test(parsed.gender)) forApplication.sex = "1";
+    else if (/女|Female/i.test(parsed.gender)) forApplication.sex = "2";
+    else forApplication.sex = parsed.gender;
+  }
+
+  // 国籍コード変換: インドネシア→IDN
+  if (parsed.nationality) {
+    forApplication.nationality_code = resolveNationalityCode(parsed.nationality);
+  }
+
+  // 氏名分割: GILANG PERMANA → family/given
+  if (parsed.name_romaji) {
+    const { family, given } = splitRomajiName(parsed.name_romaji);
+    forApplication.family_name_romaji = family;
+    forApplication.given_name_romaji = given;
+  }
+
+  // 生年月日: YYYYMMDD形式
+  if (parsed.date_of_birth) {
+    forApplication.date_of_birth = parsed.date_of_birth.replace(/-/g, "");
+  }
+
+  // 在留カード番号
+  if (parsed.residence_card_number) {
+    forApplication.residence_card_number = parsed.residence_card_number;
+  }
+
+  // 在留期限: YYYYMMDD形式
+  if (parsed.visa_expiry) {
+    forApplication.visa_expiry_date = parsed.visa_expiry.replace(/-/g, "");
+  }
+
   return {
     content: [{
       type: "text" as const,
       text: JSON.stringify({
         parsed,
+        for_application: forApplication,
         extraction_method: parsed._method,
         confidence: parsed._confidence || null,
         fields_extracted: `${filledFields}/${totalFields}`,
@@ -91,6 +131,11 @@ export async function parseResidenceCardHandler({
         needs_confirmation: true,
         message: "以下の情報を在留カードから読み取りました。正しいか確認してください。",
         warning: "⚠️ 画像はサーバーに保存されません。処理後に即座に破棄されます。",
+        _ai_instructions:
+          "📋 読み取り結果を表形式で表示してください。\n" +
+          "for_application の値は申請書類に直接使えるコードに変換済みです。\n" +
+          "ユーザーに内容を確認してもらい、OKなら generate_online_csv 等に渡してください。\n" +
+          "⚠️ 旅券番号は在留カードに記載されていないため、別途パスポートから取得が必要です。",
       }, null, 2),
     }],
   };

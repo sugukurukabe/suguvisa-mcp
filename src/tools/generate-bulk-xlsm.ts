@@ -2,8 +2,31 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import * as path from "path";
 import * as fs from "fs";
-import { officialCsvSchema, OfficialCsvData } from "../data/csv-schema.js";
+import { officialCsvSchema, OfficialCsvData, splitRomajiName, resolveNationalityCode, resolveIndustryFieldCode, resolveApplicationType } from "../data/csv-schema.js";
 import XlsxPopulate from "xlsx-populate";
+
+/**
+ * 前処理: ユーザーフレンドリーな入力を正式フォーマットに変換
+ */
+function preprocessApplicant(raw: Record<string, any>): Record<string, any> {
+  const data = { ...raw };
+  if (!data.family_name_romaji && !data.given_name_romaji && (data.name_romaji || data.full_name || data.name)) {
+    const fullName = data.name_romaji || data.full_name || data.name;
+    const { family, given } = splitRomajiName(String(fullName));
+    data.family_name_romaji = family;
+    data.given_name_romaji = given;
+  }
+  if (!data.nationality_code && data.nationality) {
+    data.nationality_code = resolveNationalityCode(String(data.nationality));
+  }
+  if (!data.industry_field_code && data.industry_field) {
+    data.industry_field_code = resolveIndustryFieldCode(String(data.industry_field));
+  }
+  if (data.application_type && !/^[123]$/.test(String(data.application_type))) {
+    data.application_type = resolveApplicationType(String(data.application_type));
+  }
+  return data;
+}
 
 // 簡易的な日本の住所分割（都道府県、市区町村、それ以降）
 function splitAddress(fullAddress: string) {
@@ -74,7 +97,8 @@ export async function generateBulkXlsmHandler(
   const parsedApplicants: OfficialCsvData[] = [];
 
   applicants.forEach((a, index) => {
-    const parsed = officialCsvSchema.safeParse(a);
+    const preprocessed = preprocessApplicant(a);
+    const parsed = officialCsvSchema.safeParse(preprocessed);
     if (!parsed.success) {
       const fieldErrors = parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`);
       errors.push(`Row ${index + 1}: \n  - ${fieldErrors.join("\n  - ")}`);

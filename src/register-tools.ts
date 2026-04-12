@@ -18,9 +18,14 @@ import { registerGenerateAnnualReportOffline } from "./tools/generate-annual-rep
 import { registerLogVisaAction } from "./tools/log-visa-action.js";
 import { registerGetVisaAuditLogs } from "./tools/get-visa-audit-logs.js";
 import { registerCompleteVisaGuide } from "./tools/complete-visa-guide.js";
+import { registerGenerateReferenceForm } from "./tools/generate-reference-form.js";
+import { registerLookupCorporateNumber } from "./tools/lookup-corporate-number.js";
+import { registerSSW2DocumentChecklist } from "./tools/ssw2-document-checklist.js";
+import { registerGenerateReasonLetter } from "./tools/generate-reason-letter.js";
+import { registerPreSubmissionChecklist } from "./tools/pre-submission-checklist.js";
 
 /**
- * 全19ツール + 7プロンプト + 6リソースを McpServer に登録する共通関数。
+ * 全24ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
  * stdio (index.ts) と HTTP (server.ts) の両方から呼ばれる。
  */
 export function registerAllTools(server: McpServer): void {
@@ -33,12 +38,15 @@ export function registerAllTools(server: McpServer): void {
   // === 入力支援系 ===
   registerGenerateIntakeSheet(server);     // クライアント向け入力シート生成
   registerParseResidenceCard(server);      // 在留カードOCR結果の構造化
+  registerLookupCorporateNumber(server);   // 法人番号API検索
 
   // === 出力系 ===
   registerGenerateBulkXlsm(server);        // オンライン一括申請用XLSM生成
   registerGeneratePaperForm(server);       // 紙申請用PDFフォーム入力
   registerGenerateAnnualReportCsv(server); // 定期報告データ（オンラインCSV / 紙面データ両対応）
   registerGenerateAnnualReportOffline(server); // 定期報告（オフラインExcel版生成）
+  registerGenerateReferenceForm(server);   // 参考様式テンプレート生成
+  registerGenerateReasonLetter(server);    // 申請理由書テンプレート生成
 
   // === ワークフロー系 ===
   registerAutonomousVisaWorkflow(server);  // LangGraph 自律型ワークフロー
@@ -54,6 +62,8 @@ export function registerAllTools(server: McpServer): void {
 
   // === インテントベース統合ツール ===
   registerCompleteVisaGuide(server);        // ワンショット完全ガイド（判定+書類+期限の統合）
+  registerSSW2DocumentChecklist(server);    // 特定技能2号 分野別書類チェックリスト
+  registerPreSubmissionChecklist(server);   // 提出前最終チェックリスト
 
   // === MCP Prompts（定型シナリオ） ===
   registerPrompts(server);
@@ -268,6 +278,40 @@ function registerPrompts(server: McpServer): void {
             "4. 統計情報（同一パターンの補正率・通過率）が返ってくるので、分かりやすく提示",
             "5. 補正の場合は、次回申請への改善提案をまとめる",
             "6. 許可の場合は、次のステップ（在留カード受取・届出）を案内",
+          ].filter(Boolean).join("\n"),
+        },
+      }],
+    })
+  );
+
+  // 8. 特定技能2号 申請準備ワークフロー
+  server.prompt(
+    "ssw2_application_preparation",
+    "特定技能2号の申請準備を分野選択から書類チェックリストまで一通り案内するワークフロー",
+    {
+      industry_field: z.string().optional().describe("分野（例: '農業', '建設'）"),
+      employment_type: z.string().optional().describe("雇用形態（例: 'direct', 'dispatch_corporate'）"),
+      applicant_name: z.string().optional().describe("申請人氏名"),
+    },
+    async ({ industry_field, employment_type, applicant_name }) => ({
+      messages: [{
+        role: "user" as const,
+        content: {
+          type: "text" as const,
+          text: [
+            `${applicant_name ? applicant_name + "さんの" : ""}特定技能2号の申請準備を案内してください。`,
+            industry_field ? `分野: ${industry_field}` : "",
+            employment_type ? `雇用形態: ${employment_type}` : "",
+            "",
+            "以下のステップで進めてください:",
+            "1. 分野が未指定の場合は、11分野から選択してもらう",
+            "2. get_ssw2_document_checklist で分野・雇用形態別の必要書類チェックリストを取得",
+            "3. 🟢自動生成可能な書類と🔴ユーザーが用意する書類を分けて提示",
+            "4. 🔴ユーザー用意の書類については取得先と目安期間をアドバイス",
+            "5. 🟢自動生成の書類については generate_reference_form での一括生成を提案",
+            "6. チェックリストUIのリンクも案内",
+            "",
+            "特定技能2号は支援計画が不要な点、日本語要件は分野による点も説明してください。",
           ].filter(Boolean).join("\n"),
         },
       }],
