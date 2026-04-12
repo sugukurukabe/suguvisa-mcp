@@ -1,0 +1,33 @@
+[
+  {
+    "code": "too_small",
+    "minimum": 3,
+    "type": "string",
+    "inclusive": true,
+    "exact": true,
+    "message": "String must contain exactly 3 character(s)",
+    "path": [
+      "nationality_code"
+    ]
+  },
+  {
+    "received": "M",
+    "code": "invalid_enum_value",
+    "options": [
+      "1",
+      "2"
+    ],
+    "path": [
+      "sex"
+    ],
+    "message": "Invalid enum value. Expected '1' | '2', received 'M'"
+  },
+  {
+    "validation": "regex",
+    "code": "invalid_string",
+    "message": "分野コードは4桁の数字です (例: 0100 for 農業)",
+    "path": [
+      "industry_field_code"
+    ]
+  }
+]

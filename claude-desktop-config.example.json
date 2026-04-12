@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "suguvisa": {
+      "command": "npx",
+      "args": ["-y", "suguvisa-mcp"]
+    }
+  }
+}

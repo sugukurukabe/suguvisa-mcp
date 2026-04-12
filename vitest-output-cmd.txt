@@ -1,0 +1,60 @@
+
+> suguvisa-mcp@0.1.0 test
+> vitest run src/tools/__tests__/parse-residence-card.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/k_jim/OneDrive/デスクトップ/suguvisa-mcp[39m
+
+[90mstderr[2m | src/tools/__tests__/parse-residence-card.test.ts[2m > [22m[2mparse_residence_card[2m > [22m[2m5. Document AI失敗時のフォールバック動作
+[22m[39mDocument AI failed, falling back to regex: API Error
+
+ [31m❯[39m src/tools/__tests__/parse-residence-card.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 21[2mms[22m[39m
+   [32m✓[39m parse_residence_card[2m > [22m1. Document AIの結果マッピングが正しいか[32m 6[2mms[22m[39m
+[31m   [31m×[31m parse_residence_card[2m > [22m2. 正規表現フォールバックが動作するか[39m[32m 11[2mms[22m[39m
+[31m     → expected { name_romaji: 'YAMADA JIRO', …(9) } to match object { name_romaji: 'YAMADA JIRO', …(8) }
+(1 matching property omitted from actual)[39m
+   [32m✓[39m parse_residence_card[2m > [22m3. 和暦（令和5年）→ 西暦（2023年）の変換[32m 0[2mms[22m[39m
+   [32m✓[39m parse_residence_card[2m > [22m4. 在留カード番号のバリデーション[32m 1[2mms[22m[39m
+   [32m✓[39m parse_residence_card[2m > [22m5. Document AI失敗時のフォールバック動作[32m 1[2mms[22m[39m
+   [32m✓[39m parse_residence_card[2m > [22m6. 画像もOCRテキストもない場合のエラー[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tools/__tests__/parse-residence-card.test.ts[2m > [22mparse_residence_card[2m > [22m2. 正規表現フォールバックが動作するか
+[31m[1mAssertionError[22m: expected { name_romaji: 'YAMADA JIRO', …(9) } to match object { name_romaji: 'YAMADA JIRO', …(8) }
+(1 matching property omitted from actual)[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  {[22m
+[2m    "_method": "regex",[22m
+[2m    "date_of_birth": "1985-12-31",[22m
+[2m    "gender": "男",[22m
+[2m    "name_romaji": "YAMADA JIRO",[22m
+[32m-   "nationality": "Vietnam",[39m
+[31m+   "nationality": "国籍・地域 Nationality/Region Vietnam",[39m
+[2m    "residence_card_number": "AB87654321EF",[22m
+[2m    "visa_expiry": "2025-10-01",[22m
+[32m-   "visa_type": "技能実習1号",[39m
+[32m-   "work_restriction": "就労不可",[39m
+[31m+   "visa_type": "在留資格 Status of Residence 技能実習1号",[39m
+[31m+   "work_restriction": "就労制限 Permission to engage 就労不可",[39m
+[2m  }[22m
+
+[36m [2m❯[22m src/tools/__tests__/parse-residence-card.test.ts:[2m82:33[22m[39m
+    [90m 80| [39m    [35mconst[39m parsedResult [33m=[39m [33mJSON[39m[33m.[39m[34mparse[39m(result[33m.[39mcontent[[34m0[39m][33m.[39mtext)[33m;[39m
+    [90m 81| [39m    
+    [90m 82| [39m    [34mexpect[39m(parsedResult[33m.[39mparsed)[33m.[39m[34mtoMatchObject[39m({
+    [90m   | [39m                                [31m^[39m
+    [90m 83| [39m      name_romaji[33m:[39m [32m"YAMADA JIRO"[39m[33m,[39m
+    [90m 84| [39m      date_of_birth[33m:[39m [32m"1985-12-31"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 00:06:18
+[2m   Duration [22m 1.46s[2m (transform 97ms, setup 0ms, collect 771ms, tests 21ms, environment 0ms, prepare 148ms)[22m
+

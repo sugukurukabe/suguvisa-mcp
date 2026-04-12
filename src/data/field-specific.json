@@ -1,0 +1,231 @@
+{
+  "version": "2026-04-01",
+  "description": "特定技能1号の対象16分野の詳細情報。試験名・試験実施機関・分野固有書類を定義。",
+  "source_url": "https://www.moj.go.jp/isa/policies/ssw/nyuukokukanri05_00021.html",
+  "fields": {
+    "農業": {
+      "code": "01",
+      "industry_code": "0100",
+      "skill_test": {
+        "name": "農業技能測定試験",
+        "organizer": "一般社団法人全国農業会議所",
+        "url": "https://asat.nca.or.jp/",
+        "sub_tests": ["耕種農業全般", "畜産農業全般"],
+        "languages": ["日本語", "英語", "インドネシア語", "ベトナム語", "タイ語", "フィリピン語", "ミャンマー語", "カンボジア語", "ネパール語", "モンゴル語"],
+        "test_locations": ["国内", "海外（インドネシア、フィリピン、カンボジア、タイ、ミャンマー、ネパール、ベトナム等）"]
+      },
+      "japanese_test": {
+        "options": [
+          { "name": "JFT-Basic（国際交流基金日本語基礎テスト）", "level": "A2相当" },
+          { "name": "JLPT N4以上（日本語能力試験）", "level": "N4以上" }
+        ]
+      },
+      "additional_documents": [
+        {
+          "name": "農業分野における特定技能外国人の受入れに関する誓約書",
+          "reference_form": "agriculture-1",
+          "who": "所属機関"
+        },
+        {
+          "name": "農業分野における業務を行わせる事業所の概要書",
+          "reference_form": "agriculture-2",
+          "who": "所属機関"
+        }
+      ],
+      "additional_documents_ssw2": [
+        {
+          "name": "２号農業技能測定試験の合格証明書の写し",
+          "who": "申請人"
+        },
+        {
+          "name": "農業分野において直接雇用形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書",
+          "who": "所属機関"
+        },
+        {
+          "name": "協議会の構成員であることの証明書（特定技能所属機関）",
+          "who": "所属機関"
+        }
+      ],
+      "dispatch_allowed": true,
+      "dispatch_note": "農業は派遣形態での受入れが認められる唯一の分野（繁忙期対応）。派遣元は農業協同組合等の要件あり。",
+      "sub_fields": [
+        { "name": "耕種農業全般", "description": "栽培管理、農産物の集出荷・選別等" },
+        { "name": "畜産農業全般", "description": "飼養管理、畜産物の集出荷・選別等" }
+      ],
+      "seasonal_notes": "繁閑の差が大きいため、複数の農家で就労する「半農半X」型や、JAを通じた派遣形態が一般的",
+      "exam_exemption_from_titp": "技能実習2号（農業）を良好に修了 → 同一区分（耕種/畜産）の技能試験免除"
+    },
+    "漁業": {
+      "code": "02",
+      "industry_code": "0200",
+      "skill_test": {
+        "name": "漁業技能測定試験",
+        "organizer": "一般社団法人大日本水産会",
+        "url": "https://suisankai.or.jp/",
+        "sub_tests": ["漁業", "養殖業"]
+      },
+      "additional_documents": [],
+      "dispatch_allowed": true,
+      "dispatch_note": "漁業も派遣形態での受入れ可能"
+    },
+    "飲食料品製造業": {
+      "code": "03",
+      "industry_code": "0300",
+      "skill_test": {
+        "name": "飲食料品製造業特定技能1号技能測定試験",
+        "organizer": "一般社団法人外国人食品産業技能評価機構（OTAFF）",
+        "url": "https://otaff1.jp/"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "外食業": {
+      "code": "04",
+      "industry_code": "0400",
+      "skill_test": {
+        "name": "外食業特定技能1号技能測定試験",
+        "organizer": "一般社団法人外国人食品産業技能評価機構（OTAFF）",
+        "url": "https://otaff1.jp/"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "介護": {
+      "code": "05",
+      "industry_code": "0500",
+      "skill_test": {
+        "name": "介護技能評価試験",
+        "organizer": "厚生労働省（一般社団法人シルバーサービス振興会）",
+        "url": "https://sssc.or.jp/"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false,
+      "special_notes": "介護日本語評価試験にも合格が必要（他分野にない追加要件）"
+    },
+    "ビルクリーニング": {
+      "code": "06",
+      "industry_code": "0600",
+      "skill_test": {
+        "name": "ビルクリーニング分野特定技能1号評価試験",
+        "organizer": "公益社団法人全国ビルメンテナンス協会"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "素形材・産業機械・電気電子情報関連製造業": {
+      "code": "07",
+      "industry_code": "0700",
+      "skill_test": {
+        "name": "製造分野特定技能1号評価試験",
+        "organizer": "経済産業省"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "建設": {
+      "code": "08",
+      "industry_code": "0800",
+      "skill_test": {
+        "name": "建設分野特定技能1号評価試験",
+        "organizer": "一般社団法人建設技能人材機構（JAC）",
+        "url": "https://jac-skill.or.jp/"
+      },
+      "additional_documents": [
+        {
+          "name": "建設キャリアアップシステムの登録証明",
+          "who": "所属機関・申請人"
+        },
+        {
+          "name": "建設特定技能受入計画の認定通知書",
+          "who": "所属機関"
+        }
+      ],
+      "dispatch_allowed": false,
+      "special_notes": "JACへの加入とCCUSへの登録が必要。月給制が原則。"
+    },
+    "造船・舶用工業": {
+      "code": "09",
+      "industry_code": "0900",
+      "skill_test": {
+        "name": "造船・舶用工業分野特定技能1号試験",
+        "organizer": "一般社団法人日本船舶技術研究協会"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "自動車整備": {
+      "code": "10",
+      "industry_code": "1000",
+      "skill_test": {
+        "name": "自動車整備分野特定技能1号評価試験",
+        "organizer": "一般社団法人日本自動車整備振興会連合会"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "航空": {
+      "code": "11",
+      "industry_code": "1100",
+      "skill_test": {
+        "name": "航空分野特定技能1号評価試験",
+        "organizer": "公益社団法人日本航空技術協会"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "宿泊": {
+      "code": "12",
+      "industry_code": "1200",
+      "skill_test": {
+        "name": "宿泊業技能測定試験",
+        "organizer": "一般社団法人宿泊業技能試験センター"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false
+    },
+    "自動車運送業": {
+      "code": "13",
+      "industry_code": "1300",
+      "skill_test": {
+        "name": "自動車運送業分野特定技能1号評価試験",
+        "organizer": "国土交通省"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false,
+      "special_notes": "2024年3月追加分野。日本の運転免許取得が前提。"
+    },
+    "鉄道": {
+      "code": "14",
+      "industry_code": "1400",
+      "skill_test": {
+        "name": "鉄道分野特定技能1号評価試験",
+        "organizer": "国土交通省"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false,
+      "special_notes": "2024年3月追加分野"
+    },
+    "林業": {
+      "code": "15",
+      "industry_code": "1500",
+      "skill_test": {
+        "name": "林業分野特定技能1号評価試験",
+        "organizer": "農林水産省"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false,
+      "special_notes": "2024年3月追加分野"
+    },
+    "木材産業": {
+      "code": "16",
+      "industry_code": "1600",
+      "skill_test": {
+        "name": "木材産業分野特定技能1号評価試験",
+        "organizer": "農林水産省"
+      },
+      "additional_documents": [],
+      "dispatch_allowed": false,
+      "special_notes": "2024年3月追加分野"
+    }
+  }
+}

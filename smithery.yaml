@@ -1,0 +1,28 @@
+# Smithery.ai configuration for SuguVisa MCP Server
+# https://smithery.ai/docs
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      SUGUVISA_API_KEY:
+        type: string
+        description: "API key for authenticating requests to SuguVisa (optional for local use)"
+      GCP_PROJECT_ID:
+        type: string
+        description: "Google Cloud Project ID (only needed for residence card OCR feature)"
+      GOOGLE_APPLICATION_CREDENTIALS:
+        type: string
+        description: "Path to GCP service account key JSON (only needed for residence card OCR)"
+    required: []
+  commandFunction: |-
+    (config) => ({
+      command: "node",
+      args: ["dist/index.js"],
+      env: {
+        SUGUVISA_API_KEY: config.SUGUVISA_API_KEY || "",
+        GCP_PROJECT_ID: config.GCP_PROJECT_ID || "",
+        GOOGLE_APPLICATION_CREDENTIALS: config.GOOGLE_APPLICATION_CREDENTIALS || ""
+      }
+    })

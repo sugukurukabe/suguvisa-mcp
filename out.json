@@ -1,0 +1,35 @@
+﻿=== 逡ｰ蟶ｸ邉ｻ・域ｬ謳阪ヵ繧｣繝ｼ繝ｫ繝峨≠繧奇ｼ峨・繝・せ繝育ｵ先棡 ===
+
+{
+  "parsed": {
+    "name_romaji": null,
+    "date_of_birth": "1994-05-10",
+    "gender": null,
+    "nationality": null,
+    "visa_type": null,
+    "visa_expiry": null,
+    "residence_card_number": null,
+    "address": null,
+    "work_restriction": null,
+    "_method": "regex"
+  },
+  "extraction_method": "regex",
+  "confidence": null,
+  "fields_extracted": "1/9",
+  "missing_fields": [
+    "name_romaji",
+    "gender",
+    "nationality",
+    "visa_type",
+    "visa_expiry",
+    "residence_card_number",
+    "address",
+    "work_restriction"
+  ],
+  "validation_errors": [],
+  "needs_confirmation": true,
+  "system_instruction": "縲宣㍾隕√僧issing_fields縺後≠繧句ｴ蜷医・縲√Θ繝ｼ繧ｶ繝ｼ縺ｫ縲傾X縺瑚ｪｭ縺ｿ蜿悶ｌ縺ｾ縺帙ｓ縺ｧ縺励◆縲∝・蜉帙＠縺ｦ縺上□縺輔＞縲阪→蠢・★雉ｪ蝠上＠縺ｦ縺上□縺輔＞縲よ耳貂ｬ・亥ｹｻ隕夲ｼ峨↓繧医ｋ蛟､縺ｮ陬懷ｮ後・邨ｶ蟇ｾ縺ｫ遖∵ｭ｢縺ｧ縺吶ょ・縺ｦ縺ｮ諠・ｱ縺梧純縺｣縺ｦ縺・ｋ蝣ｴ蜷医・縲√％縺ｮ蜀・ｮｹ縺ｧ豁｣縺励＞縺倶ｸ險遒ｺ隱阪＠縺ｦ縺上□縺輔＞縲・,
+  "message_en": "IMPORTANT: If there are missing_fields, explicitly ask the user to provide them. DO NOT hallucinate values. Ask user to confirm if all data is correct.",
+  "message_id": "PENTING: Jika ada missing_fields, minta pengguna untuk melengkapinya. JANGAN asal menebak. Minta konfirmasi jika semua data sudah benar.",
+  "warning": "逕ｻ蜒上・蜊ｳ蠎ｧ縺ｫ遐ｴ譽・＆繧後∪縺励◆ / Image discarded / Gambar dibuang"
+}

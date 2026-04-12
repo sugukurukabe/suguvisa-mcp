@@ -1,0 +1,23 @@
+﻿
+> suguvisa-mcp@0.1.0 test
+> vitest run src/tools/__tests__/parse-residence-card.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/k_jim/OneDrive/繝・せ繧ｯ繝医ャ繝・suguvisa-mcp[39m
+
+ [31m笶ｯ[39m src/tools/__tests__/parse-residence-card.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 23[2mms[22m[39m
+   [32m笨・[39m parse_residence_card[2m > [22m1. Document AI縺ｮ邨先棡繝槭ャ繝斐Φ繧ｰ縺梧ｭ｣縺励＞縺・[32m 5[2mms[22m[39m
+[31m   [31mﾃ・[31m parse_residence_card[2m > [22m2. 豁｣隕剰｡ｨ迴ｾ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ縺悟虚菴懊☆繧九°[39m[32m 12[2mms[22m[39m
+[31m     竊・expected { name_romaji: 'YAMADA JIRO', 窶ｦ(9) } to match object { name_romaji: 'YAMADA JIRO', 窶ｦ(8) }
+(1 matching property omitted from actual)[39m
+[31m   [31mﾃ・[31m parse_residence_card[2m > [22m3. 蜥梧圜・井ｻ､蜥・蟷ｴ・俄・ 隘ｿ證ｦ・・023蟷ｴ・峨・螟画鋤[39m[32m 1[2mms[22m[39m
+[31m     竊・expected null to be '1998-05-15' // Object.is equality[39m
+   [32m笨・[39m parse_residence_card[2m > [22m4. 蝨ｨ逡吶き繝ｼ繝臥分蜿ｷ縺ｮ繝舌Μ繝・・繧ｷ繝ｧ繝ｳ[32m 1[2mms[22m[39m
+   [32m笨・[39m parse_residence_card[2m > [22m5. Document AI螟ｱ謨玲凾縺ｮ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ蜍穂ｽ・[32m 2[2mms[22m[39m
+   [32m笨・[39m parse_residence_card[2m > [22m6. 逕ｻ蜒上ｂOCR繝・く繧ｹ繝医ｂ縺ｪ縺・ｴ蜷医・繧ｨ繝ｩ繝ｼ[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 23:12:13
+[2m   Duration [22m 1.05s[2m (transform 87ms, setup 0ms, collect 560ms, tests 23ms, environment 0ms, prepare 195ms)[22m
+

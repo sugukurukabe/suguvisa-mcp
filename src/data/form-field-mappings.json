@@ -1,0 +1,191 @@
+{
+  "version": "2026-04-01",
+  "description": "入管申請書（別記様式）のPDFフォームフィールド定義。様式ごとにセクション・フィールドを正確にマッピング。",
+  "forms": {
+    "別記第6号の5": {
+      "name": "在留資格認定証明書交付申請書（特定技能）",
+      "used_by": ["GRANT_01"],
+      "total_pages": 6,
+      "sections": [
+        {
+          "section": "申請人等作成用1",
+          "page": 1,
+          "fields": [
+            { "id": "nationality", "label": "国籍・地域", "type": "text", "required": true, "example": "インドネシア" },
+            { "id": "date_of_birth", "label": "生年月日", "type": "date", "required": true, "format": "YYYY年MM月DD日" },
+            { "id": "name_romaji", "label": "氏名（ローマ字）", "type": "text", "required": true, "example": "GILANG PERMANA" },
+            { "id": "name_kanji", "label": "氏名（漢字）", "type": "text", "required": false },
+            { "id": "sex", "label": "性別", "type": "select", "options": ["男", "女"], "required": true },
+            { "id": "birth_place", "label": "出生地", "type": "text", "required": true },
+            { "id": "marital_status", "label": "配偶者の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "profession", "label": "職業", "type": "text", "required": false },
+            { "id": "home_country_address", "label": "本国における居所", "type": "text", "required": true },
+            { "id": "home_country_phone", "label": "電話番号", "type": "text", "required": false }
+          ]
+        },
+        {
+          "section": "申請人等作成用2",
+          "page": 2,
+          "fields": [
+            { "id": "passport_number", "label": "旅券番号", "type": "text", "required": true, "example": "C1234567" },
+            { "id": "passport_expiry", "label": "旅券有効期限", "type": "date", "required": true },
+            { "id": "purpose_of_entry", "label": "入国目的", "type": "text", "required": true, "default": "特定技能1号（農業）" },
+            { "id": "desired_landing_port", "label": "上陸予定港", "type": "text", "required": true, "example": "鹿児島空港" },
+            { "id": "desired_entry_date", "label": "上陸予定年月日", "type": "date", "required": true },
+            { "id": "desired_period", "label": "滞在予定期間", "type": "text", "required": true, "default": "1年" },
+            { "id": "accompanying_persons", "label": "同伴者の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "past_entry_japan", "label": "過去の出入国歴", "type": "text", "required": false },
+            { "id": "criminal_record", "label": "犯罪歴の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "refusal_history", "label": "退去強制・出国命令歴", "type": "select", "options": ["有", "無"], "required": true }
+          ]
+        },
+        {
+          "section": "申請人等作成用3（特定技能固有）",
+          "page": 3,
+          "fields": [
+            { "id": "industry_field", "label": "分野", "type": "text", "required": true, "example": "農業" },
+            { "id": "work_description", "label": "業務区分", "type": "text", "required": true, "example": "耕種農業全般" },
+            { "id": "skill_test_name", "label": "技能試験名", "type": "text", "required": true, "example": "農業技能測定試験" },
+            { "id": "skill_test_pass_date", "label": "合格年月日", "type": "date", "required": true },
+            { "id": "skill_test_exempt", "label": "試験免除の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "skill_test_exempt_reason", "label": "免除理由", "type": "text", "required": false },
+            { "id": "japanese_test_name", "label": "日本語試験名", "type": "text", "required": true, "example": "JFT-Basic" },
+            { "id": "japanese_test_pass_date", "label": "合格年月日", "type": "date", "required": true },
+            { "id": "japanese_test_exempt", "label": "日本語試験免除の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "total_ssw1_period_months", "label": "通算在留期間（月）", "type": "number", "required": true }
+          ]
+        },
+        {
+          "section": "所属機関等作成用1",
+          "page": 4,
+          "fields": [
+            { "id": "company_name", "label": "契約機関の名称", "type": "text", "required": true },
+            { "id": "corporate_number", "label": "法人番号", "type": "text", "required": true, "format": "13桁" },
+            { "id": "representative", "label": "代表者氏名", "type": "text", "required": true },
+            { "id": "company_address", "label": "所在地", "type": "text", "required": true },
+            { "id": "company_phone", "label": "電話番号", "type": "text", "required": true },
+            { "id": "work_location", "label": "就労予定地", "type": "text", "required": true },
+            { "id": "contract_period_start", "label": "雇用契約期間（開始）", "type": "date", "required": true },
+            { "id": "contract_period_end", "label": "雇用契約期間（終了）", "type": "date", "required": true },
+            { "id": "monthly_salary", "label": "報酬（月額）", "type": "number", "required": true, "unit": "円" },
+            { "id": "support_type", "label": "支援実施方式", "type": "select", "options": ["自社支援", "登録支援機関に委託"], "required": true }
+          ]
+        },
+        {
+          "section": "所属機関等作成用2",
+          "page": 5,
+          "fields": [
+            { "id": "support_org_name", "label": "登録支援機関名", "type": "text", "required": false },
+            { "id": "support_org_registration_number", "label": "登録番号", "type": "text", "required": false },
+            { "id": "applicant_agent_name", "label": "申請取次者（行政書士等）", "type": "text", "required": false },
+            { "id": "agent_registration_number", "label": "届出番号", "type": "text", "required": false }
+          ]
+        }
+      ]
+    },
+    "別記第30号の5": {
+      "name": "在留資格変更許可申請書（特定技能・特定活動）",
+      "used_by": ["CHANGE_TOKKATSU_A", "CHANGE_TOKKATSU_B", "CHANGE_TOKKATSU_C", "CHANGE_TOKKATSU_D", "CHANGE_TOKKATSU_E", "CHANGE_SSW1_A", "CHANGE_SSW1_B", "CHANGE_SSW1_C", "CHANGE_SSW1_D", "CHANGE_SSW1_E", "CHANGE_SSW1_F"],
+      "total_pages": 5,
+      "sections": [
+        {
+          "section": "申請人等作成用1",
+          "page": 1,
+          "fields": [
+            { "id": "nationality", "label": "国籍・地域", "type": "text", "required": true },
+            { "id": "residence_card_number", "label": "在留カード番号", "type": "text", "required": true, "format": "AA12345678BB" },
+            { "id": "date_of_birth", "label": "生年月日", "type": "date", "required": true },
+            { "id": "name_romaji", "label": "氏名（ローマ字）", "type": "text", "required": true },
+            { "id": "sex", "label": "性別", "type": "select", "options": ["男", "女"], "required": true },
+            { "id": "marital_status", "label": "配偶者の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "passport_number", "label": "旅券番号", "type": "text", "required": true },
+            { "id": "passport_expiry", "label": "旅券有効期限", "type": "date", "required": true },
+            { "id": "current_visa_type", "label": "現在の在留資格", "type": "text", "required": true },
+            { "id": "current_visa_expiry", "label": "在留期限", "type": "date", "required": true },
+            { "id": "desired_visa_type", "label": "希望する在留資格", "type": "text", "required": true },
+            { "id": "desired_period", "label": "希望する在留期間", "type": "text", "required": true, "default": "1年" },
+            { "id": "reason_for_change", "label": "変更の理由", "type": "text", "required": true },
+            { "id": "address_japan", "label": "住居地", "type": "text", "required": true },
+            { "id": "phone", "label": "電話番号", "type": "text", "required": false }
+          ]
+        },
+        {
+          "section": "申請人等作成用2（特定技能固有）",
+          "page": 2,
+          "fields": [
+            { "id": "industry_field", "label": "分野", "type": "text", "required": true },
+            { "id": "work_description", "label": "業務区分", "type": "text", "required": true },
+            { "id": "skill_test_name", "label": "技能試験名", "type": "text", "required": true },
+            { "id": "skill_test_pass_date", "label": "合格年月日", "type": "date", "required": false },
+            { "id": "skill_test_exempt", "label": "試験免除の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "skill_test_exempt_reason", "label": "免除理由", "type": "text", "required": false, "example": "技能実習2号を良好に修了" },
+            { "id": "japanese_test_name", "label": "日本語試験名", "type": "text", "required": false },
+            { "id": "japanese_test_pass_date", "label": "合格年月日", "type": "date", "required": false },
+            { "id": "japanese_test_exempt", "label": "日本語試験免除の有無", "type": "select", "options": ["有", "無"], "required": true },
+            { "id": "previous_company_name", "label": "前所属機関名", "type": "text", "required": false },
+            { "id": "previous_visa_history", "label": "在留資格変更・更新の経歴", "type": "text", "required": false },
+            { "id": "total_ssw1_period_months", "label": "通算在留期間（月）", "type": "number", "required": true }
+          ]
+        },
+        {
+          "section": "所属機関等作成用",
+          "page": 3,
+          "fields": [
+            { "id": "company_name", "label": "契約機関の名称", "type": "text", "required": true },
+            { "id": "corporate_number", "label": "法人番号", "type": "text", "required": true },
+            { "id": "representative", "label": "代表者氏名", "type": "text", "required": true },
+            { "id": "company_address", "label": "所在地", "type": "text", "required": true },
+            { "id": "company_phone", "label": "電話番号", "type": "text", "required": true },
+            { "id": "work_location", "label": "就労場所", "type": "text", "required": true },
+            { "id": "monthly_salary", "label": "報酬（月額）", "type": "number", "required": true, "unit": "円" },
+            { "id": "contract_period_start", "label": "雇用契約期間（開始）", "type": "date", "required": true },
+            { "id": "contract_period_end", "label": "雇用契約期間（終了）", "type": "date", "required": true },
+            { "id": "support_type", "label": "支援実施方式", "type": "select", "options": ["自社支援", "登録支援機関に委託"], "required": true },
+            { "id": "support_org_name", "label": "登録支援機関名", "type": "text", "required": false },
+            { "id": "applicant_agent_name", "label": "申請取次者", "type": "text", "required": false }
+          ]
+        }
+      ]
+    },
+    "別記第30号": {
+      "name": "在留期間更新許可申請書（特定技能）",
+      "used_by": ["RENEWAL_01"],
+      "total_pages": 4,
+      "sections": [
+        {
+          "section": "申請人等作成用",
+          "page": 1,
+          "fields": [
+            { "id": "nationality", "label": "国籍・地域", "type": "text", "required": true },
+            { "id": "residence_card_number", "label": "在留カード番号", "type": "text", "required": true },
+            { "id": "date_of_birth", "label": "生年月日", "type": "date", "required": true },
+            { "id": "name_romaji", "label": "氏名（ローマ字）", "type": "text", "required": true },
+            { "id": "sex", "label": "性別", "type": "select", "options": ["男", "女"], "required": true },
+            { "id": "passport_number", "label": "旅券番号", "type": "text", "required": true },
+            { "id": "passport_expiry", "label": "旅券有効期限", "type": "date", "required": true },
+            { "id": "current_visa_type", "label": "現在の在留資格", "type": "text", "required": true, "default": "特定技能1号" },
+            { "id": "current_visa_expiry", "label": "在留期限", "type": "date", "required": true },
+            { "id": "desired_period", "label": "希望する在留期間", "type": "text", "required": true, "default": "1年" },
+            { "id": "reason_for_renewal", "label": "更新の理由", "type": "text", "required": true, "default": "引き続き特定技能1号として就労するため" },
+            { "id": "address_japan", "label": "住居地", "type": "text", "required": true },
+            { "id": "total_ssw1_period_months", "label": "通算在留期間（月）", "type": "number", "required": true }
+          ]
+        },
+        {
+          "section": "所属機関等作成用",
+          "page": 2,
+          "fields": [
+            { "id": "company_name", "label": "契約機関の名称", "type": "text", "required": true },
+            { "id": "corporate_number", "label": "法人番号", "type": "text", "required": true },
+            { "id": "representative", "label": "代表者氏名", "type": "text", "required": true },
+            { "id": "company_address", "label": "所在地", "type": "text", "required": true },
+            { "id": "company_phone", "label": "電話番号", "type": "text", "required": true },
+            { "id": "monthly_salary", "label": "報酬（月額）", "type": "number", "required": true, "unit": "円" },
+            { "id": "work_changes", "label": "前回許可後の変更の有無", "type": "text", "required": false },
+            { "id": "applicant_agent_name", "label": "申請取次者", "type": "text", "required": false }
+          ]
+        }
+      ]
+    }
+  }
+}

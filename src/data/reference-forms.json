@@ -1,0 +1,219 @@
+{
+  "version": "2026-04-01",
+  "description": "特定技能関連の参考様式マスタ。出入国在留管理庁の公式様式一覧に基づく。",
+  "source_url": "https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00030.html",
+  "forms": {
+    "1-2": {
+      "number": "参考様式第1-2号",
+      "name": "特定技能外国人の受入れに関する誓約書（所属機関）",
+      "category": "所属機関関係",
+      "required_for": ["all"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": ["company_name", "representative", "company_address", "date", "signature"],
+      "notes": "代表者の署名・押印が必要"
+    },
+    "1-3": {
+      "number": "参考様式第1-3号",
+      "name": "健康診断個人票",
+      "category": "申請人関係",
+      "required_for": ["GRANT_01"],
+      "bilingual": false,
+      "who": "申請人（医療機関で取得）",
+      "fields": ["applicant_name", "date_of_birth", "nationality", "examination_date", "doctor_name", "hospital_name"],
+      "notes": "来日前の健康診断。指定の検査項目あり"
+    },
+    "1-4": {
+      "number": "参考様式第1-4号",
+      "name": "報酬に関する説明書",
+      "category": "所属機関関係",
+      "required_for": ["all"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": ["company_name", "applicant_name", "monthly_salary", "hourly_wage", "comparison_japanese_worker", "deductions"],
+      "notes": "日本人と同等以上の報酬であることを説明。比較対象の日本人労働者の情報が必要"
+    },
+    "1-5": {
+      "number": "参考様式第1-5号",
+      "name": "特定技能雇用契約書",
+      "category": "雇用関係",
+      "required_for": ["all"],
+      "bilingual": true,
+      "bilingual_languages": ["id", "vi", "my", "tl", "zh", "en", "ne", "km", "mn", "th"],
+      "who": "所属機関",
+      "fields": [
+        "company_name", "company_address", "representative",
+        "applicant_name", "nationality", "date_of_birth",
+        "job_description", "work_location", "contract_period_start", "contract_period_end",
+        "working_hours", "rest_days", "leave",
+        "monthly_salary", "hourly_wage", "overtime_rate",
+        "social_insurance", "tax_deductions",
+        "housing", "housing_cost"
+      ],
+      "notes": "申請人の母国語又は十分に理解できる言語での翻訳を併記"
+    },
+    "1-6": {
+      "number": "参考様式第1-6号",
+      "name": "雇用条件書",
+      "category": "雇用関係",
+      "required_for": ["all"],
+      "bilingual": true,
+      "bilingual_languages": ["id", "vi", "my", "tl", "zh", "en", "ne", "km", "mn", "th"],
+      "who": "所属機関",
+      "fields": [
+        "company_name", "work_location", "job_description",
+        "contract_period_start", "contract_period_end",
+        "working_hours_start", "working_hours_end", "break_time",
+        "rest_days_per_week", "annual_leave",
+        "monthly_salary", "hourly_wage",
+        "overtime_rate_normal", "overtime_rate_holiday", "overtime_rate_midnight",
+        "bonus", "retirement_allowance",
+        "social_insurance_health", "social_insurance_pension", "employment_insurance",
+        "housing_type", "housing_address", "housing_cost"
+      ],
+      "notes": "労働基準法に基づく労働条件の明示。母国語翻訳を併記"
+    },
+    "1-7": {
+      "number": "参考様式第1-7号",
+      "name": "事前ガイダンスの確認書",
+      "category": "支援関係",
+      "required_for": ["all"],
+      "bilingual": true,
+      "bilingual_languages": ["id", "vi", "my", "tl", "zh", "en"],
+      "who": "所属機関 or 登録支援機関",
+      "fields": ["applicant_name", "guidance_date", "guidance_method", "interpreter_name", "items_explained"],
+      "notes": "入国前に対面又はテレビ電話で実施。3時間以上が目安"
+    },
+    "1-11": {
+      "number": "参考様式第1-11号",
+      "name": "所属機関概要書",
+      "category": "所属機関関係",
+      "required_for": ["all"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "company_name", "corporate_number", "representative", "company_address",
+        "established_date", "capital", "annual_revenue",
+        "total_employees", "foreign_employees_count",
+        "ssw1_current_count", "ssw1_planned_count",
+        "industry_field", "business_description"
+      ],
+      "notes": "会社の概要情報。現在の特定技能外国人の受入れ状況を記載"
+    },
+    "1-16": {
+      "number": "参考様式第1-16号",
+      "name": "雇用の経緯に係る説明書",
+      "category": "所属機関関係",
+      "required_for": ["all"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "company_name", "applicant_name",
+        "recruitment_method", "recruitment_agency",
+        "introduction_fee", "who_paid_fee",
+        "broker_involvement"
+      ],
+      "notes": "保証金の徴収や不当な費用徴収がないことの確認。ブローカー関与の有無"
+    },
+    "1-17": {
+      "number": "参考様式第1-17号",
+      "name": "1号特定技能外国人支援計画書",
+      "category": "支援関係",
+      "required_for": ["all"],
+      "bilingual": true,
+      "bilingual_languages": ["id", "vi", "my", "tl", "zh", "en"],
+      "who": "所属機関 or 登録支援機関",
+      "fields": [
+        "applicant_name", "company_name",
+        "support_responsible_person", "support_contact",
+        "pre_entry_guidance", "pickup_service",
+        "housing_support", "life_orientation",
+        "japanese_learning_support", "consultation_support",
+        "community_exchange", "job_change_support",
+        "periodic_interview"
+      ],
+      "notes": "義務的支援10項目の実施計画。委託の場合は登録支援機関が作成"
+    },
+    "1-20": {
+      "number": "参考様式第1-20号",
+      "name": "定期届出書（所属機関）",
+      "category": "届出関係",
+      "required_for": ["RENEWAL_01"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "company_name", "reporting_period",
+        "ssw1_count", "ssw1_names",
+        "working_conditions_changes", "support_implementation_status"
+      ],
+      "notes": "年1回、4/1〜5/31に提出。受入れ状況・支援実施状況を報告"
+    },
+    "1-22": {
+      "number": "参考様式第1-22号",
+      "name": "随時届出書（受入れ困難時）",
+      "category": "届出関係",
+      "required_for": [],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "company_name", "applicant_name",
+        "reason_for_difficulty", "occurrence_date",
+        "measures_taken"
+      ],
+      "notes": "受入れが困難になった場合に14日以内に届出。解雇・倒産・行方不明等"
+    },
+    "1-23": {
+      "number": "参考様式第1-23号",
+      "name": "随時届出書（雇用契約変更）",
+      "category": "届出関係",
+      "required_for": [],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "company_name", "applicant_name",
+        "change_type", "change_date",
+        "before_change", "after_change"
+      ],
+      "notes": "雇用契約の内容に変更があった場合に14日以内に届出"
+    },
+    "5-7": {
+      "number": "参考様式第5-7号",
+      "name": "報酬支払証明書",
+      "category": "更新申請関係",
+      "required_for": ["RENEWAL_01"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "company_name", "applicant_name",
+        "period_from", "period_to",
+        "monthly_payments", "total_amount",
+        "deductions_detail"
+      ],
+      "notes": "更新申請時に必要。実際の支払額が契約書と合致していることの証明"
+    },
+    "agriculture-1": {
+      "number": "農業分野参考様式第1号",
+      "name": "農業分野における特定技能外国人の受入れに関する誓約書",
+      "category": "分野固有（農業）",
+      "required_for": ["all_agriculture"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": ["company_name", "representative", "farming_type", "date"],
+      "notes": "農業分野固有。直接雇用・派遣の別を記載"
+    },
+    "agriculture-2": {
+      "number": "農業分野参考様式第2号",
+      "name": "農業分野における業務を行わせる事業所の概要書",
+      "category": "分野固有（農業）",
+      "required_for": ["all_agriculture"],
+      "bilingual": false,
+      "who": "所属機関",
+      "fields": [
+        "farm_name", "farm_address", "farm_area_hectares",
+        "crop_types", "farming_method",
+        "total_workers", "japanese_workers", "foreign_workers"
+      ],
+      "notes": "農場の規模・作物・作業者数を記載"
+    }
+  }
+}

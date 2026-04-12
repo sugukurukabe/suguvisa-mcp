@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --color-aurora-bg: #09090b;
+  --color-aurora-surface: rgba(24, 24, 27, 0.4);
+  --color-aurora-glow-blue: rgba(59, 130, 246, 0.15);
+  --color-aurora-glow-purple: rgba(168, 85, 247, 0.15);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-aurora-bg);
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Deep dark aurora gradient base */
+    background-image: 
+      radial-gradient(ellipse at top right, var(--color-aurora-glow-blue), transparent 40%),
+      radial-gradient(ellipse at bottom left, var(--color-aurora-glow-purple), transparent 40%);
+    background-attachment: fixed;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+/* Premium Dark Glassmorphism */
+.glass-panel {
+  background: var(--color-aurora-surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-input {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+.glass-input:focus-within {
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* AI Message Bubble Glow */
+.ai-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Suggestion Chips */
+.suggestion-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #94a3b8;
+  transition: all 0.2s ease-in-out;
+}
+.suggestion-chip:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(96, 165, 250, 0.4);
+  color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+/* Thinking Dots Animation */
+@keyframes thinking-dot {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+.thinking-dot {
+  animation: thinking-dot 1.2s ease-in-out infinite;
+}
+
+/* Download Widget Card */
+.download-widget {
+  background: linear-gradient(135deg, rgba(24, 24, 27, 0.6) 0%, rgba(9, 9, 11, 0.8) 100%);
+  border-left: 4px solid #60a5fa;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Typing Skeleton Animation */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.thinking-dot {
+  animation: thinking 1.4s infinite ease-in-out both;
+}
+
+@keyframes thinking {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
+}

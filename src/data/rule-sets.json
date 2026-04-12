@@ -1,0 +1,755 @@
+{
+  "version": "2026-04-01",
+  "last_updated_by": "壁晃弘",
+  "work_during_application": {
+    "rule": "申請中は原則として新しい雇用主のもとでは就労不可",
+    "exception": "申請前の在留資格に基づく雇用主のもとでは就労可能",
+    "detail": "在留資格変更許可申請中は、新しい雇用主のもとでは就労できない。ただし、申請前の在留資格の雇用主のもとでは在留期限内であれば引き続き就労可能。",
+    "notes": [
+      "特定技能1号から転職の場合: 前の雇用主のもとでは在留期限まで就労可能",
+      "技能実習から変更の場合: 実習先での実習は在留期限まで継続可能",
+      "特定活動への変更が許可された場合: 指定書に記載された雇用主のもとで就労可能",
+      "在留期限を過ぎた場合は特例期間中も就労不可（在留のみ認められ就労は認められない）"
+    ]
+  },
+  "application_patterns": {
+    "GRANT_01": {
+      "id": "GRANT_01",
+      "formal_name": "在留資格認定証明書交付申請",
+      "short_name": "交付",
+      "form_code": "別記第6号の5",
+      "from_visa": "海外在住（ビザなし）",
+      "to_visa": "特定技能1号",
+      "description": "海外から新規入国して特定技能1号を取得",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": false,
+        "note": "原則として技能試験・日本語試験の合格が必要"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "健康診断個人票（参考様式第1-3号）"
+      ],
+      "notes": [
+        "認定証明書の交付後、在外公館で査証申請が必要（交付から3ヶ月以内）",
+        "査証発給後、入国日から14日以内に市区町村で住所届出",
+        "入国後に在留カードが交付される"
+      ]
+    },
+    "CHANGE_TOKKATSU_A": {
+      "id": "CHANGE_TOKKATSU_A",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動",
+      "form_code": "別記第30号の5",
+      "from_visa": "留学",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "留学生が特定技能1号の準備のため特定活動に変更",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": false,
+        "note": "試験合格済みまたは受験予定であることが前提"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "申請理由書（自由様式）",
+        "特定技能雇用契約書の写し（内定先との契約）"
+      ],
+      "notes": [
+        "特定活動の在留期間は最長4ヶ月",
+        "資格外活動の状況（週28時間超過がないか）を確認される可能性あり",
+        "卒業証明書または退学証明書が必要"
+      ]
+    },
+    "CHANGE_TOKKATSU_B": {
+      "id": "CHANGE_TOKKATSU_B",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動",
+      "form_code": "別記第30号の5",
+      "from_visa": "技能実習1号",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "技能実習1号から特定活動に変更。JFT/ASAT合格済みかつ1号満了予定が条件",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": false,
+        "note": "技能実習1号修了者には試験免除なし。JFTまたはASATに合格済みで、かつ1号を満了予定であれば申請可能"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "申請理由書（自由様式）",
+        "技能実習1号の修了証明書または修了見込み証明書",
+        "JFT-Basic合格証明書 または ASAT合格証明書",
+        "特定技能雇用契約書の写し"
+      ],
+      "notes": [
+        "技能実習1号のみの修了者には試験免除の適用なし",
+        "JFT（日本語基礎テスト）またはASAT（農業技能評価試験等）の合格が必要",
+        "技能実習1号を満了予定（または満了済み）であることが前提条件",
+        "特定活動の在留期間は最長4ヶ月"
+      ]
+    },
+    "CHANGE_TOKKATSU_C": {
+      "id": "CHANGE_TOKKATSU_C",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動",
+      "form_code": "別記第30号の5",
+      "from_visa": "技能実習2号",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "技能実習2号から特定活動に変更",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": "同一分野の場合は免除",
+        "japanese_test": "免除",
+        "note": "技能実習2号を良好に修了した場合"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "申請理由書（自由様式）",
+        "技能実習2号の修了証明書",
+        "特定技能雇用契約書の写し"
+      ],
+      "notes": [
+        "在留期限が切迫しているため特定活動を経由するケースが多い",
+        "特定活動の在留期間は最長4ヶ月",
+        "同一分野であれば試験免除が適用される"
+      ]
+    },
+    "CHANGE_TOKKATSU_D": {
+      "id": "CHANGE_TOKKATSU_D",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "特定技能1号から転職のため特定活動に変更",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": "同一分野の場合は免除",
+        "japanese_test": "免除",
+        "note": "既に特定技能1号を持っているので試験は合格済み"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "申請理由書（自由様式）— 転職理由と新しい雇用先",
+        "前の雇用主との雇用契約の終了を証明する書類",
+        "新しい雇用主との特定技能雇用契約書の写し"
+      ],
+      "notes": [
+        "転職の場合、前の雇用主での就労は在留期限まで可能",
+        "特定活動中は新しい雇用主の下でのみ就労可能",
+        "特定活動の在留期間は最長4ヶ月",
+        "退職から14日以内に随時届出が必要"
+      ]
+    },
+    "CHANGE_SSW2_A": {
+      "id": "CHANGE_SSW2_A",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→2号",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定技能2号",
+      "description": "特定技能1号から特定技能2号へ変更（実務経験あり）",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": "免除",
+        "note": "2号技能測定試験の合格が必要"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "実務経験を証明する書類（班長等の指導・監督経験）",
+        "２号技能測定試験の合格証明書の写し"
+      ],
+      "notes": [
+        "複数の作業員を指揮・監督する実務経験が必須",
+        "在留期間の更新に上限がなく、家族帯同が可能"
+      ]
+    },
+    "CHANGE_TOKKATSU_SSW2": {
+      "id": "CHANGE_TOKKATSU_SSW2",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "特定技能1号満了間近で特定技能2号への移行準備（要件不足の場合の猶予措置）",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": "免除",
+        "note": "2号要件（試験合格や実務経験期間）を満たすための経過措置"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "申請理由書（自由様式）— 2号への移行見込み、準備状況について",
+        "特定技能雇用契約書等に順ずる書類（特定活動用）"
+      ],
+      "notes": [
+        "特定活動中に実務経験要件や試験要件を満たすことが前提"
+      ]
+    },
+    "CHANGE_TOKKATSU_E": {
+      "id": "CHANGE_TOKKATSU_E",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動",
+      "form_code": "別記第30号の5",
+      "from_visa": "技能実習3号",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "技能実習3号から特定活動に変更",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": "同一分野の場合は免除",
+        "japanese_test": "免除",
+        "note": "技能実習3号修了者は2号修了者と同等の扱い"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "申請理由書（自由様式）",
+        "技能実習3号の修了証明書",
+        "特定技能雇用契約書の写し"
+      ],
+      "notes": [
+        "技能実習3号は2号修了後の延長なので試験免除は2号と同等",
+        "特定活動の在留期間は最長4ヶ月"
+      ]
+    },
+    "CHANGE_SSW1_A": {
+      "id": "CHANGE_SSW1_A",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能1号",
+      "form_code": "別記第30号の5",
+      "from_visa": "留学",
+      "to_visa": "特定技能1号",
+      "description": "留学生から直接特定技能1号に変更",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": false,
+        "note": "試験合格が必要"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "卒業証明書または退学証明書",
+        "技能試験合格証明書",
+        "日本語試験合格証明書（N4以上 or JFT-Basic）"
+      ],
+      "notes": [
+        "資格外活動（アルバイト）の状況が審査で確認される",
+        "週28時間超のアルバイトがあった場合、不許可リスクあり",
+        "在留期限に余裕がない場合は先に特定活動に変更してから申請"
+      ]
+    },
+    "CHANGE_SSW1_B": {
+      "id": "CHANGE_SSW1_B",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能1号",
+      "form_code": "別記第30号の5",
+      "from_visa": "技能実習1号",
+      "to_visa": "特定技能1号",
+      "description": "技能実習1号から直接特定技能1号に変更。JFT/ASAT合格済みかつ1号満了予定が条件",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": false,
+        "note": "技能実習1号修了者には試験免除なし。JFTまたはASATに合格済みで、1号を満了予定であれば申請可能"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "技能実習1号の修了証明書",
+        "技能試験合格証明書（ASAT等）",
+        "日本語試験合格証明書（N4以上 or JFT-Basic）"
+      ],
+      "notes": [
+        "技能実習1号のみの修了では試験免除は適用されない（2号以上が必要）",
+        "JFTまたはASATの合格と、技能実習1号の満了（予定含む）が前提条件",
+        "在留期限に余裕がない場合は先に特定活動に変更してから申請"
+      ]
+    },
+    "CHANGE_SSW1_C": {
+      "id": "CHANGE_SSW1_C",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能1号",
+      "form_code": "別記第30号の5",
+      "from_visa": "技能実習2号",
+      "to_visa": "特定技能1号",
+      "description": "技能実習2号から特定技能1号に変更（最も一般的なパターン）",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": "同一分野の場合は免除",
+        "japanese_test": "免除",
+        "note": "技能実習2号を良好に修了した場合、同一分野の技能試験とN4が免除"
+      },
+      "skip_conditions": [
+        "同一分野の技能試験が免除",
+        "日本語試験（N4相当）が免除"
+      ],
+      "special_documents": [
+        "技能実習2号の修了証明書（実習実施者or監理団体が発行）"
+      ],
+      "notes": [
+        "最も一般的なパターン",
+        "異なる分野への移行は技能試験の合格が必要",
+        "良好な修了とは: 技能実習を中断なく2年10ヶ月以上実施していること"
+      ]
+    },
+    "CHANGE_SSW1_D": {
+      "id": "CHANGE_SSW1_D",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能1号",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定技能1号",
+      "description": "特定技能1号のまま転職（雇用主変更）。所属機関が変わるため変更申請が必要",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": "同一分野の場合は免除",
+        "japanese_test": "免除",
+        "note": "既に特定技能1号を持っているので同一分野であれば免除"
+      },
+      "skip_conditions": [
+        "同一分野の場合は技能試験免除",
+        "日本語試験免除（既に合格済み）"
+      ],
+      "special_documents": [
+        "前の雇用主からの退職証明書",
+        "新しい雇用主との特定技能雇用契約書"
+      ],
+      "notes": [
+        "転職は在留資格変更許可申請が必要（更新ではない）",
+        "異なる分野への転職の場合は技能試験の合格が必要",
+        "退職から14日以内に随時届出が必要",
+        "申請中は新しい雇用主のもとでは就労不可。前の雇用主のもとでは在留期限まで就労可能"
+      ]
+    },
+    "CHANGE_SSW1_E": {
+      "id": "CHANGE_SSW1_E",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能1号",
+      "form_code": "別記第30号の5",
+      "from_visa": "技能実習3号",
+      "to_visa": "特定技能1号",
+      "description": "技能実習3号から特定技能1号に変更",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": "同一分野の場合は免除",
+        "japanese_test": "免除",
+        "note": "技能実習3号修了者は2号修了者と同等の扱い"
+      },
+      "skip_conditions": [
+        "同一分野の技能試験が免除",
+        "日本語試験（N4相当）が免除"
+      ],
+      "special_documents": [
+        "技能実習3号の修了証明書"
+      ],
+      "notes": [
+        "3号は2号の延長なので試験免除は2号と同等",
+        "3号は優良な監理団体・実習実施者のもとでのみ実施されるため審査上プラス"
+      ]
+    },
+    "CHANGE_SSW1_F": {
+      "id": "CHANGE_SSW1_F",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能1号",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定活動（特定技能準備）",
+      "to_visa": "特定技能1号",
+      "description": "特定活動から特定技能1号に変更。2段階申請の2段目",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": "元の在留資格による",
+        "japanese_test": "元の在留資格による",
+        "note": "特定活動に変更する前の在留資格に基づいて判定"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "特定活動の指定書の写し",
+        "特定活動期間中の活動状況報告"
+      ],
+      "notes": [
+        "特定活動は最長4ヶ月なのでこの期間内に許可を得る必要がある",
+        "特定活動中に別の雇用主に変更は原則不可",
+        "前のステップで提出済みの書類は再提出不要な場合あり"
+      ]
+    },
+    "RENEWAL_01": {
+      "id": "RENEWAL_01",
+      "formal_name": "在留期間更新許可申請",
+      "short_name": "更新",
+      "form_code": "別記第30号",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定技能1号",
+      "description": "同一雇用主のもとで特定技能1号の在留期間を更新",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": "免除（既に合格済み）",
+        "japanese_test": "免除（既に合格済み）",
+        "note": "更新時は試験の再受験不要"
+      },
+      "skip_conditions": [
+        "技能試験合格証明書（既に提出済み）",
+        "日本語試験合格証明書（既に提出済み）",
+        "2年以内に同一所属機関から申請した場合: 登記事項証明書、決算報告書等"
+      ],
+      "special_documents": [
+        "報酬支払証明書（参考様式第5-7号）",
+        "住民税課税証明書・納税証明書（申請人が取得）"
+      ],
+      "notes": [
+        "特定技能1号の通算在留期間は上限5年",
+        "在留期限の3ヶ月前から申請可能",
+        "申請中に在留期限が到来しても結果が出るまで在留可能（特例期間）",
+        "報酬が雇用契約書の金額と乖離していないか確認される"
+      ]
+    },
+    "GRANT_SSW2": {
+      "id": "GRANT_SSW2",
+      "formal_name": "在留資格認定証明書交付申請",
+      "short_name": "新規（交付）→特定技能2号",
+      "form_code": "別記第29号",
+      "from_visa": "海外在住",
+      "to_visa": "特定技能2号",
+      "description": "海外から特定技能2号の呼び寄せ",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": true,
+        "note": "2号技能測定試験の合格が必要。日本語試験は不要。"
+      },
+      "skip_conditions": [],
+      "special_documents": [],
+      "notes": [
+        "特定技能2号は家族帯同が可能"
+      ]
+    },
+    "CHANGE_SSW2_A": {
+      "id": "CHANGE_SSW2_A",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定技能2号",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定技能2号",
+      "description": "特定技能1号から特定技能2号に変更",
+      "typical_processing_days": "30〜90日",
+      "exam_exemption": {
+        "skill_test": false,
+        "japanese_test": true,
+        "note": "2号技能測定試験等の合格と実務経験が必要。"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "実務経験を証明する書類"
+      ],
+      "notes": [
+        "特定技能2号は家族帯同が可能、在留期間の更新に上限なし"
+      ]
+    },
+    "RENEWAL_SSW2": {
+      "id": "RENEWAL_SSW2",
+      "formal_name": "在留期間更新許可申請",
+      "short_name": "更新→特定技能2号",
+      "form_code": "別記第30号の4",
+      "from_visa": "特定技能2号",
+      "to_visa": "特定技能2号",
+      "description": "特定技能2号の在留期間更新",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": "免除",
+        "japanese_test": "免除",
+        "note": "既に2号のため免除"
+      },
+      "skip_conditions": [],
+      "special_documents": [],
+      "notes": [
+        "在留期間の更新回数に制限なし"
+      ]
+    },
+    "CHANGE_TOKKATSU_SSW2_PREP": {
+      "id": "CHANGE_TOKKATSU_SSW2_PREP",
+      "formal_name": "在留資格変更許可申請",
+      "short_name": "変更→特定活動（2号移行準備）",
+      "form_code": "別記第30号の5",
+      "from_visa": "特定技能1号",
+      "to_visa": "特定活動（特定技能準備）",
+      "description": "特定技能1号満了までに2号試験結果待ちなどのため特定活動へ変更",
+      "typical_processing_days": "14〜30日",
+      "exam_exemption": {
+        "skill_test": "免除",
+        "japanese_test": "免除",
+        "note": "1号を修了するため"
+      },
+      "skip_conditions": [],
+      "special_documents": [
+        "2号への移行準備を裏付ける資料（受験票など）",
+        "申請理由書"
+      ],
+      "notes": [
+        "特定活動は原則最長4ヶ月（更新できる場合あり）"
+      ]
+    }
+  },
+  "pattern_lookup": {
+    "海外在住_特定技能1号": "GRANT_01",
+    "留学_特定活動": "CHANGE_TOKKATSU_A",
+    "技能実習1号_特定活動": "CHANGE_TOKKATSU_B",
+    "技能実習2号_特定活動": "CHANGE_TOKKATSU_C",
+    "特定技能1号_特定活動": "CHANGE_TOKKATSU_D",
+    "技能実習3号_特定活動": "CHANGE_TOKKATSU_E",
+    "留学_特定技能1号": "CHANGE_SSW1_A",
+    "技能実習1号_特定技能1号": "CHANGE_SSW1_B",
+    "技能実習2号_特定技能1号": "CHANGE_SSW1_C",
+    "特定技能1号_特定技能1号_転職": "CHANGE_SSW1_D",
+    "技能実習3号_特定技能1号": "CHANGE_SSW1_E",
+    "特定活動_特定技能1号": "CHANGE_SSW1_F",
+    "特定技能1号_特定技能1号_更新": "RENEWAL_01",
+    "海外在住_特定技能2号": "GRANT_SSW2",
+    "特定技能1号_特定技能2号": "CHANGE_SSW2_A",
+    "特定技能1号_特定技能2号_更新": "RENEWAL_SSW2",
+    "特定技能1号_特定活動_2号移行準備": "CHANGE_TOKKATSU_SSW2"
+  },
+  "fields": [
+    "農業",
+    "漁業",
+    "飲食料品製造業",
+    "外食業",
+    "介護",
+    "ビルクリーニング",
+    "素形材・産業機械・電気電子情報関連製造業",
+    "建設",
+    "造船・舶用工業",
+    "自動車整備",
+    "航空",
+    "宿泊",
+    "自動車運送業",
+    "鉄道",
+    "林業",
+    "木材産業"
+  ],
+  "common_documents": {
+    "all_ssw1_applications": [
+      {
+        "name": "特定技能雇用契約書",
+        "template": "参考様式第1-5号",
+        "who": "所属機関",
+        "bilingual": true
+      },
+      {
+        "name": "雇用条件書",
+        "template": "参考様式第1-6号",
+        "who": "所属機関",
+        "bilingual": true
+      },
+      {
+        "name": "報酬に関する説明書",
+        "template": "参考様式第1-4号",
+        "who": "所属機関",
+        "bilingual": false
+      },
+      {
+        "name": "雇用の経緯に係る説明書",
+        "template": "参考様式第1-16号",
+        "who": "所属機関",
+        "bilingual": false
+      },
+      {
+        "name": "所属機関概要書",
+        "template": "参考様式第1-11号",
+        "who": "所属機関",
+        "bilingual": false
+      },
+      {
+        "name": "受入れ誓約書",
+        "template": "参考様式第1-2号",
+        "who": "所属機関",
+        "bilingual": false
+      }
+    ],
+    "all_ssw2_applications": [
+      {
+        "name": "「特定技能２号」に係る提出書類一覧表",
+        "template": "規程",
+        "who": "所属機関",
+        "bilingual": false
+      },
+      {
+        "name": "特定技能雇用契約書",
+        "template": "参考様式第1-5号",
+        "who": "所属機関",
+        "bilingual": true
+      },
+      {
+        "name": "雇用条件書",
+        "template": "参考様式第1-6号",
+        "who": "所属機関",
+        "bilingual": true
+      },
+      {
+        "name": "特定技能外国人の報酬に関する説明書",
+        "template": "参考様式第1-4号",
+        "who": "所属機関",
+        "bilingual": false
+      },
+      {
+        "name": "雇用の経緯に係る説明書",
+        "template": "参考様式第1-16号",
+        "who": "所属機関",
+        "bilingual": false
+      },
+      {
+        "name": "公的義務履行に関する誓約書",
+        "template": "規程",
+        "who": "所属機関",
+        "bilingual": false
+      }
+    ],
+    "ssw2_agriculture_direct": [
+      {
+        "name": "２号農業技能測定試験の合格証明書の写し",
+        "who": "申請人"
+      },
+      {
+        "name": "農業分野において直接雇用形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書",
+        "who": "所属機関"
+      },
+      {
+        "name": "協議会の構成員であることの証明書（特定技能所属機関）",
+        "who": "所属機関"
+      }
+    ],
+    "support_self": [
+      {
+        "name": "支援計画書",
+        "template": "参考様式第1-17号",
+        "who": "所属機関",
+        "bilingual": true
+      }
+    ],
+    "support_delegated": [
+      {
+        "name": "支援計画書",
+        "template": "参考様式第1-17号",
+        "who": "登録支援機関",
+        "bilingual": true
+      },
+      {
+        "name": "支援委託契約書",
+        "template": "自由様式",
+        "who": "所属機関＋登録支援機関",
+        "bilingual": false
+      },
+      {
+        "name": "登録支援機関の登録証の写し",
+        "template": "—",
+        "who": "登録支援機関",
+        "bilingual": false
+      }
+    ],
+    "company_certificates": [
+      {
+        "name": "登記事項証明書",
+        "who": "所属機関（法務局で取得）",
+        "skippable_if_2year": true,
+        "employer_types": ["corporate"]
+      },
+      {
+        "name": "住民票の写し（マイナンバー省略されたもの）",
+        "who": "所属機関（市区町村で取得）",
+        "skippable_if_2year": true,
+        "employer_types": ["individual"]
+      },
+      {
+        "name": "決算報告書（直近2年分）",
+        "who": "所属機関",
+        "skippable_if_2year": true,
+        "employer_types": ["corporate"]
+      },
+      {
+        "name": "確定申告書の写し（直近2年分）",
+        "who": "所属機関",
+        "skippable_if_2year": true,
+        "employer_types": ["individual"]
+      },
+      {
+        "name": "労働保険料等納付証明書",
+        "who": "所属機関（労働局で取得）",
+        "skippable_if_2year": true
+      },
+      {
+        "name": "社会保険料納入状況回答票",
+        "who": "所属機関（年金機構で取得）",
+        "skippable_if_2year": true,
+        "employer_types": ["corporate", "individual_applicable"]
+      },
+      {
+        "name": "納税証明書",
+        "who": "所属機関（税務署で取得）",
+        "skippable_if_2year": true
+      }
+    ],
+    "applicant_common": [
+      {
+        "name": "パスポート写し",
+        "who": "申請人"
+      },
+      {
+        "name": "写真（3cm×4cm、3ヶ月以内、白背景）",
+        "who": "申請人"
+      }
+    ],
+    "applicant_domestic_only": [
+      {
+        "name": "在留カード写し（表裏）",
+        "who": "申請人"
+      }
+    ]
+  },
+  "bilingual_templates": {
+    "phase1_language": "id",
+    "supported_languages": [
+      "id"
+    ],
+    "language_names": {
+      "id": "インドネシア語（Bahasa Indonesia）"
+    },
+    "bilingual_documents": [
+      "特定技能雇用契約書",
+      "雇用条件書",
+      "支援計画書",
+      "事前ガイダンス説明資料"
+    ],
+    "future_languages": [
+      "vi",
+      "my",
+      "tl",
+      "zh"
+    ]
+  },
+  "deadlines": {
+    "随時届出": {
+      "days": 14,
+      "description": "届出事由発生日から14日以内（厳守）"
+    },
+    "定期届出": {
+      "period": "4/1〜5/31",
+      "description": "年1回、4月1日から5月31日まで"
+    },
+    "更新申請可能開始": {
+      "months_before": 3,
+      "description": "在留期限の3ヶ月前から申請可能"
+    },
+    "特定技能1号通算上限": {
+      "years": 5,
+      "description": "通算在留期間は上限5年"
+    },
+    "認定証明書有効期限": {
+      "months": 3,
+      "description": "交付から3ヶ月以内に査証申請が必要"
+    },
+    "特定活動最長期間": {
+      "months": 4,
+      "description": "特定活動（特定技能準備）は最長4ヶ月"
+    }
+  }
+}

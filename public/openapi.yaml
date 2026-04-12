@@ -1,0 +1,282 @@
+openapi: 3.1.0
+info:
+  title: SuguVisa - 特定技能ビザ申請AI API
+  description: |
+    日本の特定技能（SSW: Specified Skilled Worker）ビザ申請プロセスを自動化する専門APIです。
+    申請種別の判定、必要書類リスト、期限計算、データ検証、定期報告書の自動生成に対応しています。
+    
+    ## 基本的なワークフロー
+    1. `/determine` — 現在のビザと目標ビザから申請パターンを判定
+    2. `/required-documents` — 判定結果の `pattern_id` を使って必要書類を取得
+    3. `/deadlines` — 在留期限等から各種期限を計算
+    4. `/validate` — 申請データの入力値を検証
+  version: 0.2.0
+  contact:
+    name: スグクル株式会社
+    email: a_kabe@sugu-kuru.co.jp
+
+servers:
+  - url: https://suguvisa-mcp-731026511067.asia-northeast1.run.app/api/v1/tools
+    description: Production (Cloud Run)
+  - url: http://localhost:3000/api/v1/tools
+    description: Local development
+
+paths:
+  /determine:
+    post:
+      operationId: determineApplicationType
+      summary: 申請種別を自動判定する
+      description: 現在の在留資格と申請する在留資格から、正式な申請種別・必要な手続きを自動判定します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from_visa, to_visa]
+              properties:
+                from_visa:
+                  type: string
+                  description: 現在の在留資格（例 "技能実習2号", "特定技能1号"）
+                to_visa:
+                  type: string
+                  description: 申請する在留資格（例 "特定技能1号", "特定技能2号"）
+                context:
+                  type: string
+                  description: 追加コンテキスト（例 "転職", "更新", "2号移行準備"）
+                has_supervisor_experience:
+                  type: boolean
+                  description: 特定技能2号用：班長等の指導・監督実務経験があるか
+      responses:
+        '200':
+          description: 判定結果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [found, not_found]
+                  pattern_id:
+                    type: string
+                    description: 必要書類取得などで使用するパターンID
+                  formal_name:
+                    type: string
+                  description:
+                    type: string
+                  typical_processing_days:
+                    type: string
+
+  /required-documents:
+    post:
+      operationId: getRequiredDocuments
+      summary: 必要書類の完全リストを取得する
+      description: 申請パターンIDに基づいて、提出が必要な全書類のリストを返します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pattern_id]
+              properties:
+                pattern_id:
+                  type: string
+                  description: "申請パターンID（例: CHANGE_SSW1_C）— determine で取得"
+                support_type:
+                  type: string
+                  enum: [self, delegated]
+                  default: delegated
+                  description: 支援体制（self=自社支援, delegated=登録支援機関へ委託）
+                is_same_employer_2year:
+                  type: boolean
+                  default: false
+                  description: 2年以内に同一機関から申請したか（一部書類免除判定用）
+                is_domestic:
+                  type: boolean
+                  default: true
+                  description: 国内申請か海外からの呼び寄せか
+                industry_field:
+                  type: string
+                  description: "特定産業分野（例: 農業, 飲食料品製造業）"
+                employer_type:
+                  type: string
+                  enum: [corporate, individual]
+                  default: corporate
+      responses:
+        '200':
+          description: 必要書類リスト
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  total_documents:
+                    type: integer
+                  documents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        category:
+                          type: string
+                        skipped:
+                          type: boolean
+
+  /deadlines:
+    post:
+      operationId: calculateDeadlines
+      summary: 各種期限を計算する
+      description: 在留期限、届出事由発生日等から、随時届出期限・更新申請可能日・通算上限等を計算します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiry_date:
+                  type: string
+                  format: date
+                  description: 在留期限（YYYY-MM-DD）
+                event_date:
+                  type: string
+                  format: date
+                  description: 届出事由の発生日（YYYY-MM-DD）
+                ssw1_start_date:
+                  type: string
+                  format: date
+                  description: 特定技能1号の通算開始日（YYYY-MM-DD）
+                coe_issue_date:
+                  type: string
+                  format: date
+                  description: 認定証明書交付日（YYYY-MM-DD）
+      responses:
+        '200':
+          description: 期限計算結果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  today:
+                    type: string
+                  deadlines:
+                    type: array
+                    items:
+                      type: object
+
+  /validate:
+    post:
+      operationId: validateApplicationData
+      summary: 申請データの入力検証
+      description: 在留カード番号、法人番号、日付等の書式を検証します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fields]
+              properties:
+                fields:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: "検証するフィールドのキー/値（例: {\"residence_card_number\": \"AB12345678CD\"}）"
+      responses:
+        '200':
+          description: 検証結果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [all_valid, has_errors]
+                  results:
+                    type: object
+
+  /annual-report-csv:
+    post:
+      operationId: generateAnnualReportCsv
+      summary: 定期報告CSVデータを生成する
+      description: オンライン一括申請用の定期報告CSVデータを生成します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reports]
+              properties:
+                reports:
+                  type: array
+                  items:
+                    type: object
+                  description: 報告対象の申請人データ配列
+      responses:
+        '200':
+          description: CSV生成結果
+
+  /annual-report-excel:
+    post:
+      operationId: generateAnnualReportExcel
+      summary: 定期報告Excelを生成する（オフライン紙提出用）
+      description: オンライン届出を利用しない所属機関向けに、定期報告データをExcel形式で自動出力します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company_name, reporting_year]
+              properties:
+                company_name:
+                  type: string
+                  description: 所属機関名
+                reporting_year:
+                  type: integer
+                  description: 報告年度（例 2026）
+                paper_form_data:
+                  type: array
+                  items:
+                    type: object
+                  description: 従業員データ配列
+      responses:
+        '200':
+          description: Excel生成結果
+
+  /law-updates:
+    get:
+      operationId: getLawUpdates
+      summary: 法改正・制度変更情報を取得する
+      description: 特定技能等に関する最新の法改正・制度変更情報を取得します。
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date
+          description: この日付以降の更新を取得
+        - name: keyword
+          in: query
+          schema:
+            type: string
+          description: キーワードで絞り込み
+        - name: status
+          in: query
+          schema:
+            type: string
+          description: ステータスで絞り込み（施行済み, 施行準備中）
+      responses:
+        '200':
+          description: 法改正情報

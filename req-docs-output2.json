@@ -1,0 +1,243 @@
+{
+  "status": "ok",
+  "pattern_id": "CHANGE_SSW1_A",
+  "formal_name": "在留資格変更許可申請",
+  "form_code": "別記第30号の5",
+  "total_documents": 22,
+  "skipped_count": 0,
+  "field_specific_count": 2,
+  "exam_exemption": {
+    "skill_test": false,
+    "japanese_test": false,
+    "note": "試験合格が必要",
+    "skill_test_detail": {
+      "name": "農業技能測定試験",
+      "organizer": "一般社団法人全国農業会議所",
+      "url": "https://asat.nca.or.jp/",
+      "sub_tests": [
+        "耕種農業全般",
+        "畜産農業全般"
+      ],
+      "languages": [
+        "日本語",
+        "英語",
+        "インドネシア語",
+        "ベトナム語",
+        "タイ語",
+        "フィリピン語",
+        "ミャンマー語",
+        "カンボジア語",
+        "ネパール語",
+        "モンゴル語"
+      ],
+      "test_locations": [
+        "国内",
+        "海外（インドネシア、フィリピン、カンボジア、タイ、ミャンマー、ネパール、ベトナム等）"
+      ]
+    },
+    "japanese_test_options": [
+      {
+        "name": "JFT-Basic（国際交流基金日本語基礎テスト）",
+        "level": "A2相当"
+      },
+      {
+        "name": "JLPT N4以上（日本語能力試験）",
+        "level": "N4以上"
+      }
+    ]
+  },
+  "documents": [
+    {
+      "name": "特定技能雇用契約書",
+      "template": "参考様式第1-5号",
+      "who": "所属機関",
+      "category": "共通書類 / Common Docs",
+      "bilingual": true,
+      "reference_form_detail": {
+        "number": "参考様式第1-5号",
+        "fields_count": 20,
+        "bilingual_languages": [
+          "id",
+          "vi",
+          "my",
+          "tl",
+          "zh",
+          "en",
+          "ne",
+          "km",
+          "mn",
+          "th"
+        ]
+      }
+    },
+    {
+      "name": "雇用条件書",
+      "template": "参考様式第1-6号",
+      "who": "所属機関",
+      "category": "共通書類 / Common Docs",
+      "bilingual": true,
+      "reference_form_detail": {
+        "number": "参考様式第1-6号",
+        "fields_count": 23,
+        "bilingual_languages": [
+          "id",
+          "vi",
+          "my",
+          "tl",
+          "zh",
+          "en",
+          "ne",
+          "km",
+          "mn",
+          "th"
+        ]
+      }
+    },
+    {
+      "name": "報酬に関する説明書",
+      "template": "参考様式第1-4号",
+      "who": "所属機関",
+      "category": "共通書類 / Common Docs",
+      "bilingual": false,
+      "reference_form_detail": {
+        "number": "参考様式第1-4号",
+        "fields_count": 6,
+        "bilingual_languages": []
+      }
+    },
+    {
+      "name": "雇用の経緯に係る説明書",
+      "template": "参考様式第1-16号",
+      "who": "所属機関",
+      "category": "共通書類 / Common Docs",
+      "bilingual": false,
+      "reference_form_detail": {
+        "number": "参考様式第1-16号",
+        "fields_count": 7,
+        "bilingual_languages": []
+      }
+    },
+    {
+      "name": "所属機関概要書",
+      "template": "参考様式第1-11号",
+      "who": "所属機関",
+      "category": "共通書類 / Common Docs",
+      "bilingual": false,
+      "reference_form_detail": {
+        "number": "参考様式第1-11号",
+        "fields_count": 13,
+        "bilingual_languages": []
+      }
+    },
+    {
+      "name": "受入れ誓約書",
+      "template": "参考様式第1-2号",
+      "who": "所属機関",
+      "category": "共通書類 / Common Docs",
+      "bilingual": false,
+      "reference_form_detail": {
+        "number": "参考様式第1-2号",
+        "fields_count": 5,
+        "bilingual_languages": []
+      }
+    },
+    {
+      "name": "支援計画書",
+      "template": "参考様式第1-17号",
+      "who": "登録支援機関",
+      "category": "支援関連 / Support Docs",
+      "reference_form_detail": {
+        "number": "参考様式第1-17号",
+        "fields_count": 13
+      }
+    },
+    {
+      "name": "支援委託契約書",
+      "template": "自由様式",
+      "who": "所属機関＋登録支援機関",
+      "category": "支援関連 / Support Docs",
+      "reference_form_detail": null
+    },
+    {
+      "name": "登録支援機関の登録証の写し",
+      "template": "—",
+      "who": "登録支援機関",
+      "category": "支援関連 / Support Docs",
+      "reference_form_detail": null
+    },
+    {
+      "name": "住民票の写し（マイナンバー省略されたもの）",
+      "who": "所属機関（市区町村で取得）",
+      "category": "所属機関証明 / Company Certificates",
+      "skipped": false
+    },
+    {
+      "name": "確定申告書の写し（直近2年分）",
+      "who": "所属機関",
+      "category": "所属機関証明 / Company Certificates",
+      "skipped": false
+    },
+    {
+      "name": "労働保険料等納付証明書",
+      "who": "所属機関（労働局で取得）",
+      "category": "所属機関証明 / Company Certificates",
+      "skipped": false
+    },
+    {
+      "name": "社会保険料納入状況回答票",
+      "who": "所属機関（年金機構で取得）",
+      "category": "所属機関証明 / Company Certificates",
+      "skipped": false
+    },
+    {
+      "name": "納税証明書",
+      "who": "所属機関（税務署で取得）",
+      "category": "所属機関証明 / Company Certificates",
+      "skipped": false
+    },
+    {
+      "name": "パスポート写し",
+      "who": "申請人",
+      "category": "申請人共通 / Applicant Common"
+    },
+    {
+      "name": "写真（3cm×4cm、3ヶ月以内、白背景）",
+      "who": "申請人",
+      "category": "申請人共通 / Applicant Common"
+    },
+    {
+      "name": "在留カード写し（表裏）",
+      "who": "申請人",
+      "category": "申請人（国内のみ） / Applicant (Domestic Only)"
+    },
+    {
+      "name": "卒業証明書または退学証明書",
+      "category": "パターン固有 / Pattern Specific",
+      "who": "—"
+    },
+    {
+      "name": "技能試験合格証明書",
+      "category": "パターン固有 / Pattern Specific",
+      "who": "—"
+    },
+    {
+      "name": "日本語試験合格証明書（N4以上 or JFT-Basic）",
+      "category": "パターン固有 / Pattern Specific",
+      "who": "—"
+    },
+    {
+      "name": "農業分野における特定技能外国人の受入れに関する誓約書",
+      "category": "分野固有（農業） / Field Specific",
+      "who": "所属機関",
+      "reference_form_number": "農業分野参考様式第1号"
+    },
+    {
+      "name": "農業分野における業務を行わせる事業所の概要書",
+      "category": "分野固有（農業） / Field Specific",
+      "who": "所属機関",
+      "reference_form_number": "農業分野参考様式第2号"
+    }
+  ],
+  "skip_conditions": [],
+  "download_url": "https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00030.html"
+}

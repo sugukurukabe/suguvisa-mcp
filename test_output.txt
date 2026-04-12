@@ -1,0 +1,33 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/k_jim/OneDrive/デスクトップ/suguvisa-mcp[39m
+
+[90mstdout[2m | src/agents/__tests__/workflow.test.ts[2m > [22m[2mAutonomous Visa Workflow via LangGraph[2m > [22m[2mshould interrupt for missing fields and successfully generate documents after human input
+[22m[39m[SlackBot notifying Human] 以下の情報が不足しています。対象者をチェックしてデータを入力してください:
+family_name_romaji, given_name_romaji, nationality_code, date_of_birth, sex, passport_number, desired_visa_type, desired_period, company_name, company_address, company_phone, representative, industry_field_code, work_description, monthly_salary, contract_start_date
+
+ [31m❯[39m src/agents/__tests__/workflow.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 10005[2mms[22m[39m
+[31m   [31m×[31m Autonomous Visa Workflow via LangGraph[2m > [22mshould interrupt for missing fields and successfully generate documents after human input[39m[33m 10004[2mms[22m[39m
+[31m     → Test timed out in 10000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/agents/__tests__/workflow.test.ts[2m > [22mAutonomous Visa Workflow via LangGraph[2m > [22mshould interrupt for missing fields and successfully generate documents after human input
+[31m[1mError[22m: Test timed out in 10000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+[36m [2m❯[22m src/agents/__tests__/workflow.test.ts:[2m5:3[22m[39m
+    [90m  3| [39m
+    [90m  4| [39m[34mdescribe[39m([32m"Autonomous Visa Workflow via LangGraph"[39m[33m,[39m () [33m=>[39m {
+    [90m  5| [39m  it("should interrupt for missing fields and successfully generate do…
+    [90m   | [39m  [31m^[39m
+    [90m  6| [39m    
+    [90m  7| [39m    [90m// We must pass a thread_id when using MemorySaver[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m   Start at [22m 12:04:02
+[2m   Duration [22m 11.33s[2m (transform 88ms, setup 0ms, collect 844ms, tests 10.00s, environment 0ms, prepare 142ms)[22m
+

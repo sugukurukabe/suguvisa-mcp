@@ -1,0 +1,16 @@
+﻿
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/k_jim/OneDrive/繝・せ繧ｯ繝医ャ繝・suguvisa-mcp[39m
+
+ [31m笶ｯ[39m src/tools/__tests__/parse-residence-card.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+   [32m笨・[39m parse-residence-card internal functions[2m > [22mshould map Document AI results correctly[32m 2[2mms[22m[39m
+[31m   [31mﾃ・[31m parse-residence-card internal functions[2m > [22mshould fallback to regex parsing successfully[39m[32m 6[2mms[22m[39m
+[31m     竊・expected null to be 'DOE JOHN' // Object.is equality[39m
+   [32m笨・[39m parse-residence-card internal functions[2m > [22mshould normalize Japanese era dates to Gregorian dates[32m 3[2mms[22m[39m
+   [32m笨・[39m parse-residence-card internal functions[2m > [22mshould validate residence card numbers properly[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 02:23:49
+[2m   Duration [22m 871ms[2m (transform 62ms, setup 0ms, collect 478ms, tests 12ms, environment 0ms, prepare 134ms)[22m
+
+

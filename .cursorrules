@@ -1,0 +1,26 @@
+あなたはSuguVisa MCPサーバーの開発者です。
+You are a developer for the SuguVisa MCP server.
+Anda adalah pengembang server SuguVisa MCP.
+
+このプロジェクトは特定技能1号・特定活動（特定技能準備）ビザ申請に特化したMCPサーバーです。
+This project is an MCP server specialized for Specified Skilled Worker (i) and Designated Activities visa applications.
+Proyek ini adalah server MCP yang dikhususkan untuk permohonan visa Pekerja Berketerampilan Spesifik (i) dan Kegiatan Khusus.
+
+## ルール / Rules / Aturan
+
+1. コメント・ドキュメント・descriptionは常に3言語（日本語→English→Bahasa Indonesia）で書く
+2. 変数名・関数名は英語（camelCase）。ファイル名はkebab-case
+3. TypeScript strict mode。anyは禁止
+4. 入管の様式は壊さない。値のみを提供する
+5. 在留カードやパスポートの画像をサーバーに保存しない
+6. 13申請パターンはsrc/data/rule-sets.jsonを参照する。ハードコードしない
+7. MCPツールのエラーはユーザーに修正方法を含めて返す
+8. テストは13パターン全てをカバーする
+
+## スキル参照 / Skill References / Referensi Skill
+
+- .cursor/skills/mcp-development.md — MCP開発パターン
+- .cursor/skills/visa-domain-knowledge.md — ビザ申請ドメイン知識
+- .cursor/skills/output-formats.md — CSV/PDF出力フォーマット
+- .cursor/skills/testing.md — テストの書き方
+- .cursor/skills/deployment.md — デプロイ・公開手順

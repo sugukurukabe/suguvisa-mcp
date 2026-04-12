@@ -1,0 +1,34 @@
+﻿
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/k_jim/OneDrive/繝・せ繧ｯ繝医ャ繝・suguvisa-mcp[39m
+
+ [31m笶ｯ[39m src/tools/__tests__/e2e-patterns.test.ts [2m([22m[2m20 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 21[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 01: 隱榊ｮ・- 霎ｲ讌ｭ - 逶ｴ謗･髮・畑 - 豕穂ｺｺ[32m 3[2mms[22m[39m
+[31m   [31mﾃ・[31m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 02: 隱榊ｮ・- 霎ｲ讌ｭ - 辟｡譛滓ｴｾ驕｣ - 蛟倶ｺｺ莠区･ｭ荳ｻ (豕穂ｺｺ逡ｪ蜿ｷ縺ｪ縺・[39m[32m 7[2mms[22m[39m
+[31m     竊・expected false to be true // Object.is equality[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 03: 隱榊ｮ・- 蟒ｺ險ｭ - 譛画悄豢ｾ驕｣ - 豕穂ｺｺ[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 04: 隱榊ｮ・- 螳ｿ豕・- 逶ｴ謗･髮・畑 - 豕穂ｺｺ - 邨ｦ譁吝・隗定｡ｨ險・[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 05: 譖ｴ譁ｰ - 鬟ｲ鬟滓侭蜩∬｣ｽ騾 - 逶ｴ謗･髮・畑[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 06: 譖ｴ譁ｰ - 螟夜｣・- 逶ｴ謗･髮・畑[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 07: 譖ｴ譁ｰ - 繝薙Ν繧ｯ繝ｪ繝ｼ繝九Φ繧ｰ - 逶ｴ謗･髮・畑[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 08: 譖ｴ譁ｰ - 莉玖ｭｷ - 逶ｴ謗･髮・畑 - 蜷榊燕蜈ｨ隗偵い繝ｫ繝輔ぃ繝吶ャ繝域ｷｷ蜈･[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 09: 螟画峩 - 霎ｲ讌ｭ - 辟｡譛滓ｴｾ驕｣ - 謚閭ｽ螳溽ｿ偵°繧峨・遘ｻ陦・[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 10: 螟画峩 - 閾ｪ蜍戊ｻ頑紛蛯・- 逶ｴ謗･髮・畑[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 11: 螟画峩 - 闊ｪ遨ｺ - 逶ｴ謗･髮・畑[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 12: 隱榊ｮ・- 蜊願ｧ偵き繝頑ｷｷ縺倥ｊ縺ｮ蜷榊燕 (繧ｵ繝九ち繧､繧ｺ繝・せ繝・[32m 0[2mms[22m[39m
+[31m   [31mﾃ・[31m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 13: 隱榊ｮ・- 隱慕函譌･縺悟柱證ｦ陦ｨ險・[39m[32m 2[2mms[22m[39m
+[31m     竊・expected false to be true // Object.is equality[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 14: 譖ｴ譁ｰ - 蝨ｨ逡吶き繝ｼ繝画ュ蝣ｱ縺ゅｊ[32m 0[2mms[22m[39m
+[31m   [31mﾃ・[31m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 15: 螟画峩 - 繝代せ繝昴・繝域ｬ謳・(謠仙・縺ｧ縺阪↑縺・ｴ蜷医・繧ｷ繝翫Μ繧ｪ)[39m[32m 1[2mms[22m[39m
+[31m     竊・expected false to be true // Object.is equality[39m
+[31m   [31mﾃ・[31m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 16: 隱榊ｮ・- 逡ｰ蟶ｸ縺ｪ髮ｻ隧ｱ逡ｪ蜿ｷ (險伜捷豺ｷ蜈･)[39m[32m 1[2mms[22m[39m
+[31m     竊・expected '09012345678' to be '090-1234-5678' // Object.is equality[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 17: 螟画峩 - 豢ｾ驕｣蜈域ュ蝣ｱ蜈･繧・(霎ｲ讌ｭ)[32m 1[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 18: 譖ｴ譁ｰ - 譌ｧ蠖｢蠑上・譌･莉・[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 19: 隱榊ｮ・- 譛育ｵｦ縺ｧ縲取凾邨ｦ1000蜀・上・繧医≧縺ｪ荳崎ｦ√ユ繧ｭ繧ｹ繝・[32m 0[2mms[22m[39m
+   [32m笨・[39m E2E Test Matrix for Validation (20 Patterns)[2m > [22mCase 20: 螟画峩 - 讌ｵ遶ｯ縺ｫ遏ｭ縺・錐蜑・[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m16 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 21:14:04
+[2m   Duration [22m 536ms[2m (transform 63ms, setup 0ms, collect 85ms, tests 21ms, environment 0ms, prepare 161ms)[22m
+
