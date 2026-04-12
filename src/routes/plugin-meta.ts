@@ -13,15 +13,26 @@ router.get("/.well-known/ai-plugin.json", (_req: Request, res: Response) => {
   const baseUrl = process.env.SUGUVISA_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
   res.json({
     schema_version: "v1",
-    name_for_human: "SuguVisa - ビザ申請AI",
+    name_for_human: "SuguVisa — 特定技能ビザ申請AI",
     name_for_model: "suguvisa",
-    description_for_human: "日本の特定技能ビザ（在留資格）申請を自動化するAIプラグイン。申請種別の判定、必要書類リスト、期限計算、データ検証、定期報告書の自動生成に対応。",
+    description_for_human:
+      "日本の特定技能（SSW）ビザ申請を完全サポート。申請パターンの自動判定、必要書類リスト（省略条件自動適用）、期限計算（14日届出ルール対応）、データ検証、定期報告CSV/Excel生成、法改正追跡を提供。行政書士・登録支援機関・受入れ機関・外国人本人向け。",
     description_for_model:
-      "SuguVisa is an expert tool for Japanese Specified Skilled Worker (SSW/特定技能) visa applications. " +
-      "Use it to: (1) determine the correct application type from current→target visa, " +
-      "(2) get a complete list of required documents, (3) calculate all relevant deadlines, " +
-      "(4) validate applicant data fields, (5) generate annual periodic reports in CSV or Excel. " +
-      "Always call 'determine' first to get a pattern_id, then pass it to other endpoints.",
+      "SuguVisa is the expert tool for Japanese Specified Skilled Worker (SSW/特定技能) visa applications. " +
+      "ALWAYS follow this workflow: " +
+      "(1) Ask the user about their current visa and what they want to do. " +
+      "(2) Call 'determineApplicationType' with from_visa and to_visa to get the pattern_id. " +
+      "(3) Use the pattern_id to call 'getRequiredDocuments' for the full document checklist. " +
+      "(4) Call 'calculateDeadlines' with any dates the user provides (expiry_date, event_date, ssw1_start_date). " +
+      "(5) If the user has data to verify, call 'validateApplicationData'. " +
+      "(6) For annual reporting, use 'generateAnnualReportCsv' or 'generateAnnualReportExcel'. " +
+      "(7) For legal updates, call 'getLawUpdates'. " +
+      "IMPORTANT RULES: " +
+      "- Always present results in a user-friendly, structured format with headings, checklists, and tables. " +
+      "- Highlight urgent deadlines with warning emojis. " +
+      "- Explain skipped documents (省略) and why they are exempt. " +
+      "- Respond in the same language the user uses (Japanese, English, or Indonesian). " +
+      "- Always remind users that this is not legal advice and to consult a licensed immigration lawyer for final decisions.",
     auth: {
       type: "service_http",
       authorization_type: "bearer",

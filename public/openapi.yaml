@@ -1,13 +1,21 @@
 openapi: 3.1.0
 info:
-  title: SuguVisa - 特定技能ビザ申請AI API
+  title: SuguVisa — 特定技能ビザ申請AI API
   description: |
-    日本の特定技能（SSW: Specified Skilled Worker）ビザ申請プロセスを自動化する専門APIです。
-    申請種別の判定、必要書類リスト、期限計算、データ検証、定期報告書の自動生成に対応しています。
+    日本の特定技能（SSW: Specified Skilled Worker）ビザ申請を完全自動化するAPIです。
+    行政書士・登録支援機関・受入れ機関・外国人申請者本人が使えます。
+    
+    ## できること
+    - 🔍 申請種別の自動判定（技能実習→特定技能、転職、更新、2号移行など全パターン）
+    - 📋 必要書類リスト（省略条件を自動適用し、本当に必要な書類だけ返す）
+    - ⏰ 期限計算（14日届出ルール、更新申請3ヶ月前、通算5年上限チェック）
+    - ✅ データ検証（在留カード番号、法人番号、日付形式のリアルタイムチェック）
+    - 📊 定期報告CSV/Excel生成（オンライン提出・紙提出の両方に対応）
+    - ⚖️ 法改正情報（最新の制度変更を自動追跡）
     
     ## 基本的なワークフロー
-    1. `/determine` — 現在のビザと目標ビザから申請パターンを判定
-    2. `/required-documents` — 判定結果の `pattern_id` を使って必要書類を取得
+    1. `/determine` — 現在のビザと目標ビザから申請パターンを判定（まずこれを呼ぶ）
+    2. `/required-documents` — pattern_id を使って必要書類を取得
     3. `/deadlines` — 在留期限等から各種期限を計算
     4. `/validate` — 申請データの入力値を検証
   version: 0.2.0
@@ -25,8 +33,11 @@ paths:
   /determine:
     post:
       operationId: determineApplicationType
-      summary: 申請種別を自動判定する
-      description: 現在の在留資格と申請する在留資格から、正式な申請種別・必要な手続きを自動判定します。
+      summary: 申請パターンを自動判定する（最初に呼ぶ）
+      description: |
+        現在の在留資格と申請先の在留資格から、正式な申請種別（変更・更新・認定）、使用様式、標準処理期間、試験免除条件を瞬時に特定します。
+        技能実習→特定技能、転職、更新、2号移行など全パターンに対応。
+        返却される pattern_id は他のエンドポイント（/required-documents 等）で使います。
       requestBody:
         required: true
         content:
@@ -71,8 +82,12 @@ paths:
   /required-documents:
     post:
       operationId: getRequiredDocuments
-      summary: 必要書類の完全リストを取得する
-      description: 申請パターンIDに基づいて、提出が必要な全書類のリストを返します。
+      summary: 必要書類リストを取得する（省略条件自動適用）
+      description: |
+        申請パターンIDに基づき、入管提出に必要な全書類をカテゴリ別に返します。
+        「2年以内の同一機関申請で省略可」「自社支援なら不要」等の省略条件を自動適用し、
+        実際に準備が必要な書類だけをリストアップ。各書類の入手方法も含みます。
+        pattern_id は /determine で取得してください。
       requestBody:
         required: true
         content:
@@ -131,8 +146,14 @@ paths:
   /deadlines:
     post:
       operationId: calculateDeadlines
-      summary: 各種期限を計算する
-      description: 在留期限、届出事由発生日等から、随時届出期限・更新申請可能日・通算上限等を計算します。
+      summary: 全期限を自動計算する（14日ルール・更新時期・5年上限）
+      description: |
+        在留期限・届出発生日等から、すべての重要な期限を算出します。
+        - 随時届出の14日ルール期限
+        - 更新申請の開始可能日（3ヶ月前）と推奨時期
+        - 通算在留5年上限までの残日数
+        - 認定証明書（COE）の有効期限
+        期限切れリスクは危険度レベル（🟢🟡🔴）で色分けされます。
       requestBody:
         required: true
         content:
@@ -176,8 +197,11 @@ paths:
   /validate:
     post:
       operationId: validateApplicationData
-      summary: 申請データの入力検証
-      description: 在留カード番号、法人番号、日付等の書式を検証します。
+      summary: 申請データをリアルタイム検証する
+      description: |
+        在留カード番号（12桁英数字）、法人番号（13桁）、日付形式、電話番号等の入力値を検証します。
+        入管への提出前にデータ不備を検出し、補正指示のリスクを大幅に低減。
+        エラーがある場合は具体的な修正方法を提案します。
       requestBody:
         required: true
         content:
@@ -208,8 +232,11 @@ paths:
   /annual-report-csv:
     post:
       operationId: generateAnnualReportCsv
-      summary: 定期報告CSVデータを生成する
-      description: オンライン一括申請用の定期報告CSVデータを生成します。
+      summary: 定期届出CSVを生成する（オンライン提出用）
+      description: |
+        年1回の特定技能定期届出（受入れ状況・活動状況・支援実施状況）を、
+        入管オンライン申請システムに直接アップロード可能なCSV形式で出力します。
+        2025年4月改正の新フォーマットに対応。紙提出用データも同時生成されます。
       requestBody:
         required: true
         content:
@@ -230,8 +257,10 @@ paths:
   /annual-report-excel:
     post:
       operationId: generateAnnualReportExcel
-      summary: 定期報告Excelを生成する（オフライン紙提出用）
-      description: オンライン届出を利用しない所属機関向けに、定期報告データをExcel形式で自動出力します。
+      summary: 定期届出Excelを生成する（紙提出用）
+      description: |
+        オンライン届出を利用しない所属機関向けに、紙提出用の定期報告書をExcel形式で自動出力。
+        JSONデータからセル配置まで全自動で処理します。
       requestBody:
         required: true
         content:
@@ -259,7 +288,9 @@ paths:
     get:
       operationId: getLawUpdates
       summary: 法改正・制度変更情報を取得する
-      description: 特定技能等に関する最新の法改正・制度変更情報を取得します。
+      description: |
+        特定技能制度に関する最新の法改正・制度変更・運用要領の改定情報を取得します。
+        施行日、影響範囲、対応方法を含みます。日付・キーワード・ステータスで絞り込み可能。
       parameters:
         - name: since
           in: query
