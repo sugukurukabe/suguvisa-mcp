@@ -1,5 +1,5 @@
 # Smithery.ai configuration for SuguVisa MCP Server
-# 日本の特定技能ビザ申請を完全自動化するAI MCPサーバー
+# 日本の特定技能ビザ申請を完全自動化するAI MCPサーバー（24ツール搭載）
 # https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
 
 startCommand:
@@ -8,36 +8,75 @@ startCommand:
     type: object
     required: []
     properties:
+      SUGUVISA_PLAN:
+        type: string
+        title: "利用プラン / Plan"
+        default: "free"
+        enum:
+          - "free"
+          - "pro"
+          - "enterprise"
+        description: >
+          利用プラン。free=基本ツール（申請判定・書類リスト・期限計算）、
+          pro=全機能（CSV生成・参考様式・年次報告・SSW2チェックリスト）、
+          enterprise=監査ログ・テナント管理・API認証付き。
+          / Select your plan. free=basic tools, pro=all features, enterprise=audit logs & tenant management.
       SUGUVISA_API_KEY:
         type: string
         default: ""
-        title: "SuguVisa API Key"
-        description: "API認証キー。省略時はローカルモード（認証なし）で起動。本番運用時は設定推奨。 / API key for authentication. Omit for local use without auth."
+        title: "SuguVisa API Key（Enterprise）"
+        description: >
+          Enterprise プラン用のAPI認証キー。省略時はローカルモード（認証なし）で起動します。
+          取得方法: SuguVisa管理画面 → Settings → API Keys で発行。
+          例: sk_live_abc123...
+          / API key for Enterprise plan. Omit for local/free use.
       GCP_PROJECT_ID:
         type: string
         default: ""
-        title: "Google Cloud Project ID"
-        description: "在留カードOCR（Document AI）と法務文書検索（Vertex AI Search）に必要。これらを使わない場合は省略可。 / Required only for residence card OCR and legal document search."
+        title: "Google Cloud Project ID（任意）"
+        description: >
+          在留カードOCR（Document AI）と法務文書検索（Vertex AI Search）を
+          有効にするために必要。これらの機能を使わない場合は空欄のままでOK。
+          例: my-project-123456
+          / Required only for residence card OCR (Document AI) and legal doc search (Vertex AI).
+          Leave empty if you don't need these features.
       GOOGLE_APPLICATION_CREDENTIALS:
         type: string
         default: ""
-        title: "GCP Service Account Key Path"
-        description: "GCPサービスアカウントキーJSONのパス。GCP_PROJECT_IDと合わせて設定。 / Path to GCP service account key JSON."
+        title: "GCP サービスアカウントキーパス（任意）"
+        description: >
+          GCPサービスアカウントキーJSONファイルの絶対パス。
+          GCP_PROJECT_ID と合わせて設定してください。
+          Cloud Shell等のマネージド環境では不要な場合があります。
+          例: /path/to/service-account-key.json
+          / Absolute path to GCP service account key JSON. Set together with GCP_PROJECT_ID.
       SUPABASE_URL:
         type: string
         default: ""
-        title: "Supabase URL"
-        description: "監査ログ・申請結果フィードバック用。省略時はメモリ内ストレージ使用。 / For audit logging. Falls back to in-memory storage if omitted."
+        title: "Supabase URL（任意）"
+        description: >
+          監査ログ・申請結果フィードバックの永続化に使用。
+          省略時は安全にインメモリストレージにフォールバックします。
+          Supabase ダッシュボード → Settings → API → Project URL からコピー。
+          例: https://abcdefghijk.supabase.co
+          / For persistent audit logs. Falls back to in-memory if omitted.
+          Find at: Supabase Dashboard → Settings → API → Project URL.
       SUPABASE_SERVICE_KEY:
         type: string
         default: ""
-        title: "Supabase Service Key"
-        description: "Supabaseサービスキー。SUPABASE_URLと合わせて設定。 / Supabase service role key, used with SUPABASE_URL."
+        title: "Supabase Service Key（任意）"
+        description: >
+          Supabase サービスロールキー。SUPABASE_URL と合わせて設定。
+          Supabase ダッシュボード → Settings → API → service_role key からコピー。
+          ⚠️ このキーは秘密情報です。公開リポジトリにコミットしないでください。
+          / Supabase service role key. Set together with SUPABASE_URL.
+          ⚠️ This is a secret. Do not commit to public repositories.
   commandFunction: |-
     (config) => ({
       command: "node",
       args: ["dist/index.js"],
       env: {
+        SUGUVISA_PLAN: config.SUGUVISA_PLAN || "free",
         SUGUVISA_API_KEY: config.SUGUVISA_API_KEY || "",
         GCP_PROJECT_ID: config.GCP_PROJECT_ID || "",
         GOOGLE_APPLICATION_CREDENTIALS: config.GOOGLE_APPLICATION_CREDENTIALS || "",
