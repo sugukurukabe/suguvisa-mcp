@@ -25,9 +25,7 @@ info:
 
 servers:
   - url: https://suguvisa-mcp-731026511067.asia-northeast1.run.app/api/v1/tools
-    description: Production (Cloud Run)
-  - url: http://localhost:3000/api/v1/tools
-    description: Local development
+    description: SuguVisa Production API
 
 paths:
   /determine:

@@ -1,4 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerAllResources } from "./register-resources.js";
 import { z } from "zod";
 import { registerDetermineApplication } from "./tools/determine-application.js";
 import { registerRequiredDocuments } from "./tools/required-documents.js";
@@ -52,6 +53,9 @@ export function registerAllTools(server: McpServer): void {
 
   // === MCP Prompts（定型シナリオ） ===
   registerPrompts(server);
+
+  // === MCP Resources（知識データの公開） ===
+  registerAllResources(server);
 }
 
 /**

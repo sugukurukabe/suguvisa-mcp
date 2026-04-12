@@ -20,4 +20,4 @@ registerAllTools(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error("🛂 SuguVisa MCP server running (stdio, 9 tools)");
+console.error("🛂 SuguVisa MCP server running (stdio, 18 tools, 7 prompts, 6 resources)");
