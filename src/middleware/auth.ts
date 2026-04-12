@@ -23,7 +23,7 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
 
   // ヘルスチェック、プラグイン発見、MCP エンドポイントは認証不要
   // MCP はプロトコルレベルで認可を処理するため、HTTP 認証はバイパス
-  const publicPaths = ["/health", "/.well-known/ai-plugin.json", "/openapi.yaml", "/privacy", "/mcp"];
+  const publicPaths = ["/health", "/.well-known/ai-plugin.json", "/.well-known/mcp/server-card.json", "/openapi.yaml", "/privacy", "/mcp"];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     next();
     return;

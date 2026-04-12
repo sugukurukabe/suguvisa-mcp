@@ -58,6 +58,47 @@ router.get("/openapi.yaml", (_req: Request, res: Response) => {
   }
 });
 
+// ─── MCP Server Card (Smithery Auto-Discovery) ───
+router.get("/.well-known/mcp/server-card.json", (_req: Request, res: Response) => {
+  res.json({
+    serverInfo: {
+      name: "suguvisa-mcp",
+      version: "0.9.1",
+      description: "特定技能ビザ申請を完全自動化するAIエージェントサーバー。24ツール搭載。"
+    },
+    authentication: {
+      required: false,
+      schemes: []
+    },
+    configSchema: {
+      type: "object",
+      properties: {
+        plan: {
+          type: "string",
+          title: "Subscription Plan",
+          description: "Select your plan tier. free=5 basic tools, pro=all 24 tools, enterprise=audit logs & tenant mgmt",
+          default: "free",
+          enum: ["free", "pro", "enterprise"]
+        },
+        apiKey: {
+          type: "string",
+          title: "API Key (Enterprise only)",
+          description: "API key for Enterprise plan. Not required for free/pro plans.",
+          default: "",
+          "x-from": { header: "x-suguvisa-api-key" }
+        },
+        gcpProjectId: {
+          type: "string",
+          title: "GCP Project ID (Optional)",
+          description: "Google Cloud Project ID for residence card OCR and legal document search. Leave empty if not needed.",
+          default: ""
+        }
+      },
+      required: []
+    }
+  });
+});
+
 // ─── Privacy Policy ───
 router.get("/privacy", (_req: Request, res: Response) => {
   res.type("text/html").send(`

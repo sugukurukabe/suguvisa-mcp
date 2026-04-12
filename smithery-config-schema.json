@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "plan": {
+      "type": "string",
+      "title": "Subscription Plan",
+      "description": "Select your plan tier. free=5 basic tools (pattern detection, document list, deadline calc), pro=all 24 tools (AI reason letter, reference forms, SSW2 checklist, OCR), enterprise=audit logs & tenant management",
+      "default": "free",
+      "enum": ["free", "pro", "enterprise"]
+    },
+    "apiKey": {
+      "type": "string",
+      "title": "API Key (Enterprise only)",
+      "description": "API key for Enterprise plan. Not required for free/pro plans. Get yours at the SuguVisa dashboard.",
+      "default": "",
+      "x-from": {
+        "header": "x-suguvisa-api-key"
+      }
+    },
+    "gcpProjectId": {
+      "type": "string",
+      "title": "GCP Project ID (Optional)",
+      "description": "Google Cloud Project ID for residence card OCR (Document AI) and legal document search (Vertex AI). Leave empty if you don't need these features.",
+      "default": ""
+    }
+  },
+  "required": []
+}
