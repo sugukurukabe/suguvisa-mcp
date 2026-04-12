@@ -23,9 +23,11 @@ import { registerLookupCorporateNumber } from "./tools/lookup-corporate-number.j
 import { registerSSW2DocumentChecklist } from "./tools/ssw2-document-checklist.js";
 import { registerGenerateReasonLetter } from "./tools/generate-reason-letter.js";
 import { registerPreSubmissionChecklist } from "./tools/pre-submission-checklist.js";
+import { registerParsePassport } from "./tools/parse-passport.js";
+import { registerReviewDocument } from "./tools/review-document.js";
 
 /**
- * 全24ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
+ * 全26ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
  * stdio (index.ts) と HTTP (server.ts) の両方から呼ばれる。
  */
 export function registerAllTools(server: McpServer): void {
@@ -38,6 +40,7 @@ export function registerAllTools(server: McpServer): void {
   // === 入力支援系 ===
   registerGenerateIntakeSheet(server);     // クライアント向け入力シート生成
   registerParseResidenceCard(server);      // 在留カードOCR結果の構造化
+  registerParsePassport(server);           // パスポートOCR（Document AI + Gemini Vision）
   registerLookupCorporateNumber(server);   // 法人番号API検索
 
   // === 出力系 ===
@@ -59,6 +62,7 @@ export function registerAllTools(server: McpServer): void {
   // === 情報系 ===
   registerLawUpdates(server);              // 法改正情報
   registerSearchLegalDocs(server);         // 法務ドキュメントRAG検索
+  registerReviewDocument(server);          // AI書類レビュー（Gemini Vision）
 
   // === インテントベース統合ツール ===
   registerCompleteVisaGuide(server);        // ワンショット完全ガイド（判定+書類+期限の統合）

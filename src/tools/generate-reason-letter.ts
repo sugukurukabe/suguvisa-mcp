@@ -15,6 +15,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createRequire } from "module";
+import { generateText, isVertexAIAvailable } from "../lib/vertex-ai.js";
 
 const require = createRequire(import.meta.url);
 const ruleSets = require("../data/rule-sets.json");
@@ -449,19 +450,111 @@ export function registerGenerateReasonLetter(server: McpServer) {
       custom_reason: z.string().optional().describe(
         "カスタム理由文。テンプレートの「変更の理由」セクションを上書きしたい場合に指定。"
       ),
+      use_ai: z.boolean().optional().default(false).describe(
+        "true にすると Gemini AI が申請人の状況に合わせて理由書を専門的にリライト。テンプレートの穴埋めではなく、行政書士レベルの本格的な理由書を生成。"
+      ),
       language: z.enum(["ja"]).default("ja").describe(
         "出力言語（現在は日本語のみ対応）"
       ),
     },
     { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
-      const result = generateReasonLetter(params);
+      const templateResult = generateReasonLetter(params);
+
+      // AI強化モード
+      if (params.use_ai && isVertexAIAvailable()) {
+        try {
+          const aiLetter = await generateAIReasonLetter(
+            params.pattern_id,
+            params.context,
+            templateResult
+          );
+          return {
+            content: [{
+              type: "text" as const,
+              text: JSON.stringify({
+                ...templateResult,
+                letter: aiLetter,
+                ai_enhanced: true,
+                _ai_instructions:
+                  "🤖 Gemini AI が申請人の状況に最適化した理由書を生成しました。\n" +
+                  "テンプレートベースではなく、審査官の心証を良くする文章に仕上げています。\n" +
+                  "ユーザーに確認してもらい、必要に応じて修正してください。",
+              }, null, 2),
+            }],
+          };
+        } catch (err: any) {
+          console.warn("AI reason letter generation failed, using template:", err.message);
+          // テンプレート版にフォールバック
+        }
+      }
+
       return {
         content: [{
           type: "text" as const,
-          text: JSON.stringify(result, null, 2),
+          text: JSON.stringify(templateResult, null, 2),
         }],
       };
     }
   );
+}
+
+// ── Gemini AIによる理由書生成 ──
+async function generateAIReasonLetter(
+  patternId: string,
+  context: Record<string, string>,
+  templateResult: any
+): Promise<string> {
+  const template = LETTER_TEMPLATES[patternId] || LETTER_TEMPLATES.GENERIC;
+  const pattern = ruleSets.application_patterns[patternId];
+
+  const contextSummary = Object.entries(context)
+    .map(([k, v]) => `- ${k}: ${v}`)
+    .join("\n");
+
+  const prompt = `あなたは日本の入管申請を専門とする行政書士です。以下の情報に基づいて、入管の審査官に提出する「申請理由書」を作成してください。
+
+## 申請パターン
+- パターン: ${patternId}
+- 正式名: ${pattern?.formal_name || templateResult.template_title}
+- 変更元: ${pattern?.from_visa || "不明"}
+- 変更先: ${pattern?.to_visa || "不明"}
+
+## 申請人の情報
+${contextSummary}
+
+## 理由書の構成（参考）
+${template.structure.join("\n")}
+
+## 注意事項
+${template.cautions.join("\n")}
+
+## 作成ルール
+1. 「謹啓」で始まり「敬白」で終わる正式な書簡形式
+2. 審査官が読みやすい論理的な構成
+3. 申請の正当性・必要性を客観的に説明
+4. 不許可リスクを避ける穏当な表現
+5. 挨拶文、申請人情報、変更理由、今後の計画の順で記載
+6. 約800〜1200文字程度
+7. 未提供の情報は「＿＿＿＿」（下線）で示す
+
+理由書本文のみを出力してください。JSON形式は不要です。`;
+
+  const result = await generateText(prompt, false);
+  
+  // 日付ヘッダーを追加
+  const formattedDate = `令和${new Date().getFullYear() - 2018}年${new Date().getMonth() + 1}月${new Date().getDate()}日`;
+  
+  return [
+    formattedDate,
+    "",
+    "出入国在留管理局 御中",
+    "",
+    template.title,
+    "",
+    result.trim(),
+    "",
+    `作成日: ${new Date().toISOString().slice(0, 10)}`,
+    context.representative ? `申請取次者: ${context.representative}` : "",
+  ].filter(Boolean).join("\n");
 }
