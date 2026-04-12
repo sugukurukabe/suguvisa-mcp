@@ -63,7 +63,7 @@ interface ExamInfo {
 export function registerGeneratePaperForm(server: McpServer) {
   server.tool(
     "generate_paper_form",
-    "紙申請用のPDFフォームフィールドマッピングを生成する。 / Generate PDF form field mapping for paper applications. / Hasilkan pemetaan bidang formulir PDF untuk aplikasi kertas.",
+    "【紙申請PDFマッピング】申請パターンに対応する紙申請書（別記第30号の5等）の全フィールドにデータを自動マッピング。記入済み/未記入/必須の状態を可視化し、完成度をパーセントで表示。 / Maps applicant data to official paper form PDF fields with completion tracking and required-field highlighting.",
     {
       pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'） / Application pattern ID / ID pola aplikasi"),
       applicant_data: z.record(z.string()).describe(

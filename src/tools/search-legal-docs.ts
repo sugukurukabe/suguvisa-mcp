@@ -9,7 +9,7 @@ import { SearchServiceClient } from "@google-cloud/discoveryengine";
 export function registerSearchLegalDocs(server: McpServer) {
   server.tool(
     "search_legal_docs",
-    "Vertex AI Searchで法務文書・行政書類・SuguVisaのマニュアル等をセマンティック検索する。法務マニュアル、契約書テンプレート、行政届出チェックリストなど、業務に必要な文書を自然言語で検索できます。",
+    "【法務文書検索】Vertex AI Searchによるセマンティック検索で、法務マニュアル・契約書テンプレート・行政届出チェックリスト・SuguVisaマニュアル等を自然言語で横断検索。「特定技能1号 建設 所属機関概要書の書き方」のような質問でも関連文書を返す。 / Semantic search across legal documents, contract templates, and administrative checklists using Vertex AI Search.",
     {
       query: z.string().describe("検索クエリ（自然言語またはキーワード、例: 「特定技能1号 建設 分野の所属機関概要書の書き方」）"),
       max_results: z.number().optional().describe("最大結果件数（デフォルト: 5）"),

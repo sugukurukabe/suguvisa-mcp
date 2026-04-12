@@ -12,7 +12,7 @@ const CSV_COLUMNS = Object.keys(officialCsvSchema.shape) as (keyof OfficialCsvDa
 export function registerGenerateOnlineCsv(server: McpServer) {
   server.tool(
     "generate_online_csv",
-    "オンライン申請用のCSVデータを生成する。 / Generate CSV data for online application. 必須フィールドや特定フォーマット（YYYYMMDDなど）を厳格にチェックし、エラーがあれば不足情報を返します。",
+    "【オンライン申請CSV生成】入管オンライン申請システムに直接アップロード可能なCSVデータを生成。日付(YYYYMMDD)・コード値の自動変換、必須フィールドの厳格チェック、複数申請人の一括処理に対応。 / Generates ISA-compatible CSV for online batch submission with strict field validation and auto-formatting.",
     {
       applicants: z.array(z.record(z.any())).describe(
         "申請人データの配列。各オブジェクトのキー: " + CSV_COLUMNS.join(", ") + "\n※日付は「2000年7月7日」といった自然言語でもパースを試みますが、エラーが出た場合はYYYYMMDDで再入力してください。"

@@ -102,7 +102,7 @@ export async function parseResidenceCardHandler({
 export function registerParseResidenceCard(server: McpServer) {
   server.tool(
     "parse_residence_card",
-    "在留カードの画像またはOCRテキストを構造化データに変換・検証する。Vertex AI Document AIで高精度OCRを実行。画像はサーバーに保存しない。",
+    "【在留カードOCR】在留カードの画像またはOCRテキストから、氏名・国籍・在留資格・在留期限・カード番号等を構造化データに変換。Google Vertex AI Document AIによる高精度OCRと、正規表現フォールバックの二段構え。画像データはサーバーに一切保存しません。 / Extracts structured data from residence card images using Vertex AI Document AI with regex fallback. Images are never stored.",
     {
       image_base64: z.string().optional().describe(
         "在留カード画像のBase64エンコードデータ（表面）。"

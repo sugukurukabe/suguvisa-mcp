@@ -73,7 +73,7 @@ export function determinePattern(fromVisa: string, toVisa: string, context?: str
 export function registerDetermineApplication(server: McpServer) {
   server.tool(
     "determine_application_type",
-    "現在のビザと申請するビザから、正式な申請種別・必要な手続きを自動判定します。parse_residence_card の直後に使用してください。Determine application type based on current and target visas.",
+    "【申請パターン自動判定】現在の在留資格と申請先の在留資格から、正式な申請種別（変更・更新・認定）、使用様式（別記第30号の5等）、標準処理期間、試験免除条件を瞬時に特定。技能実習→特定技能、特定技能1号→2号、転職、更新など全パターンに対応。parse_residence_card の直後に使用してください。 / Instantly determines the exact application type, required form, processing period, and exam exemptions from current and target visa status.",
     {
       from_visa: z.string().describe(
         "現在の在留資格（parse_residence_card で取得した visa_type をそのまま入力してください） / Current visa status"

@@ -22,7 +22,7 @@ interface IntakeSection {
 export function registerGenerateIntakeSheet(server: McpServer) {
   server.tool(
     "generate_intake_sheet",
-    "クライアントに渡す情報入力シートを生成する / Generate information intake sheet for clients / Hasilkan lembar asupan informasi untuk klien",
+    "【入力シート自動生成】申請パターンに応じた情報ヒアリングシートを自動作成。クライアント（受入れ機関）に渡して記入してもらうことで、申請に必要な全データを漏れなく収集。分野別の追加項目にも対応。 / Auto-generates a customized intake form for clients to fill out, ensuring all required data is collected without omissions.",
     {
       pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'） / Application pattern ID / ID pola aplikasi"),
       company_name: z.string().optional().describe("所属機関名 / Company name / Nama perusahaan"),

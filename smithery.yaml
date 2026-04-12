@@ -1,5 +1,6 @@
 # Smithery.ai configuration for SuguVisa MCP Server
-# https://smithery.ai/docs
+# 日本の特定技能ビザ申請を完全自動化するAI MCPサーバー
+# https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
 
 startCommand:
   type: stdio
@@ -8,13 +9,19 @@ startCommand:
     properties:
       SUGUVISA_API_KEY:
         type: string
-        description: "API key for authenticating requests to SuguVisa (optional for local use)"
+        description: "SuguVisa API認証キー。省略するとローカル利用モード（認証なし）で起動します。本番運用時は設定を推奨。 / API key for SuguVisa authentication. Omit for local use without auth."
       GCP_PROJECT_ID:
         type: string
-        description: "Google Cloud Project ID (only needed for residence card OCR feature)"
+        description: "Google Cloud プロジェクトID。在留カードOCR（Vertex AI Document AI）と法務文書のセマンティック検索（Vertex AI Search）に必要。これらの機能を使わない場合は省略可。 / Google Cloud Project ID. Required only for residence card OCR and semantic legal document search."
       GOOGLE_APPLICATION_CREDENTIALS:
         type: string
-        description: "Path to GCP service account key JSON (only needed for residence card OCR)"
+        description: "GCPサービスアカウントキーJSONのパス。GCP_PROJECT_IDと合わせて設定してください。 / Path to GCP service account key JSON file."
+      SUPABASE_URL:
+        type: string
+        description: "Supabase プロジェクトURL。監査ログ記録・申請結果フィードバックに必要。省略時はメモリ内ストレージを使用。 / Supabase project URL for audit logging and submission feedback."
+      SUPABASE_SERVICE_KEY:
+        type: string
+        description: "Supabase サービスキー。SUPABASE_URLと合わせて設定してください。 / Supabase service key, used with SUPABASE_URL."
     required: []
   commandFunction: |-
     (config) => ({
@@ -23,6 +30,8 @@ startCommand:
       env: {
         SUGUVISA_API_KEY: config.SUGUVISA_API_KEY || "",
         GCP_PROJECT_ID: config.GCP_PROJECT_ID || "",
-        GOOGLE_APPLICATION_CREDENTIALS: config.GOOGLE_APPLICATION_CREDENTIALS || ""
+        GOOGLE_APPLICATION_CREDENTIALS: config.GOOGLE_APPLICATION_CREDENTIALS || "",
+        SUPABASE_URL: config.SUPABASE_URL || "",
+        SUPABASE_SERVICE_KEY: config.SUPABASE_SERVICE_KEY || ""
       }
     })

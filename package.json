@@ -1,7 +1,7 @@
 {
-  "name": "suguvisa-mcp",
+  "name": "@sugukuru/suguvisa-mcp",
   "version": "0.2.0",
-  "description": "特定技能ビザ申請の専門AI — Claude MCP + GPT Actions デュアルプラグイン。申請種別判定、必要書類リスト、期限計算、データ検証、定期報告書を自動生成。",
+  "description": "日本の特定技能ビザ申請を完全自動化する業界唯一のAI MCPサーバー。18種のツールで申請パターン自動判定・必要書類リスト（省略条件自動適用）・期限計算（14日届出ルール）・在留カードOCR・オンライン一括申請CSV/Excel生成・紙申請PDFマッピング・法改正追跡・監査ログを提供。Claude/ChatGPT/Cursor/Windsurfに直接組み込み可能。行政書士・登録支援機関・受入れ機関向け。 | The only AI MCP server that fully automates Japan's Specified Skilled Worker (SSW) visa applications. 18 tools: application type detection, document checklist with auto-skip logic, deadline calculator, residence card OCR, bulk CSV/Excel generation, paper form PDF mapping, legal update tracking, and audit logging.",
   "keywords": [
     "mcp",
     "visa",
@@ -25,6 +25,9 @@
     "dist",
     "src/data"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc && shx cp -r src/data dist/",
     "dev": "tsx watch src/index.ts",

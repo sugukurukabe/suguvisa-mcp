@@ -226,7 +226,7 @@ export async function generateBulkXlsmHandler(
 export function registerGenerateBulkXlsm(server: McpServer) {
   server.tool(
     "generate_bulk_xlsm",
-    "公式の一括申請用Excelテンプレート(.xlsm)にデータを注入し、マクロを維持したままローカル出力します。 / Writes validated applicant data into the official ISA .xlsm template without breaking macros.",
+    "【一括申請Excel生成】出入国在留管理庁の公式一括申請用Excelテンプレート(.xlsm)に申請人データを自動注入。マクロを破壊せずにデータだけを正確に埋め込む独自技術。認定・更新・変更の3種類に対応。 / Injects validated applicant data into the official ISA .xlsm bulk application template without breaking macros.",
     {
       application_type: z.enum(["1", "2", "3"]).describe("1:認定(COE), 2:更新(Renewal), 3:変更(Change)"),
       applicants: z.array(z.record(z.any())).describe("申請人データの配列。必須要件はcsv-schema.tsによって厳密にチェックされます。"),

@@ -218,7 +218,7 @@ export function getRequiredDocumentsData(params: {
 export function registerRequiredDocuments(server: McpServer) {
   server.tool(
     "get_required_documents",
-    "申請パターンIDに基づいて必要書類の完全リストを返す。 / Return a complete list of required documents based on the application pattern ID. / Mengembalikan daftar lengkap dokumen yang diperlukan berdasarkan ID pola aplikasi.",
+    "【必要書類リスト生成】申請パターンIDに基づき、入管提出に必要な全書類を一覧化。「2年以内の同一機関申請で省略可」「自社支援なら不要」等の省略条件を自動適用し、実際に準備が必要な書類だけを返す。カテゴリ別（申請人・所属機関・分野別）に整理し、各書類の入手方法・注意点も付記。 / Returns categorized document checklist with automatic skip-condition logic for 2-year rule, self-support exemptions, and more.",
     {
       pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'）。ユーザーからパターンIDの直接指定がない場合は、まずは 'determine_application_type' を使って判定するか、対話で状況を引き出してください。"),
       support_type: z.enum(["self", "delegated"]).default("delegated").describe("支援体制（self=自社支援, delegated=登録支援機関へ委託）。ヒアリング時は『登録支援機関に支援を委託されますか？』と尋ねてください。"),

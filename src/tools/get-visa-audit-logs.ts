@@ -99,7 +99,7 @@ export async function getVisaAuditLogsHandler(
 export function registerGetVisaAuditLogs(server: any) {
   server.tool(
     "get_visa_audit_logs",
-    "Retrieve past audit logs of business actions for specific resources or events.",
+    "【監査ログ取得】特定のリソース（申請人・企業等）やイベントに紐づく過去の操作履歴を取得。誰がいつ何をしたかをタイムライン表示し、業務の透明性を担保。 / Retrieves past audit logs for specific resources or events, providing a full timeline of who did what and when.",
     getVisaAuditLogsSchema.shape,
     async (args: any, extra: any) => {
       // 処理のキャンセルを可能にする対応

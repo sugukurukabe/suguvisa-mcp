@@ -88,7 +88,7 @@ export async function createOfflineExcel(company_name: string, reporting_year: n
 export function registerGenerateAnnualReportOffline(server: McpServer) {
   server.tool(
     "generate_annual_report_offline",
-    "オンライン届出を利用しない所属機関（紙提出）向けに、定期報告データをExcel形式で自動出力します。Generate an offline (Excel) annual report from JSON paper form data.",
+    "【定期届出Excel生成】オンライン届出未対応の所属機関向けに、紙提出用の定期報告書をExcel形式で自動出力。JSONデータからセル配置まで全自動。 / Generates offline Excel annual report for paper submission by organizations not using the online system.",
     {
       company_name: z.string().describe("所属機関名 / Company name"),
       reporting_year: z.number().describe("報告年度（例: 2026） / Reporting year"),

@@ -113,7 +113,7 @@ export function validateSSW2Test(value: string): ValidationResult {
 export function registerValidateData(server: McpServer) {
   server.tool(
     "validate_application_data",
-    "申請データの入力検証を実行する。 / Validate application data input. / Validasi input data aplikasi.",
+    "【申請データ検証】在留カード番号（12桁英数字）、法人番号（13桁）、日付形式、電話番号等の入力値をリアルタイムにチェック。入管への提出前にデータ不備を検出し、補正指示のリスクを大幅に低減。 / Real-time validation of residence card numbers, corporate numbers, dates, and phone formats to prevent submission errors.",
     {
       fields: z.record(z.string()).describe(
         "検証するフィールドのキー/値 / Key/value fields to validate / Bidang kunci/nilai untuk divalidasi"

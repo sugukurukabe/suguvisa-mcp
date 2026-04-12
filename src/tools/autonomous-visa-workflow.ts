@@ -5,7 +5,7 @@ import { visaWorkflowApp } from "../agents/visa-workflow/graph.js";
 export function registerAutonomousVisaWorkflow(server: McpServer) {
   server.tool(
     "start_autonomous_visa_workflow",
-    "LangGraphによる自律型ビザ申請ワークフローを開始します。不足データがある場合は途中で止まります。",
+    "【自律型ワークフロー開始】AIが対話しながら不足データを収集し、判定→書類リスト→入力シート→検証→書類生成まで自動実行。途中で人間の確認が必要な場合は一時停止し、resume_autonomous_visa_workflowで再開可能。 / Starts an autonomous visa workflow that collects missing data through conversation and auto-executes the full application pipeline.",
     {
       thread_id: z.string().describe("このフローの一意なスレッドID。人間が再開する時にも使用します。"),
       applicant_data: z.record(z.any()).describe("申請データの初期値"),
@@ -47,7 +47,7 @@ export function registerAutonomousVisaWorkflow(server: McpServer) {
 
   server.tool(
     "resume_autonomous_visa_workflow",
-    "一時停止した自律型ワークフローに人間の入力を与えて再開します。",
+    "【ワークフロー再開】一時停止中の申請ワークフローに、人間が入力したデータを追加して処理を再開。Human-in-the-Loop（HITL）パターンで安全に申請プロセスを進行。 / Resumes a paused workflow with human-provided data, supporting safe Human-in-the-Loop (HITL) progression.",
     {
       thread_id: z.string().describe("再開するスレッドID"),
       human_update: z.record(z.any()).describe("申請データに対して人間が追加・修正したフィールド。例: { applicant_data: { nationality_code: 'USA' } }")

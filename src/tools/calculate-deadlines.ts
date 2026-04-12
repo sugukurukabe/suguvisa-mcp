@@ -186,7 +186,7 @@ export function calculateDeadlinesData(
 export function registerCalculateDeadlines(server: McpServer) {
   server.tool(
     "calculate_deadlines",
-    "期限計算ツール。随時届出14日ルール、更新申請可能開始日、定期届出期間、通算在留期間チェック、認定証明書の有効期限を計算する。 / Deadline calculator for notifications, renewals, limitations, and COE expiry. / Kalkulator tenggat waktu untuk pemberitahuan, perpanjangan, batasan, dan kedaluwarsa COE.",
+    "【期限自動計算】在留期限・届出発生日から、随時届出の14日ルール期限、更新申請の開始可能日（3ヶ月前）、定期届出期間、通算在留5年上限チェック、認定証明書(COE)の有効期限を自動算出。期限切れリスクを色分け警告。 / Calculates all critical deadlines: 14-day notification rule, 3-month renewal window, cumulative 5-year limit, and COE expiry with risk-level alerts.",
     {
       expiry_date: z.string().optional().describe("在留期限（YYYY-MM-DD） / Expiry date / Tanggal kedaluwarsa"),
       event_date: z.string().optional().describe("届出事由の発生日（YYYY-MM-DD） / Event date for notification / Tanggal kejadian untuk pemberitahuan"),

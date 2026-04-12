@@ -11,9 +11,9 @@ import { registerAllTools } from "./register-tools.js";
 
 const server = new McpServer({
   name: "suguvisa-mcp",
-  version: "0.1.0",
+  version: "0.2.0",
   description:
-    "特定技能1号・特定活動（特定技能準備）ビザ申請の専門MCPサーバー。申請種別判定、必要書類リスト、期限計算、入力シート生成、オンライン申請CSV生成、紙申請書PDF生成を提供。",
+    "日本の特定技能ビザ申請を自動化するAIサーバー。行政書士・登録支援機関・受入れ機関向け。18種のツールで申請種別の自動判定、130パターン対応の必要書類リスト、省略条件の自動適用、14日届出ルールの期限計算、入管オンライン申請CSV/Excel生成、紙申請PDFマッピング、在留カードOCR、法改正の自動追跡、申請結果の統計分析を提供。Claude・ChatGPT・Cursor・Windsurf等のAIツールに直接組み込んで使える唯一のビザ申請プラットフォーム。",
 });
 
 registerAllTools(server);

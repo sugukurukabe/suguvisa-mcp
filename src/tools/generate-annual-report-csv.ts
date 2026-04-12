@@ -83,7 +83,7 @@ export async function generateAnnualReportCsvHandler(reports: any[]) {
 export function registerGenerateAnnualReportCsv(server: McpServer) {
   server.tool(
     "generate_annual_report_csv",
-    "年に1回の特定技能定期届出（受入れ状況・支援実施状況等）オンライン一括申請用のCSVデータを生成する。 / Generate annual periodic report CSV for online submission.",
+    "【定期届出CSV生成】年1回の特定技能定期届出（受入れ状況・活動状況・支援実施状況）をオンライン一括申請用CSVとして出力。2025年4月改正の新フォーマットに対応。紙提出用データも同時生成。 / Generates annual periodic report CSV for ISA online submission, compatible with the April 2025 format revision.",
     {
       reports: z.array(z.record(z.any())).describe(
         "報告対象となる申請人データの配列。各オブジェクトのキー: " + REPORT_CSV_COLUMNS.join(", ") + "\n※日付や数字などはSuguVisaが自動的に正規化します。不足データはエラーになります。"

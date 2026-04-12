@@ -21,8 +21,9 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
   // 環境変数によるローカルバイパス（開発時やローカル専用MCPとしての利用時）
   const localApiKey = process.env.SUGUVISA_API_KEY;
 
-  // ヘルスチェック & プラグイン発見エンドポイントは認証不要
-  const publicPaths = ["/health", "/.well-known/ai-plugin.json", "/openapi.yaml", "/privacy"];
+  // ヘルスチェック、プラグイン発見、MCP エンドポイントは認証不要
+  // MCP はプロトコルレベルで認可を処理するため、HTTP 認証はバイパス
+  const publicPaths = ["/health", "/.well-known/ai-plugin.json", "/openapi.yaml", "/privacy", "/mcp"];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     next();
     return;

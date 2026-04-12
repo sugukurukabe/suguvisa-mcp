@@ -106,7 +106,7 @@ export async function logVisaActionHandler(
 export function registerLogVisaAction(server: any) {
   server.tool(
     "log_visa_action",
-    "Record a business-level audit log for visa processing actions.",
+    "【操作ログ記録】ビザ申請業務の全アクション（書類確認・提出・結果受領等）を監査ログとしてSupabaseに記録。コンプライアンス対応と業務トレーサビリティを確保。 / Records all visa processing actions as audit logs in Supabase for compliance and traceability.",
     logVisaActionSchema.shape,
     async (args: any, extra: any) => {
       // 処理のキャンセルを可能にする対応
