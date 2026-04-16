@@ -108,6 +108,7 @@ export function registerLogVisaAction(server: any) {
     "log_visa_action",
     "【操作ログ記録】ビザ申請業務の全アクション（書類確認・提出・結果受領等）を監査ログとしてSupabaseに記録。コンプライアンス対応と業務トレーサビリティを確保。 / Records all visa processing actions as audit logs in Supabase for compliance and traceability.",
     logVisaActionSchema.shape,
+    { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     async (args: any, extra: any) => {
       // 処理のキャンセルを可能にする対応
       if (extra?._cancel && extra._cancel.isCanceled) {

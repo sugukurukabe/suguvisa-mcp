@@ -101,7 +101,7 @@ describe("E2E Workflow over all 13 patterns", () => {
       const reqParsed = JSON.parse(reqDocsResult.content[0].text);
       expect(["success", "warning", "ok"]).toContain(reqParsed.status);
       expect(reqParsed.documents.length).toBeGreaterThan(0);
-      expect(reqParsed._ai_instructions).toContain("表形式"); // AI instruction check
+      expect(reqParsed._ai_instructions).toContain("表で表示"); // AI instruction check
 
       // 3. Track Submission Outcome (Test HITL reporting)
       const trackResult = await handlers["track_submission_outcome"]({

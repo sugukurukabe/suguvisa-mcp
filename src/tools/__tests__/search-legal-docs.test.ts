@@ -19,8 +19,9 @@ beforeEach(async () => {
   const mod = await import("../search-legal-docs.js");
 
   const mockServer = {
-    tool: vi.fn((_name: string, _desc: string, _schema: unknown, handler: unknown) => {
-      toolHandler = handler as (params: Record<string, unknown>) => Promise<unknown>;
+    tool: vi.fn((_name: string, _desc: string, _schema: unknown, opts: unknown, handler?: unknown) => {
+      const actualHandler = typeof opts === "function" ? opts : handler;
+      toolHandler = actualHandler as (params: Record<string, unknown>) => Promise<unknown>;
     }),
   } as unknown as McpServer;
 

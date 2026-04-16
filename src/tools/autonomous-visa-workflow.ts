@@ -10,7 +10,7 @@ export function registerAutonomousVisaWorkflow(server: McpServer) {
       thread_id: z.string().describe("このフローの一意なスレッドID。人間が再開する時にも使用します。"),
       applicant_data: z.record(z.any()).describe("申請データの初期値"),
     },
-    { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ thread_id, applicant_data }) => {
       const config = { configurable: { thread_id } };
       const resultState = await visaWorkflowApp.invoke({ applicant_data }, config);
@@ -52,7 +52,7 @@ export function registerAutonomousVisaWorkflow(server: McpServer) {
       thread_id: z.string().describe("再開するスレッドID"),
       human_update: z.record(z.any()).describe("申請データに対して人間が追加・修正したフィールド。例: { applicant_data: { nationality_code: 'USA' } }")
     },
-    { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ thread_id, human_update }) => {
       const config = { configurable: { thread_id } };
       

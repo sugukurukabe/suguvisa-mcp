@@ -116,7 +116,7 @@ export function registerTrackSubmissionOutcome(server: McpServer) {
     " / Record immigration submission outcomes for HITL feedback loop." +
     " / Mencatat hasil pengajuan imigrasi untuk loop umpan balik HITL.",
     submissionOutcomeSchema.shape,
-    { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async (params) => {
       // パターンIDの存在確認
       // Validate pattern_id exists in rule-sets

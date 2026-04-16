@@ -33,6 +33,7 @@ export function registerReviewDocument(server: McpServer) {
         "申請パターンID（例: CHANGE_SSW1_C）。指定するとパターン固有のチェックが追加される"
       ),
     },
+    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ document_type, image_base64, image_mime_type, document_text, application_pattern }) => {
       if (!image_base64 && !document_text) {
         return {

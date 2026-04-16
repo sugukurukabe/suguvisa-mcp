@@ -165,6 +165,7 @@ export function registerParseResidenceCard(server: McpServer) {
         "Claude VisionがOCRで読み取ったテキスト（Document AIが使えない場合のフォールバック）"
       ),
     },
+    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async (args) => await parseResidenceCardHandler(args as any)
   );
 }

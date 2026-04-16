@@ -25,9 +25,15 @@ import { registerGenerateReasonLetter } from "./tools/generate-reason-letter.js"
 import { registerPreSubmissionChecklist } from "./tools/pre-submission-checklist.js";
 import { registerParsePassport } from "./tools/parse-passport.js";
 import { registerReviewDocument } from "./tools/review-document.js";
+import { registerTranslateWorkplaceMessage } from "./tools/translate-workplace.js";
+import { registerStaffManagement } from "./tools/staff-management.js";
+import { registerWageCompliance } from "./tools/wage-compliance.js";
+import { registerPeriodicNotificationChecker } from "./tools/periodic-notification-checker.js";
+import { registerAnalyzeSupportRecords } from "./tools/analyze-support-records.js";
+import { registerGeneratePeriodicNotification } from "./tools/generate-periodic-notification.js";
 
 /**
- * 全26ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
+ * 全36ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
  * stdio (index.ts) と HTTP (server.ts) の両方から呼ばれる。
  */
 export function registerAllTools(server: McpServer): void {
@@ -68,6 +74,16 @@ export function registerAllTools(server: McpServer): void {
   registerCompleteVisaGuide(server);        // ワンショット完全ガイド（判定+書類+期限の統合）
   registerSSW2DocumentChecklist(server);    // 特定技能2号 分野別書類チェックリスト
   registerPreSubmissionChecklist(server);   // 提出前最終チェックリスト
+
+  // === 🏭 現場日常業務ツール（Factory Daily Tools） ===
+  registerTranslateWorkplaceMessage(server); // 多言語翻訳（定型文+AI自由翻訳）
+  registerStaffManagement(server);           // 在留カード一括管理・届出リマインダー・ダッシュボード
+  registerWageCompliance(server);            // 給与コンプライアンスチェック
+
+  // === 定期届出ツール（Periodic Notification） ===
+  registerPeriodicNotificationChecker(server); // 定期届出の必要提出書類リスト自動判定
+  registerAnalyzeSupportRecords(server);       // 添付ファイル解析・監査 (Document AI)
+  registerGeneratePeriodicNotification(server); // 定期届出ファイル・参考様式データの自動生成
 
   // === MCP Prompts（定型シナリオ） ===
   registerPrompts(server);

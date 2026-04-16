@@ -255,7 +255,7 @@ export function registerGenerateBulkXlsm(server: McpServer) {
       application_type: z.enum(["1", "2", "3"]).describe("1:認定(COE), 2:更新(Renewal), 3:変更(Change)"),
       applicants: z.array(z.record(z.any())).describe("申請人データの配列。必須要件はcsv-schema.tsによって厳密にチェックされます。"),
     },
-    { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ application_type, applicants }) => {
        return await generateBulkXlsmHandler(application_type, applicants);
     }

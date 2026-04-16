@@ -15,6 +15,7 @@ export function registerSearchLegalDocs(server: McpServer) {
       query: z.string().describe("検索クエリ（自然言語またはキーワード、例: 「特定技能1号 建設 分野の所属機関概要書の書き方」）"),
       max_results: z.number().optional().describe("最大結果件数（デフォルト: 5）"),
     },
+    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ query, max_results }) => {
       const projectId = process.env.VERTEX_SEARCH_PROJECT_ID || process.env.GCP_PROJECT_ID;
       const location = process.env.VERTEX_SEARCH_LOCATION || "global";

@@ -6,8 +6,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const PROJECT_ID = process.env.GCP_PROJECT_ID || "mcp-service-492010";
 const LOCATION = process.env.VERTEX_AI_LOCATION || "us-central1";
-const MODEL_ID = process.env.VERTEX_AI_MODEL || "gemini-2.5-pro";
-const FLASH_MODEL_ID = process.env.VERTEX_AI_FLASH_MODEL || "gemini-2.5-flash";
+const MODEL_ID = process.env.VERTEX_AI_MODEL || "gemini-3.0-pro";
+const FLASH_MODEL_ID = process.env.VERTEX_AI_FLASH_MODEL || "gemini-3.0-flash";
 
 let genAI: GoogleGenAI | null = null;
 

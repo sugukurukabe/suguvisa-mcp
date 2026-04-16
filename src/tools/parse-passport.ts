@@ -37,6 +37,7 @@ export function registerParsePassport(server: McpServer) {
         "AIが読み取ったOCRテキスト（画像がない場合のフォールバック） / OCR text fallback"
       ),
     },
+    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ image_base64, image_mime_type, ocr_text }) => {
       let parsed: ParsedPassport;
 
