@@ -5,3 +5,4 @@
  */
 export * from "./pii/index.js";
 export * from "./logger/index.js";
+export * from "./rate-limit/index.js";

@@ -2,8 +2,26 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import * as path from "path";
 import * as fs from "fs";
+import { fileURLToPath } from "url";
 import { officialCsvSchema, OfficialCsvData, splitRomajiName, resolveNationalityCode, resolveIndustryFieldCode, resolveApplicationType } from "../data/csv-schema.js";
 import XlsxPopulate from "xlsx-populate";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function resolveTemplatePath(templateName: string): string | null {
+  const candidates = [
+    path.resolve(__dirname, "../../assets", templateName),
+    path.resolve(__dirname, "../../../assets", templateName),
+    path.resolve(process.cwd(), "assets", templateName),
+    path.resolve(process.cwd(), "apps/mcp-server/assets", templateName),
+    path.resolve(process.cwd(), templateName),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
 
 /**
  * 前処理: ユーザーフレンドリーな入力を正式フォーマットに変換
@@ -127,12 +145,12 @@ export async function generateBulkXlsmHandler(
   if (appType === "1") templateName = "一括登録用Excelツール_認定 シート.xlsm";
   else if (appType === "2") templateName = "一括登録用Excelツール_更新 シート.xlsm";
 
-  const templatePath = path.resolve(process.cwd(), templateName);
-  if (!fs.existsSync(templatePath)) {
+  const templatePath = resolveTemplatePath(templateName);
+  if (!templatePath) {
      return {
       content: [{
         type: "text" as const,
-        text: JSON.stringify({ status: "error", message: `Excel template not found: ${templatePath}` }, null, 2)
+        text: JSON.stringify({ status: "error", message: `Excel template not found: ${templateName}` }, null, 2)
       }]
      };
   }
