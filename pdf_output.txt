@@ -1,0 +1,188 @@
+suguvisa-mcp
+a-kabe-1qio/suguvisa-mcp • last deployed 4 minutes ago
+93/100
+Remote
+Quick Setup
+98% uptime
+About
+日本の特定技能ビザ申請を自動化するMCPサーバー。申請種別判定、必要書類リスト、期限計算、データ検証に対応。
+日本の特定技能（SSW）ビザ申請業務を、AIチャットだけで完結させる業界唯一のMCPサーバー。
+行政書士・登録支援機関・受入れ機関が日常的に行うビザ申請業務——申請種別の判定、必要書類の洗い出し、期限管理、書類生
+成——を 18種のAIツール...
+View more
+Capabilities
+Tools
+26
+Resources
+6
+Prompts
+8
+determine_application_type
+【申請パターン自動判定】現在の在留資格と申請先の在留資格から、正式な申請種別（変更・更新・認定）、使用様式（別記第30号の5等）、標準処理期間、試験免除
+条件を瞬時に特定。技能実習→特定技能、特定技能1号→2号、転職、更新など全パターンに対応。parse_residence_card の直後に使用してください。 / Instantly…
+get_required_documents
+【必要書類リスト生成】申請パターンIDに基づき、入管提出に必要な全書類を一覧化。「2年以内の同一機関申請で省略可」「自社支援なら不要」等の省略条件を自動適用
+し、実際に準備が必要な書類だけを返す。カテゴリ別（申請人・所属機関・分野別）に整理し、各書類の入手方法・注意点も付記。 / Returns categorized documen…
+validate_application_data
+【申請データ検証】在留カード番号（12桁英数字）、法人番号（13桁）、日付形式、電話番号等の入力値をリアルタイムにチェック。入管への提出前にデータ不備を検出し、
+補正指示のリスクを大幅に低減。 / Real-time validation of residence card numbers, corporate numbers, dates, and phone formats to prevent…
+check_csv_missing_fields
+オンライン申請のCSV生成前に、必須フィールドが揃っているか、およびスキーマに沿って正しく入力されているかをチェックする。 / Pre-check missing/invalid CSV fields.
+calculate_deadlines
+【期限自動計算】在留期限・届出発生日から、随時届出の14日ルール期限、更新申請の開始可能日（3ヶ月前）、定期届出期間、通算在留5年上限チェック、認定証明書
+(COE)の有効期限を自動算出。期限切れリスクを色分け警告。 / Calculates all critical deadlines: 14-day notification rule, 3-month renewal window,…
+generate_intake_sheet
+【入力シート自動生成】申請パターンに応じた情報ヒアリングシートを自動作成。クライアント（受入れ機関）に渡して記入してもらうことで、申請に必要な全データを漏れなく収集。
+分野別の追加項目にも対応。 / Auto-generates a customized intake form for clients to fill out, ensuring all required data is collected without…
+parse_residence_card
+Search MCPs...
+
+=== PAGE BREAK ===
+【在留カードOCR】在留カードの画像またはOCRテキストから、氏名・国籍・在留資格・在留期限・カード番号等を構造化データに変換。Google Vertex AI Document AIに
+よる高精度OCRと、正規表現フォールバックの二段構え。画像データはサーバーに一切保存しません。 / Extracts structured data from residence card images usin…
+parse_passport
+【パスポートOCR】パスポート画像からAIで自動読み取り。氏名（姓名分割）・生年月日・性別・国籍・旅券番号・有効期限・MRZを抽出。Document AI → Gemini
+Vision → 正規表現の3段フォールバック。画像はサーバーに保存しません。 / Extract passport data (name, DOB, gender, nationality, passport number,…
+lookup_corporate_number
+【法人番号検索】会社名から国税庁の法人番号公表APIで法人番号・本店所在地を自動取得。会社名を入力するだけで申請に必要な企業情報が揃います。法人番号を直
+接指定した場合はチェックデジット検証も実行。 / Looks up corporate number, headquarters address via National Tax Agency API. Enter company…
+generate_bulk_xlsm
+【一括申請Excel生成】出入国在留管理庁の公式一括申請用Excelテンプレート(.xlsm)に申請人データを自動注入。マクロを破壊せずにデータだけを正確に埋め込む独自技
+術。認定・更新・変更の3種類に対応。 / Injects validated applicant data into the official ISA .xlsm bulk application template without breaking…
+Show 16 more...
+Performance
+Tool
+Calls
+Latency
+Uptime
+lookup_corporate_number
+39
+172ms
+100.0%
+get_complete_visa_guide
+25
+162ms
+100.0%
+Connect
+Get connection URL
+Overview
+Performance
+Usage
+API
+Observability
+Logs
+Releases
+Settings
+
+=== PAGE BREAK ===
+determine_application_type
+24
+149ms
+100.0%
+calculate_deadlines
+24
+149ms
+100.0%
+search_legal_docs
+22
+24.0s
+81.8%
+get_required_documents
+19
+161ms
+100.0%
+get_law_updates
+18
+169ms
+100.0%
+validate_application_data
+14
+161ms
+100.0%
+generate_reference_form
+8
+239ms
+100.0%
+205
+2.7s
+98.0%
+Uptime (30d) 100.0%
+Latency (30d) 176ms
+Usage
+Top Clients
+1
+Smithery
+137
+Total
+137
+Daily Sessions
+https://suguvisa-mcp--a-kabe-1qio.run.tools
+Or connect your agent
+Agents
+Humans
+Connection Prompt
+Send this prompt to your agent
+Copy
+“curl https://smithery.ai/skill.md and connect to a-kabe-1qio/suguvisa-mcp using smithery mcp add a-kabe-
+1qio/suguvisa-mcp ”
+Building a client or agent? View developer docs
+Published
+Apr 12, 2026
+Homepage
+sugu-kuru.co.jp
+Weekly Tool Calls
+205
+Apr 13
+Apr 14
+Apr 15
+Apr 16
+0ms
+50ms
+100ms
+150ms
+200ms
+
+=== PAGE BREAK ===
+API
+Use Smithery Connect to integrate this server into your application. Create a connection, then use the MCP
+SDK or AI SDK to call tools — OAuth, token refresh, and session management are handled for you.
+Create API key
+Manage Connections
+Configuration for a-kabe-1qio/suguvisa-mcp
+Optional parameters
+CLI
+AI SDK
+TypeScript
+1. Install Smithery CLI
+npm install -g @smithery/cli@latest
+2. Create a namespace
+smithery namespace create {your-namespace}
+3. Use this server
+Accelerating the Agent Economy
+Resources
+Documentation
+Privacy Policy
+System Status
+Company
+Pricing
+About
+Blog
+Apr 12
+Apr 13
+Apr 14
+Apr 15
+0
+20
+40
+60
+80
+# Add this server
+smithery mcp add a-kabe-1qio/suguvisa-mcp
+# List available tools
+smithery tool list {connection}
+# Call a tool
+smithery tool call {connection} {tool_name} '{"key": "value"}'
+
+=== PAGE BREAK ===
+Connect
+© 2026 Smithery. All rights reserved.

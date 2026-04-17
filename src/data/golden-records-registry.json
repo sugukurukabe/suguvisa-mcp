@@ -1,0 +1,14 @@
+{
+  "description": "SuguVisa AI審査および生成のための完全・成功形（Ground Truth / Golden Records）のリスト。AIによるフォーム評価時や推論時の正解データとして利用します。",
+  "records": [
+    {
+      "id": "golden_ssw1_direct_fully_outsourced",
+      "visa_type": "特定技能1号 (ssw1)",
+      "employment_type": "直接雇用 (direct_employment)",
+      "management_type": "登録支援機関に全部委託 (fully_outsourced)",
+      "application_pattern": "特定活動からの変更 (change_from_designated_activities)",
+      "gcs_uri_base": "gs://sugukuru-visa-docs/sugukuru_contractor/MUHAMMAD_RAJU/ssw1(委託　2025.12.19～)/",
+      "notes": "このケースの書類一式をベースにDocument AIで抽出したスキーマを、今後の全SuguVisa出力の品質比較基準（Benchmark）とします。"
+    }
+  ]
+}

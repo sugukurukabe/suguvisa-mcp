@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createRequire } from "module";
+import { createClient } from "@supabase/supabase-js";
+import { calculatePatternStats } from "./track-submission-outcome.js";
 
 const require = createRequire(import.meta.url);
 const ruleSets = require("../data/rule-sets.json");
@@ -45,7 +47,7 @@ interface DocumentEntry {
   reference_form_number?: string;
 }
 
-export function getRequiredDocumentsData(params: {
+export async function getRequiredDocumentsData(params: {
   pattern_id: string;
   support_type?: "self" | "delegated";
   is_same_employer_2year?: boolean;
@@ -192,6 +194,41 @@ export function getRequiredDocumentsData(params: {
         }
       }
 
+      let historical_revision_warning = null;
+      try {
+        if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+          const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+          // Timeout logic so getting required documents doesn't stall
+          const statsPromise = calculatePatternStats(supabase, pattern_id);
+          const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000));
+          const stats = await Promise.race([statsPromise, timeoutPromise]);
+          
+          if (stats && stats.total >= 3) {
+            const revisionRate = stats.revision_required / stats.total;
+            if (revisionRate >= 0.2 || stats.common_revision_codes.length > 0) {
+              historical_revision_warning = `⚠️【HITL警告】過去の同一パターン（${pattern_id}）において、補正・追加資料指示が高い確率（${(revisionRate * 100).toFixed(0)}%）で発生しています。特に頻出する補正コード: ${stats.common_revision_codes.join(", ") || "なし"}。事前の要件確認と該当社内資料の追加添付を強く推奨します。`;
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch pattern stats:", e);
+      }
+
+      let aiInstructions = "🎯 【エージェントモード：書類リスト取得完了 → 次は作成】\n" +
+        "書類リストが出ました。チャットで終わるな。書類を作れ。\n\n" +
+        "1. 「📄 必要書類 " + documents.length + "件（うち" + documents.filter((d: DocumentEntry) => d.skipped).length + "件省略可）」と1行で伝える\n" +
+        "2. 書類リストを簡潔な表で表示（☐ チェックボックス付き）\n" +
+        "3. 即座に以下を実行（ユーザーに聞かずに）：\n" +
+        "   - generate_reason_letter(use_ai: true) → 理由書を生成\n" +
+        "   - generate_reference_form → テンプレート生成\n" +
+        "   - generate_intake_sheet → 入力シート生成\n" +
+        "4. 省略条件は簡潔にメモ程度で\n\n" +
+        "禁止：「次のステップとして○○を提案します」→ 提案じゃなく実行しろ";
+
+      if (historical_revision_warning) {
+        aiInstructions += `\n\n🚨🚨【超重要：過去実績からの学習警告】🚨🚨\n${historical_revision_warning}\nこの警告内容をユーザーに一番に伝え、該当しそうな追加の疎明資料（課税証明書や理由書詳細など）を準備させる行動を取ること。`;
+      }
+
   return {
     status: "ok",
     pattern_id,
@@ -201,20 +238,11 @@ export function getRequiredDocumentsData(params: {
     skipped_count: documents.filter((d: DocumentEntry) => d.skipped).length,
     field_specific_count: fieldDocs.length,
     exam_exemption: examInfo,
+    historical_revision_warning,
     documents,
     skip_conditions: pattern.skip_conditions || [],
     download_url: "https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00030.html",
-    _ai_instructions:
-      "🎯 【エージェントモード：書類リスト取得完了 → 次は作成】\n" +
-      "書類リストが出ました。チャットで終わるな。書類を作れ。\n\n" +
-      "1. 「📄 必要書類 " + documents.length + "件（うち" + documents.filter((d: DocumentEntry) => d.skipped).length + "件省略可）」と1行で伝える\n" +
-      "2. 書類リストを簡潔な表で表示（☐ チェックボックス付き）\n" +
-      "3. 即座に以下を実行（ユーザーに聞かずに）：\n" +
-      "   - generate_reason_letter(use_ai: true) → 理由書を生成\n" +
-      "   - generate_reference_form → テンプレート生成\n" +
-      "   - generate_intake_sheet → 入力シート生成\n" +
-      "4. 省略条件は簡潔にメモ程度で\n\n" +
-      "禁止：「次のステップとして○○を提案します」→ 提案じゃなく実行しろ",
+    _ai_instructions: aiInstructions,
     _next_actions: [
       { tool: "generate_reason_letter", reason: "理由書をAI生成", params: { use_ai: true } },
       { tool: "generate_reference_form", reason: "参考様式テンプレートを生成" },
@@ -238,7 +266,7 @@ export function registerRequiredDocuments(server: McpServer) {
     },
     { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
-      const result = getRequiredDocumentsData(params);
+      const result = await getRequiredDocumentsData(params);
       if ('message' in result) {
         return {
           content: [{

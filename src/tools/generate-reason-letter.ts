@@ -16,6 +16,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createRequire } from "module";
 import { generateText, isVertexAIAvailable } from "../lib/vertex-ai.js";
+import { createClient } from "@supabase/supabase-js";
+import { calculatePatternStats } from "./track-submission-outcome.js";
 
 const require = createRequire(import.meta.url);
 const ruleSets = require("../data/rule-sets.json");
@@ -508,6 +510,29 @@ async function generateAIReasonLetter(
   const template = LETTER_TEMPLATES[patternId] || LETTER_TEMPLATES.GENERIC;
   const pattern = ruleSets.application_patterns[patternId];
 
+  // Supabaseから統計データを取得
+  const supabaseUrl = process.env.SUPABASE_URL || "";
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || "";
+  let statsInfo = "";
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const stats = await calculatePatternStats(supabase, patternId);
+      if (stats) {
+        let statsStr = `【過去の審査統計と頻出補正理由のフィードバック】\n`;
+        statsStr += `- 過去の補正率（追加資料要求率）: ${(stats.revision_rate * 100).toFixed(1)}%\n`;
+        statsStr += `- 過去の不許可率: ${((stats.rejected / stats.total) * 100).toFixed(1)}%\n`;
+        if (stats.common_revision_codes.length > 0) {
+          statsStr += `- よくある入管からの指摘事項: ${stats.common_revision_codes.join(", ")}\n`;
+        }
+        statsStr += `\n🌟 指示: 上記の不許可・補正理由を先回りして払拭できるよう、理由書の構成を調整・強化してください。不許可リスクを軽減する「鉄板の理由書」を目指してください。`;
+        statsInfo = statsStr;
+      }
+    } catch (e) {
+      console.warn("Failed to fetch pattern stats:", e);
+    }
+  }
+
   const contextSummary = Object.entries(context)
     .map(([k, v]) => `- ${k}: ${v}`)
     .join("\n");
@@ -520,7 +545,7 @@ async function generateAIReasonLetter(
 - 変更元: ${pattern?.from_visa || "不明"}
 - 変更先: ${pattern?.to_visa || "不明"}
 
-## 申請人の情報
+${statsInfo ? `## 不許可リスクの回避（HITLフィードバック）\n${statsInfo}\n` : ""}## 申請人の情報
 ${contextSummary}
 
 ## 理由書の構成（参考）

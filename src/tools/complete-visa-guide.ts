@@ -87,7 +87,7 @@ export function registerCompleteVisaGuide(server: McpServer) {
       const { patternId, pattern } = patternResult;
 
       // ── Step 2: 必要書類リスト ──
-      const documentsResult = getRequiredDocumentsData({
+      const documentsResult = await getRequiredDocumentsData({
         pattern_id: patternId,
         support_type: support_type as "self" | "delegated",
         is_same_employer_2year,

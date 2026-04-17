@@ -2,14 +2,14 @@ import { describe, it, expect } from "vitest";
 import { getRequiredDocumentsData } from "../required-documents.js";
 
 describe("required-documents", () => {
-  it("should return an error for invalid pattern_id", () => {
-    const result = getRequiredDocumentsData({ pattern_id: "INVALID_PATTERN" });
+  it("should return an error for invalid pattern_id", async () => {
+    const result = await getRequiredDocumentsData({ pattern_id: "INVALID_PATTERN" });
     expect(result).toHaveProperty("status", "error");
     expect((result as any).message).toContain("Pattern ID not found");
   });
 
-  it("should return required documents for CHANGE_SSW1_A (self support, domestic)", () => {
-    const result: any = getRequiredDocumentsData({
+  it("should return required documents for CHANGE_SSW1_A (self support, domestic)", async () => {
+    const result: any = await getRequiredDocumentsData({
       pattern_id: "CHANGE_SSW1_A",
       support_type: "self",
       is_domestic: true,
@@ -33,8 +33,8 @@ describe("required-documents", () => {
     expect(result.skipped_count).toBe(0);
   });
 
-  it("should skip skippable documents if same employer within 2 years", () => {
-    const result: any = getRequiredDocumentsData({
+  it("should skip skippable documents if same employer within 2 years", async () => {
+    const result: any = await getRequiredDocumentsData({
       pattern_id: "RENEWAL_01",
       support_type: "delegated",
       is_domestic: true,
@@ -50,8 +50,8 @@ describe("required-documents", () => {
     expect(skippedDoc.skip_reason).toBeDefined();
   });
 
-  it("should omit domestic-only documents for overseas applicants", () => {
-    const result: any = getRequiredDocumentsData({
+  it("should omit domestic-only documents for overseas applicants", async () => {
+    const result: any = await getRequiredDocumentsData({
       pattern_id: "GRANT_01",
       support_type: "delegated",
       is_domestic: false, // Application from overseas
@@ -63,8 +63,8 @@ describe("required-documents", () => {
     expect(domesticDocs.length).toBe(0);
   });
 
-  it("should include field-specific documents and exam info", () => {
-    const result: any = getRequiredDocumentsData({
+  it("should include field-specific documents and exam info", async () => {
+    const result: any = await getRequiredDocumentsData({
       pattern_id: "CHANGE_SSW1_A",
       industry_field: "農業",
     });

@@ -14,6 +14,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createRequire } from "module";
+import { parseResidenceCardHandler } from "./parse-residence-card.js";
 
 const require = createRequire(import.meta.url);
 const ruleSets = require("../data/rule-sets.json");
@@ -108,14 +109,17 @@ const IMMIGRATION_OFFICES: Record<string, { name: string; jurisdiction: string[]
 // チェックロジック
 // ──────────────────────────────────────────────────
 
-function runPreSubmissionChecklist(params: {
+async function runPreSubmissionChecklist(params: {
   pattern_id: string;
   submission_method: "online" | "paper" | "both";
   applicant_data: Record<string, string | number | boolean | undefined>;
   prepared_documents: string[];
   employer_prefecture?: string;
+  residence_card_image_base64?: string;
+  residence_card_image_mime_type?: "image/jpeg" | "image/png" | "image/webp";
+  ocr_text?: string;
 }) {
-  const { pattern_id, submission_method, applicant_data, prepared_documents, employer_prefecture } = params;
+  const { pattern_id, submission_method, applicant_data, prepared_documents, employer_prefecture, residence_card_image_base64, residence_card_image_mime_type, ocr_text } = params;
 
   const checks: CheckItem[] = [];
   const pattern = ruleSets.application_patterns[pattern_id];
@@ -272,6 +276,57 @@ function runPreSubmissionChecklist(params: {
       detail: `${ad.contract_start} ～ ${ad.contract_end}（約${months}ヶ月間）`,
       action_needed: months <= 0 ? "雇用契約の終了日が開始日より後であることを確認してください" : undefined,
     });
+  }
+
+  // ─── Category 3.5: 在留カードOCR整合性チェック ───
+  if (residence_card_image_base64 || ocr_text) {
+    try {
+      const ocrResponse = await parseResidenceCardHandler({
+        image_base64: residence_card_image_base64,
+        image_mime_type: residence_card_image_mime_type,
+        ocr_text
+      });
+      const content0 = ocrResponse.content?.[0];
+      const ocrResultText = content0 && typeof content0 === 'object' && 'text' in content0 ? content0.text : undefined;
+      if (ocrResultText) {
+        const ocrData = JSON.parse(ocrResultText);
+        if (ocrData && ocrData.parsed) {
+          const parsed = ocrData.parsed;
+          // 氏名チェック
+          if (parsed.name_romaji && ad.applicant_name) {
+            const isNameMatch = typeof ad.applicant_name === 'string' && parsed.name_romaji.toLowerCase().replace(/\s+/g, '') === ad.applicant_name.toLowerCase().replace(/\s+/g, '');
+            checks.push({
+              id: "DATA-005",
+              category: "OCRチェック",
+              check: "氏名の一致（OCR vs 申請データ）",
+              status: isNameMatch ? "pass" : "fail",
+              detail: `OCR: ${parsed.name_romaji} / 申請: ${ad.applicant_name}`,
+              action_needed: isNameMatch ? undefined : "在留カードと申請データの氏名が一致しません。修正してください。",
+            });
+          }
+          // 在留期限チェック
+          if (parsed.visa_expiry && ad.visa_expiry) {
+            const isExpiryMatch = parsed.visa_expiry === String(ad.visa_expiry);
+            checks.push({
+              id: "DATA-006",
+              category: "OCRチェック",
+              check: "在留期限の一致（OCR vs 申請データ）",
+              status: isExpiryMatch ? "pass" : "fail",
+              detail: `OCR: ${parsed.visa_expiry} / 申請: ${ad.visa_expiry}`,
+              action_needed: isExpiryMatch ? undefined : "在留カードと申請データの在留期限が一致しません。更新してください。",
+            });
+          }
+        }
+      }
+    } catch (err: any) {
+      checks.push({
+        id: "DATA-OCR-ERR",
+        category: "OCRチェック",
+        check: "OCR解析エラー",
+        status: "warning",
+        detail: `OCR処理中にエラーが発生しました: ${err.message}`,
+      });
+    }
   }
 
   // ─── Category 4: 署名・押印チェック ───
@@ -442,10 +497,13 @@ export function registerPreSubmissionChecklist(server: McpServer) {
         "所属機関（雇用主）の所在都道府県。最低賃金チェックと管轄入管局の特定に使用。\n" +
         "例: '東京', '鹿児島', '北海道'"
       ),
+      residence_card_image_base64: z.string().optional().describe("在留カード画像のBase64エンコードデータ（表面）"),
+      residence_card_image_mime_type: z.enum(["image/jpeg", "image/png", "image/webp"]).optional().describe("画像のMIMEタイプ"),
+      ocr_text: z.string().optional().describe("事前に読み取ったOCRテキスト（フォールバック用）"),
     },
     { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
-      const result = runPreSubmissionChecklist(params);
+      const result = await runPreSubmissionChecklist(params as any);
       return {
         content: [{
           type: "text" as const,

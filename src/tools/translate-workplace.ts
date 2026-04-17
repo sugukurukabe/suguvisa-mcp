@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { generateText, isVertexAIAvailable } from "../lib/vertex-ai.js";
+import { createClient } from "@supabase/supabase-js";
 
 // === 業務定型文テンプレート ===
 const TEMPLATES: Record<string, Record<string, string>> = {
@@ -146,7 +147,33 @@ export function registerTranslateWorkplaceMessage(server: McpServer) {
     async ({ message, target_languages, domain, to_easy_japanese }) => {
       const langs = target_languages || ["id", "vi"];
       const domainKey = domain || "general";
-      const glossary = DOMAIN_GLOSSARY[domainKey] || {};
+      const baseGlossary = DOMAIN_GLOSSARY[domainKey] || {};
+
+      let dynamicGlossary: Record<string, string> = {};
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+      
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          const { data, error } = await supabase
+            .from("domain_glossaries")
+            .select("term_ja, term_translated")
+            .eq("domain", domainKey);
+            
+          if (!error && data) {
+            data.forEach(item => {
+              if (item.term_ja && item.term_translated) {
+                dynamicGlossary[item.term_ja] = item.term_translated;
+              }
+            });
+          }
+        } catch (e: any) {
+          console.warn("[WARNING] Supabase 辞書の取得に失敗しました:", e.message);
+        }
+      }
+
+      const glossary = { ...baseGlossary, ...dynamicGlossary };
 
       if (!isVertexAIAvailable()) {
         return {

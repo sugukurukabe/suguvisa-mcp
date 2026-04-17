@@ -3,6 +3,23 @@ import { z } from "zod";
 import { SearchServiceClient } from "@google-cloud/discoveryengine";
 import { generateText, isVertexAIAvailable } from "../lib/vertex-ai.js";
 
+// --- キャッシュ関連の設定 ---
+interface CacheEntry {
+  timestamp: number;
+  data: any;
+}
+const searchCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24時間
+
+// --- タイムアウト用ユーティリティ ---
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallbackErrorMsg = 'Timeout'): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(fallbackErrorMsg)), ms);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+}
+
 /**
  * 入管マニュアル等のRAG検索 (Vertex AI Search / Discovery Engine API)
  * DataStore未設定時は Gemini による法務知識ベースでフォールバック
@@ -17,6 +34,13 @@ export function registerSearchLegalDocs(server: McpServer) {
     },
     { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ query, max_results }) => {
+      // === キャッシュの確認 ===
+      const cacheKey = `${query}_${max_results || 5}`;
+      const cached = searchCache.get(cacheKey);
+      if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+        return cached.data;
+      }
+
       const projectId = process.env.VERTEX_SEARCH_PROJECT_ID || process.env.GCP_PROJECT_ID;
       const location = process.env.VERTEX_SEARCH_LOCATION || "global";
       const dataStoreId = process.env.VERTEX_SEARCH_DATA_STORE_ID;
@@ -33,7 +57,8 @@ export function registerSearchLegalDocs(server: McpServer) {
             pageSize: max_results || 5,
           };
 
-          const [searchResults] = await client.search(request);
+          // Vertex AI Search は最大8秒でタイムアウト
+          const [searchResults] = await withTimeout(client.search(request), 8000, "Vertex AI Search timeout after 8000ms");
           const results = searchResults.map((res: any) => {
             const doc = res.document;
             const structData = doc?.structData?.fields;
@@ -47,7 +72,7 @@ export function registerSearchLegalDocs(server: McpServer) {
             };
           });
 
-          return {
+          const responseData = {
             content: [{
               type: "text" as const,
               text: JSON.stringify({
@@ -58,6 +83,9 @@ export function registerSearchLegalDocs(server: McpServer) {
               }, null, 2),
             }],
           };
+          
+          searchCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
+          return responseData;
         } catch (error: any) {
           console.error("Vertex AI Search failed, falling back to Gemini:", error.message);
           // フォールバック: Gemini
@@ -67,32 +95,40 @@ export function registerSearchLegalDocs(server: McpServer) {
       // === Stage 2: Gemini AIベースの法務知識フォールバック ===
       if (isVertexAIAvailable()) {
         try {
-          const answer = await searchWithGemini(query, max_results || 5);
-          return {
+          // Gemini は最大7秒でタイムアウト
+          const answer = await withTimeout(searchWithGemini(query, max_results || 5), 7000, "Gemini search timeout after 7000ms");
+          const responseData = {
             content: [{
               type: "text" as const,
               text: JSON.stringify(answer, null, 2),
             }],
           };
+          
+          searchCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
+          return responseData;
         } catch (err: any) {
           console.error("Gemini search fallback failed:", err.message);
         }
       }
 
       // === Stage 3: 組み込み知識ベース（最終フォールバック）===
-      return {
+      const responseData = {
         content: [{
           type: "text" as const,
           text: JSON.stringify({
             status: "fallback",
             source: "builtin_knowledge",
             query,
-            message: "Vertex AI Search / Gemini が利用できません。組み込みの基本知識から回答します。",
+            message: "Vertex AI Search / Gemini が利用できません（またはタイムアウト）。組み込みの基本知識から回答します。",
             results: getBuiltinResults(query),
             _ai_instructions: "検索結果が限定的です。ユーザーの質問に対してあなた自身の入管法の知識で補完してください。",
           }, null, 2),
         }],
       };
+      
+      // 組み込みの結果も一応キャッシュしておく
+      searchCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
+      return responseData;
     }
   );
 }
@@ -151,37 +187,43 @@ JSONのみを出力してください。`;
 }
 
 // === 組み込みナレッジベース（最終フォールバック）===
-function getBuiltinResults(query: string): Array<{title: string, snippet: string}> {
+function getBuiltinResults(query: string): Array<{title: string, snippet: string, link: string}> {
   const knowledge = [
     {
       keywords: ["14日", "届出", "随時"],
       title: "随時届出の14日ルール",
       snippet: "特定技能所属機関は、受入れ外国人の雇用契約変更・終了・新規雇用・転職等の事由が発生した場合、14日以内に出入国在留管理庁へ届出が必要です（入管法第19条の18）。届出を怠ると30万円以下の罰金の対象となります。",
+      link: ""
     },
     {
       keywords: ["最低賃金", "時給", "給与"],
       title: "最低賃金との関係",
       snippet: "特定技能外国人の報酬は、同等の業務に従事する日本人と同等以上でなければなりません。また、都道府県ごとの最低賃金を下回ることはできません。2025年度の全国加重平均最低賃金は1,055円です。",
+      link: ""
     },
     {
       keywords: ["試験", "免除", "技能実習", "移行"],
       title: "技能実習からの移行時の試験免除",
       snippet: "技能実習2号を良好に修了した場合、同一の業務区分への移行であれば技能試験と日本語試験（N4相当）の両方が免除されます。異なる分野への移行の場合は技能試験の合格が必要です。",
+      link: ""
     },
     {
       keywords: ["派遣", "農業", "漁業"],
       title: "派遣形態が認められる分野",
       snippet: "特定技能1号で派遣形態が認められているのは農業と漁業の2分野のみです（令和元年法務省令第7号）。これらの分野では、季節的な労働需要の変動に対応するため、派遣元が労働者派遣事業の許可を得ていることを条件に派遣が認められています。",
+      link: ""
     },
     {
       keywords: ["特定活動", "つなぎ", "ビザ"],
       title: "特定活動（つなぎビザ）の要件",
       snippet: "特定技能1号の申請準備中に在留期限が切れる場合、「特定活動」への変更が認められることがあります。就労は前の雇用主のもとでのみ可能で、新しい雇用主のもとでの就労は認められません。通常4ヶ月が付与されます。",
+      link: ""
     },
     {
       keywords: ["オンライン", "申請", "マイナンバー"],
       title: "オンライン申請の手続き",
       snippet: "在留資格のオンライン申請は、出入国在留管理庁の電子届出システムから行えます。弁護士・行政書士等の申請取次者が利用する場合は、事前に利用者登録が必要です。一括申請も可能で、CSV/Excelでのデータアップロードに対応しています。",
+      link: ""
     },
   ];
 

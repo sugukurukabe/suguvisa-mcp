@@ -52,7 +52,7 @@ const submissionOutcomeSchema = z.object({
  * Calculate revision rate for the same pattern
  * Menghitung tingkat revisi untuk pola yang sama
  */
-interface PatternStats {
+export interface PatternStats {
   total: number;
   accepted: number;
   revision_required: number;
@@ -62,7 +62,7 @@ interface PatternStats {
   common_revision_codes: string[];
 }
 
-async function calculatePatternStats(
+export async function calculatePatternStats(
   supabase: SupabaseClient,
   patternId: string
 ): Promise<PatternStats | null> {

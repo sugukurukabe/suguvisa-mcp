@@ -31,8 +31,9 @@ import { registerWageCompliance } from "./tools/wage-compliance.js";
 import { registerPeriodicNotificationChecker } from "./tools/periodic-notification-checker.js";
 import { registerAnalyzeSupportRecords } from "./tools/analyze-support-records.js";
 import { registerGeneratePeriodicNotification } from "./tools/generate-periodic-notification.js";
-
-/**
+import { registerAiFormValidator } from "./tools/ai-form-validator.js";
+import { registerAdvancedDocExtractor } from "./tools/advanced-doc-extractor.js";
+import { registerSyncVertexDatastore } from "./tools/sync-vertex-datastore.js";/**
  * 全36ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
  * stdio (index.ts) と HTTP (server.ts) の両方から呼ばれる。
  */
@@ -41,6 +42,8 @@ export function registerAllTools(server: McpServer): void {
   registerDetermineApplication(server);   // 申請種別の自動判定
   registerRequiredDocuments(server);       // 必要書類リスト
   registerValidateData(server);            // 入力データの検証
+  registerAiFormValidator(server);         // Gemini Flash/Pro による自動ルーター形式の視覚的フォーマット検証
+  registerAdvancedDocExtractor(server);    // Document AI Generative Extractor による高精度パース
   registerCalculateDeadlines(server);      // 期限計算
 
   // === 入力支援系 ===
@@ -68,6 +71,7 @@ export function registerAllTools(server: McpServer): void {
   // === 情報系 ===
   registerLawUpdates(server);              // 法改正情報
   registerSearchLegalDocs(server);         // 法務ドキュメントRAG検索
+  registerSyncVertexDatastore(server);     // GCS書類一括インポート
   registerReviewDocument(server);          // AI書類レビュー（Gemini Vision）
 
   // === インテントベース統合ツール ===

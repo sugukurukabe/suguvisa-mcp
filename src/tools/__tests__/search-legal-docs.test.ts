@@ -41,8 +41,8 @@ describe("search_legal_docs (mock mode)", () => {
     const parsed = JSON.parse(
       (result as { content: { text: string }[] }).content[0].text
     );
-    expect(parsed.status).toBe("mock_success");
-    expect(parsed.message).toContain("モック");
+    expect(parsed.status).toBe("fallback");
+    expect(parsed.message).toContain("組み込みの基本知識から回答します。");
     expect(parsed.results).toBeDefined();
     expect(parsed.results.length).toBeGreaterThan(0);
   });

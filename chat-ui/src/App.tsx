@@ -22,11 +22,31 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isLoading) {
+      setLoadingStep(0);
+      interval = setInterval(() => {
+        setLoadingStep(prev => (prev < 3 ? prev + 1 : prev));
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
+  const loadingSteps = [
+    "AIが書類構成を分析中...",
+    "過去の申請データから最適化中...",
+    "書類を自動生成中...",
+    "最終的な検証を実行中..."
+  ];
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, loadingStep]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,13 +146,18 @@ export default function App() {
                                  <FileText size={24} />
                                </div>
                                <div>
-                                 <h4 className="text-white font-semibold mb-1">定期報告書 (Excel)</h4>
-                                 <p className="text-xs text-slate-400">所属機関向けフォーマット</p>
+                                 <h4 className="text-white font-semibold mb-1">生成ドキュメント</h4>
+                                 <p className="text-xs text-slate-400">SuguVisaによる作成ファイル</p>
                                </div>
                              </div>
-                             <button className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30 whitespace-nowrap">
-                               ダウンロード
-                             </button>
+                             <div className="flex gap-2">
+                               <button className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-colors border border-white/10 whitespace-nowrap hidden sm:block">
+                                 プレビュー
+                               </button>
+                               <button className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30 whitespace-nowrap">
+                                 ダウンロード
+                               </button>
+                             </div>
                           </div>
                         );
                       }
@@ -148,11 +173,24 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex w-full justify-start"
               >
-                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-bl-sm flex items-center gap-3 w-32 ai-glow">
-                   <div className="flex gap-1.5 pl-1">
-                     <span className="w-2.5 h-2.5 bg-blue-500/80 rounded-full thinking-dot [animation-delay:-0.3s]"></span>
-                     <span className="w-2.5 h-2.5 bg-indigo-500/80 rounded-full thinking-dot [animation-delay:-0.15s]"></span>
-                     <span className="w-2.5 h-2.5 bg-purple-500/80 rounded-full thinking-dot"></span>
+                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-bl-sm flex flex-col gap-3 min-w-[280px] ai-glow">
+                   <div className="flex items-center gap-3">
+                     <div className="flex gap-1.5 pl-1">
+                       <span className="w-2.5 h-2.5 bg-blue-500/80 rounded-full thinking-dot [animation-delay:-0.3s]"></span>
+                       <span className="w-2.5 h-2.5 bg-indigo-500/80 rounded-full thinking-dot [animation-delay:-0.15s]"></span>
+                       <span className="w-2.5 h-2.5 bg-purple-500/80 rounded-full thinking-dot"></span>
+                     </div>
+                     <span className="text-sm font-medium text-slate-300 tracking-wide">
+                        {loadingSteps[loadingStep] || "処理中..."}
+                     </span>
+                   </div>
+                   <div className="w-full bg-white/10 rounded-full h-1.5 mt-1 overflow-hidden">
+                     <motion.div 
+                       className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-full"
+                       initial={{ width: "25%" }}
+                       animate={{ width: `${(loadingStep + 1) * 25}%` }}
+                       transition={{ duration: 0.5, ease: "easeInOut" }}
+                     />
                    </div>
                 </div>
               </motion.div>
