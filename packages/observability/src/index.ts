@@ -4,6 +4,7 @@ export * from "./tracer.js";
 export * from "./metrics.js";
 export * from "./langfuse.js";
 export * from "./mcp.js";
+export * from "./mcp-server-instrumentation.js";
 export * from "./otel-init.js";
 export * from "./logger-mixin.js";
 export { obsMiddleware } from "./express.js";
