@@ -1,0 +1,126 @@
+/**
+ * Directory router / ディレクトリ掲載用ルート / Router direktori
+ *
+ * Claude Connectors Directory と ChatGPT Apps Store への掲載に必要な
+ * エンドポイントをまとめた Express Router。
+ *
+ * - Manifest: /.well-known/mcp/server-card.json, /.well-known/ai-plugin.json,
+ *             /.well-known/openai-app.json
+ * - Static assets: /logo.svg, /favicon.svg, /og-image.{svg,png}, /openapi.yaml
+ * - Legal / support HTML: /, /privacy, /terms, /security, /support
+ * - Plain text: /.well-known/security.txt, /robots.txt, /sitemap.xml
+ */
+import { Router, type Request, type Response } from "express";
+import * as fs from "fs";
+import * as path from "path";
+import { buildDirectoryMetadata } from "./metadata.js";
+import { serverCardHandler } from "./server-card.js";
+import { aiPluginHandler } from "./ai-plugin.js";
+import { openaiAppHandler } from "./openai-app.js";
+import {
+  landingHandler,
+  privacyHandler,
+  termsHandler,
+  securityHandler,
+  supportHandler,
+} from "./pages.js";
+
+export function createDirectoryRouter(): Router {
+  const router = Router();
+
+  // Manifests
+  router.get("/.well-known/mcp/server-card.json", serverCardHandler);
+  router.get("/.well-known/ai-plugin.json", aiPluginHandler);
+  router.get("/.well-known/openai-app.json", openaiAppHandler);
+
+  // OpenAPI
+  router.get("/openapi.yaml", (_req: Request, res: Response) => {
+    const specPath = path.resolve(process.cwd(), "public", "openapi.yaml");
+    if (fs.existsSync(specPath)) {
+      res.type("text/yaml").sendFile(specPath);
+    } else {
+      res.status(404).json({ error: "openapi.yaml not found" });
+    }
+  });
+
+  // Static branding assets
+  router.get("/logo.svg", staticFileHandler("public/logo.svg", "image/svg+xml"));
+  router.get("/favicon.svg", staticFileHandler("public/favicon.svg", "image/svg+xml"));
+  router.get("/favicon.ico", staticFileHandler("public/favicon.svg", "image/svg+xml"));
+  router.get("/og-image.svg", staticFileHandler("public/og-image.svg", "image/svg+xml"));
+  router.get("/og-image.png", staticFileHandler("public/og-image.svg", "image/svg+xml")); // fallback
+
+  // Screenshot / marketing assets (served from public/assets/ if present)
+  router.get("/assets/:filename", (req: Request, res: Response) => {
+    const raw = req.params.filename;
+    const name = Array.isArray(raw) ? raw[0] : raw;
+    if (typeof name !== "string" || !/^[\w.-]+$/.test(name)) {
+      res.status(400).json({ error: "invalid filename" });
+      return;
+    }
+    const abs = path.resolve(process.cwd(), "public/assets", name);
+    if (!fs.existsSync(abs)) {
+      res.status(404).json({ error: "asset not found" });
+      return;
+    }
+    res.setHeader("Cache-Control", "public, max-age=86400").sendFile(abs);
+  });
+
+  // HTML pages
+  router.get("/", landingHandler);
+  router.get("/privacy", privacyHandler);
+  router.get("/terms", termsHandler);
+  router.get("/security", securityHandler);
+  router.get("/support", supportHandler);
+  router.get("/docs", (_req, res) => res.redirect(302, "/openapi.yaml"));
+
+  // security.txt (RFC 9116)
+  router.get("/.well-known/security.txt", (_req: Request, res: Response) => {
+    const m = buildDirectoryMetadata();
+    const expires = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString();
+    res
+      .type("text/plain")
+      .send(
+        [
+          `Contact: mailto:${m.publisher.supportEmail}`,
+          `Expires: ${expires}`,
+          `Preferred-Languages: ja, en, id`,
+          `Canonical: ${m.urls.baseUrl}/.well-known/security.txt`,
+          `Policy: ${m.urls.security}`,
+          "",
+        ].join("\n"),
+      );
+  });
+
+  // robots / sitemap
+  router.get("/robots.txt", (_req: Request, res: Response) => {
+    const m = buildDirectoryMetadata();
+    res
+      .type("text/plain")
+      .send([`User-agent: *`, `Allow: /`, `Sitemap: ${m.urls.baseUrl}/sitemap.xml`, ""].join("\n"));
+  });
+
+  router.get("/sitemap.xml", (_req: Request, res: Response) => {
+    const m = buildDirectoryMetadata();
+    const paths = ["/", "/privacy", "/terms", "/security", "/support"];
+    res.type("application/xml").send(
+      `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${paths.map((p) => `  <url><loc>${m.urls.baseUrl}${p}</loc></url>`).join("\n")}
+</urlset>`,
+    );
+  });
+
+  return router;
+}
+
+function staticFileHandler(relPath: string, contentType: string) {
+  return (_req: Request, res: Response) => {
+    const abs = path.resolve(process.cwd(), relPath);
+    if (!fs.existsSync(abs)) {
+      res.status(404).json({ error: `${relPath} not found` });
+      return;
+    }
+    res.type(contentType).setHeader("Cache-Control", "public, max-age=86400").sendFile(abs);
+  };
+}

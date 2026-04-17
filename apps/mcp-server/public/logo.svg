@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="SuguVisa logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="40" fill="url(#g)"/>
+  <path d="M82 170c0 14 14 26 42 26s42-10 42-28c0-20-16-28-42-34-20-4-30-8-30-18s10-16 26-16c14 0 24 6 26 20h24c-4-26-22-40-50-40-28 0-48 14-48 38 0 20 14 30 42 36 22 4 30 8 30 18s-10 18-28 18c-16 0-26-6-28-22z" fill="#ffffff"/>
+  <rect x="60" y="200" width="136" height="10" rx="5" fill="#ffffff" opacity="0.9"/>
+</svg>
