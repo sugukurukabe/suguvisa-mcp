@@ -35,6 +35,7 @@ import { registerAiFormValidator } from "./tools/ai-form-validator.js";
 import { registerAdvancedDocExtractor } from "./tools/advanced-doc-extractor.js";
 import { registerSyncVertexDatastore } from "./tools/sync-vertex-datastore.js";
 import { registerGenerateOnlineCsv } from "./tools/generate-online-csv.js";
+import { registerSearchGoldenRecords } from "./tools/search-golden-records.js";
 
 /**
  * 全36ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
@@ -75,6 +76,7 @@ export function registerAllTools(server: McpServer): void {
   // === 情報系 ===
   registerLawUpdates(server);              // 法改正情報
   registerSearchLegalDocs(server);         // 法務ドキュメントRAG検索
+  registerSearchGoldenRecords(server);     // Golden Records ハイブリッド検索 (BM25 + Vector)
   registerSyncVertexDatastore(server);     // GCS書類一括インポート
   registerReviewDocument(server);          // AI書類レビュー（Gemini Vision）
 

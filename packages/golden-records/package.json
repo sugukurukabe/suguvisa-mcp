@@ -1,14 +1,43 @@
 {
   "name": "@suguvisa/golden-records",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./firestore": {
+      "types": "./dist/stores/firestore.d.ts",
+      "import": "./dist/stores/firestore.js"
+    },
+    "./vertex": {
+      "types": "./dist/embeddings/vertex.d.ts",
+      "import": "./dist/embeddings/vertex.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@suguvisa/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@google-cloud/firestore": "^7.0.0",
+    "@google-cloud/aiplatform": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@google-cloud/firestore": {
+      "optional": true
+    },
+    "@google-cloud/aiplatform": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "typescript": "^5.7.0",
