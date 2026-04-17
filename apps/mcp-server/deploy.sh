@@ -56,13 +56,17 @@ gcloud run deploy "${SERVICE_NAME}" \
   --platform=managed \
   --allow-unauthenticated \
   --port=8080 \
-  --memory=256Mi \
+  --memory=512Mi \
   --cpu=1 \
   --min-instances=0 \
   --max-instances=10 \
   --timeout=300 \
   --set-env-vars="NODE_ENV=production" \
   --set-env-vars="SUGUVISA_API_KEY=${SUGUVISA_API_KEY:-}" \
+  --set-env-vars="AUTH0_DOMAIN=${AUTH0_DOMAIN:-}" \
+  --set-env-vars="AUTH0_AUDIENCE=${AUTH0_AUDIENCE:-}" \
+  --set-env-vars="AUTH0_ISSUER_BASE_URL=${AUTH0_ISSUER_BASE_URL:-}" \
+  --set-env-vars="ALLOW_LEGACY_API_KEY=${ALLOW_LEGACY_API_KEY:-true}" \
   --service-account="${SERVICE_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
   --quiet
 
