@@ -1,16 +1,37 @@
 {
   "name": "@suguvisa/core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./pii": {
+      "types": "./dist/pii/index.d.ts",
+      "import": "./dist/pii/index.js"
+    },
+    "./logger": {
+      "types": "./dist/logger/index.d.ts",
+      "import": "./dist/logger/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc --noEmit"
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "neverthrow": "^8.1.1",
+    "pino": "^9.5.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.5",
     "typescript": "^5.7.0",
     "vitest": "^3.2.4"
   }
