@@ -30,4 +30,9 @@ describe('TOOL_SCOPE_MAP', () => {
     const scopes = getToolScopes('nonexistent_tool');
     expect(scopes).toEqual([]);
   });
+
+  it('should return read:golden_records for search_golden_records', () => {
+    const scopes = getToolScopes('search_golden_records');
+    expect(scopes).toContain('read:golden_records');
+  });
 });

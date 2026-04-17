@@ -36,6 +36,7 @@ export const TOOL_SCOPE_MAP: Record<string, Scope[]> = {
 
   get_law_updates: ['read:law_updates'],
   search_legal_docs: ['read:law_updates'],
+  search_golden_records: ['read:golden_records'],
   sync_vertex_datastore: ['admin:tenant'],
   review_document: ['review:document'],
 
