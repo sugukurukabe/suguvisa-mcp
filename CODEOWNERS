@@ -1,0 +1,10 @@
+# SuguVisa CODEOWNERS
+# 全変更に壁さんのレビューが必要 / All changes require review by kabe / Semua perubahan memerlukan review dari kabe
+
+* @sugukurukabe
+
+# セキュリティ関連 / Security-related / Terkait keamanan
+packages/auth/ @sugukurukabe
+infra/ @sugukurukabe
+.cursor/ @sugukurukabe
+CLAUDE.md @sugukurukabe

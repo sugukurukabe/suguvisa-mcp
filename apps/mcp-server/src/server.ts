@@ -1,0 +1,359 @@
+#!/usr/bin/env node
+/**
+ * SuguVisa MCP — HTTP エントリポイント (Dual Plugin Server)
+ *
+ * 3つのモードを同時に提供:
+ *   1. MCP Protocol (/mcp) — Claude.ai Remote MCP
+ *   2. REST API (/api/v1/tools/*) — GPT Actions / 外部API
+ *   3. Standalone Chat (/api/v1/chatbot) — 自社フロントエンド用 (オプション)
+ */
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { registerAllTools } from "./register-tools.js";
+import { apiKeyAuth } from "./middleware/auth.js";
+import { logUsage } from "./middleware/usage-logger.js";
+import type { AuthRequest } from "./middleware/auth.js";
+import { apiRateLimiter, checkToolAccess } from "./middleware/rate-limiter.js";
+
+import {
+  createAuthProvider,
+  createAuthMiddleware,
+  generateResourceMetadata,
+  type AuthConfig,
+  type Principal,
+} from "@suguvisa/auth";
+import { supabase } from "./lib/supabase.js";
+import { getToolScopes } from "./lib/tool-scopes.js";
+
+// REST API & Plugin Meta routes
+import toolsRestRouter from "./routes/tools-rest.js";
+import pluginMetaRouter from "./routes/plugin-meta.js";
+import tenantRouter from "./routes/tenant.js";
+
+const app = express();
+app.use(express.json());
+app.use(cors({
+  origin: "*",
+  methods: "GET, POST, DELETE, OPTIONS",
+  exposedHeaders: ["Mcp-Session-Id"]
+}));
+
+// ─── OAuth 2.1 設定 / OAuth 2.1 Configuration / Konfigurasi OAuth 2.1 ───
+const authConfig: AuthConfig = {
+  domain: process.env.AUTH0_DOMAIN ?? '',
+  audience: process.env.AUTH0_AUDIENCE ?? process.env.SUGUVISA_BASE_URL ?? 'https://suguvisa-mcp-731026511067.asia-northeast1.run.app',
+  issuerBaseUrl: process.env.AUTH0_ISSUER_BASE_URL ?? '',
+  allowLegacyApiKey: process.env.ALLOW_LEGACY_API_KEY !== 'false',
+};
+
+const oauthEnabled = Boolean(authConfig.domain && authConfig.issuerBaseUrl);
+const authProvider = oauthEnabled ? createAuthProvider(authConfig) : null;
+
+async function legacyApiKeyValidator(key: string): Promise<Principal | null> {
+  const localApiKey = process.env.SUGUVISA_API_KEY;
+  if (localApiKey && key === localApiKey) {
+    return {
+      sub: 'local-dev-user',
+      tenantId: 'local-dev-tenant',
+      scopes: [],
+      iss: 'legacy',
+      aud: authConfig.audience,
+      exp: Math.floor(Date.now() / 1000) + 86400,
+    };
+  }
+
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+    try {
+      const { data: apiKeyData } = await supabase
+        .from("api_keys")
+        .select("id, key, status, tenant_id, tenants (id, organization_name, subscription_plan, status)")
+        .eq("key", key)
+        .eq("status", "active")
+        .single();
+
+      if (!apiKeyData) return null;
+      const tenant = Array.isArray(apiKeyData.tenants) ? apiKeyData.tenants[0] : apiKeyData.tenants;
+      if (!tenant || (tenant as { status?: string }).status !== 'active') return null;
+
+      return {
+        sub: `api-key:${apiKeyData.id}`,
+        tenantId: (tenant as { id: string }).id,
+        scopes: [],
+        iss: 'legacy',
+        aud: authConfig.audience,
+        exp: Math.floor(Date.now() / 1000) + 86400,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
+// ─── 認証とレートリミット ───
+// OAuth 2.1 有効時は新しいミドルウェアを使用、無効時は既存の apiKeyAuth を使用
+if (oauthEnabled && authProvider) {
+  const resourceMetadataUrl = `${authConfig.audience}/.well-known/oauth-protected-resource`;
+  const oauthMiddleware = createAuthMiddleware(authProvider, {
+    resourceMetadataUrl,
+    legacyApiKeyValidator: authConfig.allowLegacyApiKey ? legacyApiKeyValidator : undefined,
+  });
+
+  app.use((req, res, next) => {
+    const publicPaths = ["/health", "/.well-known/", "/openapi.yaml", "/privacy", "/mcp"];
+    if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
+      return next();
+    }
+    return oauthMiddleware(req, res, next);
+  });
+} else {
+  app.use(apiKeyAuth);
+}
+app.use("/mcp", apiRateLimiter);
+
+// ─── OAuth 2.1 Discovery Endpoints ───
+app.get("/.well-known/oauth-protected-resource", (_req, res) => {
+  const metadata = generateResourceMetadata(authConfig);
+  res.json(metadata);
+});
+
+if (oauthEnabled && authProvider) {
+  app.get("/.well-known/oauth-authorization-server", async (_req, res) => {
+    try {
+      const metadata = await authProvider.getAuthorizationServerMetadata();
+      res.json(metadata);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("[OAuth] Failed to fetch AS metadata:", message);
+      res.status(502).json({ error: "Failed to fetch authorization server metadata" });
+    }
+  });
+}
+
+// ─── ヘルスチェック ───
+app.get("/health", (_req, res) => {
+  res.json({
+    status: "ok",
+    server: "suguvisa-mcp",
+    version: "0.9.4",
+    auth: {
+      oauth21: oauthEnabled ? "enabled" : "disabled",
+      legacyApiKey: authConfig.allowLegacyApiKey ? "enabled" : "disabled",
+    },
+    modes: {
+      mcp: "/mcp (Claude.ai Remote MCP)",
+      rest: "/api/v1/tools/* (GPT Actions / REST API)",
+      tenant: "/api/v1/tenant/* (SaaS Management)",
+      standalone: process.env.ENABLE_STANDALONE_CHAT === "true" ? "enabled" : "disabled",
+    },
+    tools: 37,
+    prompts: 8,
+    resources: 6,
+  });
+});
+
+// ─── Plugin Discovery & Metadata (GPT) ───
+app.use(pluginMetaRouter);
+
+// ─── REST API (GPT Actions / External) ───
+app.use("/api/v1/tools", toolsRestRouter);
+
+// ─── Tenant Management API ───
+app.use("/api/v1/tenant", tenantRouter);
+
+// ─── Legacy REST endpoint (backward compat) ───
+import { determinePattern } from "./tools/determine-application.js";
+app.post("/api/v1/visa/determine", (req: AuthRequest, res) => {
+  try {
+    let { from_visa, to_visa, context, has_supervisor_experience } = req.body;
+    if (to_visa === "特定技能2号" && has_supervisor_experience === false) {
+      to_visa = "特定活動";
+      context = "2号移行準備";
+    }
+    const result = determinePattern(from_visa, to_visa, context);
+    res.json({ status: "success", data: result });
+  } catch (error: any) {
+    res.status(400).json({ status: "error", message: error.message });
+  }
+});
+
+// ─── MCP エンドポイント (Streamable HTTP) — Claude.ai Remote MCP ───
+app.post("/mcp", async (req: AuthRequest, res) => {
+  const startTime = Date.now();
+  const isToolCall = req.body?.method === "tools/call";
+  const toolName = isToolCall ? req.body?.params?.name : "unknown_tool";
+
+  try {
+    // プランベースのツールアクセス制御
+    if (isToolCall && toolName) {
+      const access = checkToolAccess(toolName, req.tenant?.subscription_plan);
+      if (!access.allowed) {
+        res.status(403).json({
+          jsonrpc: "2.0",
+          error: { code: -32003, message: access.reason || "Tool not available on your plan" },
+          id: req.body?.id || null,
+        });
+        return;
+      }
+
+      // OAuth スコープチェック（認証済み principal がある場合のみ）
+      const principal = (req as Express.Request).principal;
+      if (oauthEnabled && principal && principal.iss !== 'legacy') {
+        const requiredScopes = getToolScopes(toolName);
+        const missing = requiredScopes.filter(s => !principal.scopes.includes(s));
+        if (missing.length > 0) {
+          res.status(403).json({
+            jsonrpc: "2.0",
+            error: { code: -32003, message: `Insufficient scope. Required: ${missing.join(', ')}` },
+            id: req.body?.id || null,
+          });
+          return;
+        }
+      }
+    }
+
+    const server = new McpServer({
+      name: "suguvisa-mcp",
+      version: "0.3.0",
+      description: "特定技能ビザ申請の専門MCPサーバー（Claude & GPT デュアルプラグイン）",
+    });
+
+    registerAllTools(server);
+
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+    });
+
+    res.on("close", () => {
+      transport.close();
+      server.close();
+    });
+
+    res.on("finish", () => {
+      if (isToolCall) {
+        const duration = Date.now() - startTime;
+        const status = (res.statusCode >= 200 && res.statusCode < 300) ? "success" : "error";
+        logUsage(req, toolName, status, duration);
+      }
+    });
+
+    await server.connect(transport);
+    await transport.handleRequest(req as any, res, req.body);
+  } catch (error: any) {
+    console.error("MCP request error:", error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: "2.0",
+        error: { code: -32603, message: "Internal server error" },
+        id: null,
+      });
+    }
+    if (isToolCall) {
+      const duration = Date.now() - startTime;
+      logUsage(req, toolName, "error", duration, error?.message || "Unknown error");
+    }
+  }
+});
+
+// ─── GET /mcp, DELETE /mcp（プロトコル準拠） ───
+app.get("/mcp", (_req, res) => {
+  res.status(405).json({
+    jsonrpc: "2.0",
+    error: { code: -32000, message: "GET not supported in stateless mode. Use POST." },
+    id: null,
+  });
+});
+
+app.delete("/mcp", (_req, res) => {
+  res.status(405).json({
+    jsonrpc: "2.0",
+    error: { code: -32000, message: "DELETE not supported in stateless mode." },
+    id: null,
+  });
+});
+
+// ─── Standalone Chat Mode (Optional) ───
+if (process.env.ENABLE_STANDALONE_CHAT === "true") {
+  console.error("   🤖 Standalone chat mode enabled (Vertex AI)");
+
+  // Lazy import to avoid loading Vertex AI deps when not needed
+  import("./agents/chat-agent.js").then(({ processChatMessage }) => {
+    app.post("/api/v1/chatbot", async (req: AuthRequest, res) => {
+      const { messages } = req.body;
+      if (!messages || !Array.isArray(messages)) {
+        res.status(400).json({ status: "error", message: "messages array is required" });
+        return;
+      }
+      try {
+        const result = await processChatMessage(messages);
+        res.json({ status: "success", reply: result });
+      } catch (err: any) {
+        console.error("Chatbot error:", err);
+        res.status(500).json({ status: "error", message: err.message || "Failed to process chat" });
+      }
+    });
+  }).catch((err) => {
+    console.error("   ⚠️  Chat agent failed to load:", err.message);
+  });
+
+  // Visa workflow (also optional, Vertex AI dependent)
+  import("./agents/visa-workflow/graph.js").then(({ visaWorkflowApp }) => {
+    app.post("/api/v1/chat", async (req: AuthRequest, res) => {
+      const { thread_id, applicant_data, resume_data } = req.body;
+      if (!thread_id) {
+        res.status(400).json({ status: "error", message: "thread_id is required" });
+        return;
+      }
+      const config = { configurable: { thread_id } };
+      try {
+        if (resume_data) {
+          await visaWorkflowApp.updateState(config, resume_data, "notification");
+          const resultState = await visaWorkflowApp.invoke(null, config);
+          const newSnapshot = await visaWorkflowApp.getState(config);
+          if (newSnapshot.next && newSnapshot.next.includes("audit")) {
+            res.json({ status: "waiting_for_human", missing_fields: newSnapshot.values.missing_fields });
+            return;
+          }
+          res.json({ status: "completed", generated_documents: resultState.generated_documents });
+        } else {
+          await visaWorkflowApp.invoke({ applicant_data: applicant_data || {} }, config);
+          const snapshot = await visaWorkflowApp.getState(config);
+          if (snapshot.next && snapshot.next.includes("audit")) {
+            res.json({ status: "waiting_for_human", missing_fields: snapshot.values.missing_fields });
+            return;
+          }
+          res.json({ status: "completed" });
+        }
+      } catch (err: any) {
+        res.status(500).json({ status: "error", message: err.message });
+      }
+    });
+  }).catch((err) => {
+    console.error("   ⚠️  Visa workflow agent failed to load:", err.message);
+  });
+}
+
+// ─── サーバー起動 ───
+const PORT = parseInt(process.env.PORT || "3000", 10);
+app.listen(PORT, "0.0.0.0", () => {
+  console.error(`🛂 SuguVisa MCP Server v0.9.4 listening on port ${PORT}`);
+  console.error(`   MCP endpoint (Claude):   http://localhost:${PORT}/mcp`);
+  console.error(`   REST API (GPT Actions):  http://localhost:${PORT}/api/v1/tools/`);
+  console.error(`   Tenant Management:       http://localhost:${PORT}/api/v1/tenant/`);
+  console.error(`   OpenAPI spec:            http://localhost:${PORT}/openapi.yaml`);
+  console.error(`   Plugin manifest:         http://localhost:${PORT}/.well-known/ai-plugin.json`);
+  console.error(`   PRM (RFC 9728):          http://localhost:${PORT}/.well-known/oauth-protected-resource`);
+  console.error(`   Health check:            http://localhost:${PORT}/health`);
+  console.error(`   Auth: OAuth 2.1 ${oauthEnabled ? 'ENABLED' : 'DISABLED'}, Legacy API Key ${authConfig.allowLegacyApiKey ? 'ENABLED' : 'DISABLED'}`);
+  if (!oauthEnabled && !process.env.SUGUVISA_API_KEY) {
+    console.error("   ⚠️  認証未設定（AUTH0_DOMAIN + SUGUVISA_API_KEY 環境変数で有効化）");
+  }
+  if (process.env.ENABLE_STANDALONE_CHAT !== "true") {
+    console.error("   ℹ️  Standalone chat mode disabled (set ENABLE_STANDALONE_CHAT=true to enable)");
+  }
+});
+

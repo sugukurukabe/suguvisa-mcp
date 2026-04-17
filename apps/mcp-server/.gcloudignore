@@ -1,0 +1,20 @@
+# Cloud Build ignore (gcloud builds submit)
+node_modules/
+dist/
+chat-ui/
+output/
+coverage/
+.git
+.gitignore
+.npm
+.DS_Store
+*.log
+.vscode/
+.idea/
+Thumbs.db
+test/
+.gemini/
+knowledge/
+*.md
+gcs-key.json
+.env

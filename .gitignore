@@ -9,13 +9,11 @@ Thumbs.db
 .vscode/
 .idea/
 output/
-chat-ui/node_modules/
-chat-ui/dist/
-tmp-*
-tmp_*
-test_output.txt
-vitest-output-cmd.txt
-*.dump.json
-xlsm_headers_dump.json
-build_mapping.cjs
-dump_headers.cjs
+.turbo/
+pnpm-debug.log*
+
+# アプリ固有 / App-specific / Khusus aplikasi
+apps/mcp-server/chat-ui/node_modules/
+apps/mcp-server/chat-ui/dist/
+apps/mcp-server/tmp/
+apps/mcp-server/assets/
