@@ -1,0 +1,31 @@
+# Build artifacts
+dist/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Dev files
+.git
+.gitignore
+.npm
+.DS_Store
+*.log
+.vscode/
+
+# Ignore test directories just in case, though they are inside src we might not strictly need them in the final image, 
+# but tsc needs them to compile correctly if included in tsconfig.
+# So we don't ignore src/tools/__tests__ unless we are sure tsc doesn't need them.
+
+# IDE / OS
+.idea/
+Thumbs.db
+
+# Other
+test/
+.gemini/
+knowledge/
+chat-ui/
+output/
+*.md
+

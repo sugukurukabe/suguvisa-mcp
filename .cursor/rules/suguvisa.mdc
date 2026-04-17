@@ -1,0 +1,29 @@
+---
+description: SuguVisa MCP サーバー開発の絶対ルール
+alwaysApply: true
+---
+
+# SuguVisa 開発ルール
+
+## 絶対禁止事項
+- ユーザーのPII（氏名・在留カード番号・パスポート番号）を平文でログ出力しない
+- モデル呼び出しを直接 import しない（必ず packages/llm-router 経由）
+- Golden Records を JSON ファイルから直接読み込まない（必ず packages/golden-records の DAO 経由）
+- process.env を直接参照しない（packages/core/config 経由）
+- トークン（OAuth access_token）を downstream API にそのまま転送しない
+- console.log を本番コードで使わない（必ず pino logger）
+
+## 必須事項
+- 全ての新規 MCP ツールに readOnlyHint, openWorldHint, destructiveHint を付与
+- 全ての書き込みツールに tenant_id の所有権チェック
+- 全てのDBクエリに tenant_id フィルタを必須化
+- エラーハンドリングは Result<T, E> 型を使用（neverthrow ライブラリ）
+- テストカバレッジ 80% 以上を維持
+
+## 3言語ルール
+コメント・ドキュメント・descriptionは常に日本語→English→Bahasa Indonesiaの順で書く。
+変数名・関数名は英語のみ（camelCase）。ファイル名は kebab-case。
+
+## コミットメッセージ
+Conventional Commits 準拠。scope は以下から選択:
+auth, router, golden, observ, tenant, mcp, eval, infra, docs, security
