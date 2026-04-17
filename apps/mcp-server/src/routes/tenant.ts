@@ -28,6 +28,39 @@ router.get("/me", async (req: AuthRequest, res) => {
 
   const plan = getPlanConfig(tenant.subscription_plan);
 
+  let billing:
+    | {
+        stripe_customer_id: string | null;
+        stripe_subscription_id: string | null;
+        subscription_status: string | null;
+        current_period_end: string | null;
+        cancel_at_period_end: boolean;
+      }
+    | undefined;
+
+  if (process.env.SUPABASE_URL && tenant.id !== "local-dev-tenant") {
+    try {
+      const { data } = await supabase
+        .from("tenants")
+        .select(
+          "stripe_customer_id, stripe_subscription_id, subscription_status, subscription_current_period_end, subscription_cancel_at_period_end",
+        )
+        .eq("id", tenant.id)
+        .maybeSingle();
+      if (data) {
+        billing = {
+          stripe_customer_id: data.stripe_customer_id ?? null,
+          stripe_subscription_id: data.stripe_subscription_id ?? null,
+          subscription_status: data.subscription_status ?? null,
+          current_period_end: data.subscription_current_period_end ?? null,
+          cancel_at_period_end: Boolean(data.subscription_cancel_at_period_end),
+        };
+      }
+    } catch (error) {
+      console.error("[tenant/me] failed to load billing fields:", error);
+    }
+  }
+
   res.json({
     status: "ok",
     tenant: {
@@ -42,6 +75,7 @@ router.get("/me", async (req: AuthRequest, res) => {
         features: plan.features,
         allowed_tools: plan.allowed_tools === "all" ? "全ツール利用可能" : `${plan.allowed_tools.length}ツールのみ`,
       },
+      billing,
     },
   });
 });
