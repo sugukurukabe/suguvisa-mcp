@@ -30,6 +30,16 @@ import {
   rateLimitPresets,
   createRedisStore,
 } from "@suguvisa/core/rate-limit";
+import {
+  obsMiddleware,
+  initOtel,
+  withObsContext,
+  getObsContext,
+  updateObsContext,
+  getMetrics,
+  getLlmTracer,
+  newRequestId,
+} from "@suguvisa/observability";
 import { supabase } from "./lib/supabase.js";
 import { getToolScopes } from "./lib/tool-scopes.js";
 
@@ -45,12 +55,33 @@ const app = express();
 // Percayai X-Forwarded-For saat berjalan di belakang Cloud Run / Cloud Armor.
 app.set("trust proxy", 1);
 
+// ─── OpenTelemetry 初期化（optional） ───
+// Initialize OpenTelemetry if OTEL_* env vars are set.
+// Inisialisasi OpenTelemetry jika variabel OTEL_* disetel.
+const otelExporter = (process.env.OTEL_EXPORTER ?? "none") as "none" | "google" | "otlp";
+if (otelExporter !== "none") {
+  await initOtel({
+    serviceName: "suguvisa-mcp",
+    serviceVersion: process.env.APP_VERSION ?? "0.9.4",
+    exporter: otelExporter,
+    otlpEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    gcpProjectId: process.env.GCP_PROJECT_ID,
+  }).catch((err: unknown) => {
+    console.error("[otel] init failed:", err);
+  });
+}
+
 app.use(express.json({ limit: "1mb" }));
 app.use(cors({
   origin: "*",
   methods: "GET, POST, DELETE, OPTIONS",
-  exposedHeaders: ["Mcp-Session-Id"]
+  exposedHeaders: ["Mcp-Session-Id", "X-Request-Id"]
 }));
+
+// ─── Observability ミドルウェア（全リクエストに request_id / span を付与） ───
+// Observability middleware — request_id / span on every request.
+// Middleware observability — request_id / span pada setiap permintaan.
+app.use(obsMiddleware());
 
 // ─── レート制限 (第一層: IP グローバル) ───
 // Global IP-based limiter — first line of defense against floods.
@@ -230,6 +261,19 @@ app.post("/mcp", async (req: AuthRequest, res) => {
   const isToolCall = req.body?.method === "tools/call";
   const toolName = isToolCall ? req.body?.params?.name : "unknown_tool";
 
+  // 観測コンテキストに MCP 固有情報を追記
+  // Enrich observability context with MCP-specific fields.
+  // Perkaya konteks observability dengan kolom khusus MCP.
+  updateObsContext({
+    tenantId: req.tenant?.id,
+    principalSubject: (req as Express.Request).principal?.sub,
+    operation: isToolCall ? `mcp.tool.${toolName}` : `mcp.${req.body?.method ?? "request"}`,
+    attrs: {
+      "mcp.method": req.body?.method ?? "",
+      "mcp.tool": toolName ?? "",
+    },
+  });
+
   try {
     // プランベースのツールアクセス制御
     if (isToolCall && toolName) {
@@ -281,6 +325,23 @@ app.post("/mcp", async (req: AuthRequest, res) => {
         const duration = Date.now() - startTime;
         const status = (res.statusCode >= 200 && res.statusCode < 300) ? "success" : "error";
         logUsage(req, toolName, status, duration);
+        // ─── observability: ツール call の metric と LlmTracer 送信 ───
+        try {
+          const metrics = getMetrics();
+          metrics.counter("mcp.tool.calls", 1, { tool: toolName, status });
+          metrics.histogram("mcp.tool.duration_ms", duration, { tool: toolName, status });
+          const ctx = getObsContext() ?? {
+            requestId: newRequestId(),
+            operation: `mcp.tool.${toolName}`,
+          };
+          void getLlmTracer().traceToolCall(ctx, {
+            tool: toolName,
+            durationMs: duration,
+            status: status as "success" | "error",
+          });
+        } catch (obsErr) {
+          console.error("[observability] finish handler failed:", obsErr);
+        }
       }
     });
 
@@ -298,6 +359,23 @@ app.post("/mcp", async (req: AuthRequest, res) => {
     if (isToolCall) {
       const duration = Date.now() - startTime;
       logUsage(req, toolName, "error", duration, error?.message || "Unknown error");
+      try {
+        const metrics = getMetrics();
+        metrics.counter("mcp.tool.calls", 1, { tool: toolName, status: "error" });
+        metrics.histogram("mcp.tool.duration_ms", duration, { tool: toolName, status: "error" });
+        const ctx = getObsContext() ?? {
+          requestId: newRequestId(),
+          operation: `mcp.tool.${toolName}`,
+        };
+        void getLlmTracer().traceToolCall(ctx, {
+          tool: toolName,
+          durationMs: duration,
+          status: "error",
+          errorMessage: error?.message,
+        });
+      } catch {
+        /* ignore */
+      }
     }
   }
 });

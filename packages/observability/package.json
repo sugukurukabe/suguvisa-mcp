@@ -1,16 +1,57 @@
 {
   "name": "@suguvisa/observability",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "import": "./dist/express.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp.d.ts",
+      "import": "./dist/mcp.js"
+    },
+    "./langfuse": {
+      "types": "./dist/langfuse.d.ts",
+      "import": "./dist/langfuse.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@suguvisa/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@google-cloud/opentelemetry-cloud-trace-exporter": "^3.0.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.72.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.214.0",
+    "@opentelemetry/sdk-node": "^0.214.0",
+    "@opentelemetry/sdk-trace-node": "^2.0.0",
+    "express": "^5.1.0",
+    "langfuse": "^3.37.0"
+  },
+  "peerDependenciesMeta": {
+    "@google-cloud/opentelemetry-cloud-trace-exporter": { "optional": true },
+    "@opentelemetry/auto-instrumentations-node": { "optional": true },
+    "@opentelemetry/exporter-trace-otlp-http": { "optional": true },
+    "@opentelemetry/sdk-node": { "optional": true },
+    "@opentelemetry/sdk-trace-node": { "optional": true },
+    "express": { "optional": true },
+    "langfuse": { "optional": true }
+  },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.4"
   }
