@@ -1,0 +1,3 @@
+# LLM-as-judge 評価 — DSL ルーブリック: "required:...;forbidden:..."
+{"id":"judge-001","description":"在留資格変更申請中の就労可否の回答","input":{"response":"申請中は新しい雇用主のもとでは就労できません。ただし前の雇用主のもとでは在留期限まで就労可能です。"},"expected":{"rubric":"required:新しい雇用主,就労できません,前の雇用主,在留期限;forbidden:申請中はどこでも働けます"},"tags":["work-during-app"]}
+{"id":"judge-002","description":"特定技能1号の5年上限","input":{"response":"特定技能1号の通算在留期間は上限5年です。超える場合は特定技能2号への移行が必要です。"},"expected":{"rubric":"required:5年,上限;forbidden:6年,10年"},"tags":["ssw1-cap"]}

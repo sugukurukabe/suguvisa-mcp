@@ -1,0 +1,7 @@
+# Citation 評価 — LLM 回答に必要な出典が含まれているかをチェックする
+# 各行は EvalCase<CitationInput, CitationExpected>
+{"id":"cite-001","description":"14日届出ルールの回答に入管法19条の16が引用されるか","input":{"answer":"随時届出は事由発生から14日以内です。根拠: 入管法第19条の16 (https://laws.e-gov.go.jp/)。"},"expected":{"mustCite":["入管法","19条の16"]},"tags":["deadlines","law-basis"]}
+{"id":"cite-002","description":"特定技能1号の5年上限の回答が上限を明記しているか","input":{"answer":"特定技能1号の通算在留期間は上限5年です。2号への移行を検討してください。"},"expected":{"mustCite":["5年","特定技能1号"]},"tags":["ssw1-cap"]}
+{"id":"cite-003","description":"禁止ワード: 技能実習3号から直接2号への移行不可","input":{"answer":"技能実習3号修了者は直接特定技能2号に移行できます。"},"expected":{"mustCite":["技能実習"],"forbidden":["直接特定技能2号に移行できます"]},"tags":["hallucination-guard"]}
+{"id":"cite-004","description":"参考様式1-5号（雇用契約書）が含まれるか","input":{"answer":"雇用契約書は参考様式第1-5号を使用します。"},"expected":{"mustCite":["参考様式","1-5"]},"tags":["reference-form"]}
+{"id":"cite-005","description":"定期届出の期間が正しいか","input":{"answer":"定期届出は毎年4月1日〜5月31日に提出します。"},"expected":{"mustCite":["4月1日","5月31日"]},"tags":["annual-report"]}

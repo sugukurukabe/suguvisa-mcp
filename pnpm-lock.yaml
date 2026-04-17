@@ -186,6 +186,28 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@22.19.17)(msw@2.13.4(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.3)
 
+  packages/evals:
+    dependencies:
+      '@suguvisa/core':
+        specifier: workspace:*
+        version: link:../core
+      '@suguvisa/golden-records':
+        specifier: workspace:*
+        version: link:../golden-records
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@22.19.17)(msw@2.13.4(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.3)
+
   packages/golden-records:
     dependencies:
       '@google-cloud/aiplatform':

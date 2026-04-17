@@ -16,6 +16,8 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "eval": "pnpm --filter @suguvisa/evals eval",
+    "eval:citation": "pnpm --filter @suguvisa/evals build && node packages/evals/dist/cli.js citation --dataset evals/datasets/citations.jsonl",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {

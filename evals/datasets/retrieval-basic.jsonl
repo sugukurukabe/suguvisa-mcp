@@ -1,0 +1,7 @@
+# Retrieval 評価 — Golden Records から関連 Record がヒットするか
+# seed 用: packages/evals/src/__tests__/seed-records.ts でロード
+{"id":"retr-001","description":"特定技能1号の試験免除に関する質問","input":{"query":"特定技能1号 技能試験 免除"},"expected":{"relevantIds":["rec-ssw1-exemption"]},"tags":["exemption","ssw1"]}
+{"id":"retr-002","description":"随時届出14日ルール","input":{"query":"在留カード 紛失 届出"},"expected":{"relevantIds":["rec-notification-14day"]},"tags":["deadlines"]}
+{"id":"retr-003","description":"特定技能2号の分野要件","input":{"query":"特定技能2号 分野 監督経験"},"expected":{"relevantIds":["rec-ssw2-field"]},"tags":["ssw2"]}
+{"id":"retr-004","description":"定期届出の期間","input":{"query":"定期届出 4月 5月"},"expected":{"relevantIds":["rec-annual-report"]},"tags":["annual-report"]}
+{"id":"retr-005","description":"認定証明書の有効期限","input":{"query":"認定証明書 有効期限 3ヶ月"},"expected":{"relevantIds":["rec-coe-validity"]},"tags":["coe"]}
