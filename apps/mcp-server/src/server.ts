@@ -48,6 +48,7 @@ import { getToolScopes } from "./lib/tool-scopes.js";
 import toolsRestRouter from "./routes/tools-rest.js";
 import pluginMetaRouter from "./routes/plugin-meta.js";
 import tenantRouter from "./routes/tenant.js";
+import billingRouter, { billingWebhookHandler } from "./routes/billing.js";
 
 const app = express();
 
@@ -71,6 +72,15 @@ if (otelExporter !== "none") {
     console.error("[otel] init failed:", err);
   });
 }
+
+// ─── Stripe Webhook (RAW body) ───
+// Mounted BEFORE express.json() so Stripe signature verification works.
+// Must stay before any body-parsing middleware.
+app.post(
+  "/api/v1/billing/webhook",
+  express.raw({ type: "application/json", limit: "1mb" }),
+  billingWebhookHandler,
+);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(cors({
@@ -167,7 +177,14 @@ if (oauthEnabled && authProvider) {
   });
 
   app.use((req, res, next) => {
-    const publicPaths = ["/health", "/.well-known/", "/openapi.yaml", "/privacy"];
+    const publicPaths = [
+      "/health",
+      "/.well-known/",
+      "/openapi.yaml",
+      "/privacy",
+      "/api/v1/billing/plans",
+      "/api/v1/billing/webhook",
+    ];
     if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
       return next();
     }
@@ -223,6 +240,7 @@ app.get("/health", (_req, res) => {
       mcp: "/mcp (Claude.ai Remote MCP)",
       rest: "/api/v1/tools/* (GPT Actions / REST API)",
       tenant: "/api/v1/tenant/* (SaaS Management)",
+      billing: process.env.STRIPE_SECRET_KEY ? "/api/v1/billing/* (Stripe configured)" : "/api/v1/billing/* (Stripe not configured)",
       standalone: process.env.ENABLE_STANDALONE_CHAT === "true" ? "enabled" : "disabled",
     },
     tools: 37,
@@ -239,6 +257,11 @@ app.use("/api/v1/tools", toolsRestRouter);
 
 // ─── Tenant Management API ───
 app.use("/api/v1/tenant", tenantRouter);
+
+// ─── Billing API (Stripe) ───
+// Webhook (POST /api/v1/billing/webhook) is mounted earlier with RAW body.
+// Plans is public, checkout/portal require authentication.
+app.use("/api/v1/billing", billingRouter);
 
 // ─── Legacy REST endpoint (backward compat) ───
 import { determinePattern } from "./tools/determine-application.js";

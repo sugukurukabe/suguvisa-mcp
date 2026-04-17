@@ -49,6 +49,7 @@
     "@langchain/langgraph": "^1.2.6",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "@suguvisa/auth": "workspace:*",
+    "@suguvisa/billing": "workspace:*",
     "@suguvisa/core": "workspace:*",
     "@suguvisa/golden-records": "workspace:*",
     "@suguvisa/observability": "workspace:*",

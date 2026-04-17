@@ -2,13 +2,39 @@
 
 ## 概要 / Overview / Ikhtisar
 
-Stripe Billing 統合。プラン管理、Usage-based billing、Checkout / Customer Portal を提供する。
+SuguVisa MCP の Stripe 課金ライブラリ。プランカタログ、Stripe Checkout / Customer Portal、
+Webhook ハンドラー、テスト用 Fake Client を提供する。
 
-Stripe Billing integration. Provides plan management, usage-based billing, Checkout / Customer Portal.
+SuguVisa MCP's Stripe billing library. Provides plan catalog, Stripe Checkout /
+Customer Portal, webhook handler, and a Fake client for testing.
 
-Integrasi Stripe Billing. Menyediakan manajemen paket, billing berbasis penggunaan, Checkout / Customer Portal.
+Pustaka penagihan Stripe untuk SuguVisa MCP. Menyediakan katalog paket, Stripe
+Checkout / Customer Portal, penangan webhook, dan klien palsu untuk pengujian.
 
-## ロードマップ / Roadmap / Peta Jalan
+## 使い方 / Usage / Penggunaan
 
-- Phase 4 で実装予定
-- free / starter / pro / enterprise の 4 プラン、請求書払い対応（JA・WIN 向け）
+```typescript
+import {
+  StripeBillingClient,
+  buildPriceMappingFromEnv,
+  processStripeEvent,
+} from "@suguvisa/billing";
+
+const client = new StripeBillingClient({
+  apiKey: process.env.STRIPE_SECRET_KEY!,
+  webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+});
+const mappings = buildPriceMappingFromEnv();
+
+// Checkout session を作る
+const session = await client.createCheckoutSession({
+  tenantId: "tenant-uuid",
+  priceId: "price_xxxxx",
+  successUrl: "https://app.example/success",
+  cancelUrl: "https://app.example/cancel",
+});
+```
+
+## 設計書 / Design doc / Dokumen desain
+
+詳細な設計・セットアップ手順は [`docs/billing/README.md`](../../docs/billing/README.md) を参照。
