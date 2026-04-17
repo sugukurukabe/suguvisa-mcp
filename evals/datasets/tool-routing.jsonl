@@ -1,0 +1,4 @@
+# Tool Routing 評価 — determine_application_type 等の判定ツールが期待通り動くか
+{"id":"route-001","description":"海外から特定技能1号 → GRANT_01","input":{"toolName":"determine_application_type","args":{"current_visa":"none","target_visa":"特定技能1号","current_location":"overseas"}},"expected":{"outputHasPath":["structuredContent.pattern_id"]},"tags":["grant"]}
+{"id":"route-002","description":"技能実習2号 → 特定技能1号変更","input":{"toolName":"determine_application_type","args":{"current_visa":"技能実習2号","target_visa":"特定技能1号","current_location":"domestic"}},"expected":{"outputHasPath":["structuredContent.pattern_id"]},"tags":["change-from-titp"]}
+{"id":"route-003","description":"特定技能1号更新","input":{"toolName":"determine_application_type","args":{"current_visa":"特定技能1号","target_visa":"特定技能1号","current_location":"domestic"}},"expected":{"outputHasPath":["structuredContent.pattern_id"]},"tags":["renewal"]}
