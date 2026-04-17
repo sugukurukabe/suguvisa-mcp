@@ -104,7 +104,7 @@ if (oauthEnabled && authProvider) {
   });
 
   app.use((req, res, next) => {
-    const publicPaths = ["/health", "/.well-known/", "/openapi.yaml", "/privacy", "/mcp"];
+    const publicPaths = ["/health", "/.well-known/", "/openapi.yaml", "/privacy"];
     if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
       return next();
     }
