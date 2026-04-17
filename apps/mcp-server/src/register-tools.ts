@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerAllResources } from "./register-resources.js";
+import { registerAllResources } from "./resources/index.js";
+import { registerEnhancedPrompts } from "./resources/prompts.js";
 import { z } from "zod";
 import { registerDetermineApplication } from "./tools/determine-application.js";
 import { registerRequiredDocuments } from "./tools/required-documents.js";
@@ -35,7 +36,10 @@ import { registerAiFormValidator } from "./tools/ai-form-validator.js";
 import { registerAdvancedDocExtractor } from "./tools/advanced-doc-extractor.js";
 import { registerSyncVertexDatastore } from "./tools/sync-vertex-datastore.js";
 import { registerGenerateOnlineCsv } from "./tools/generate-online-csv.js";
-import { registerSearchGoldenRecords } from "./tools/search-golden-records.js";
+import {
+  registerSearchGoldenRecords,
+  getGoldenRecordsStore,
+} from "./tools/search-golden-records.js";
 
 /**
  * 全36ツール + 8プロンプト + 6リソースを McpServer に登録する共通関数。
@@ -97,9 +101,10 @@ export function registerAllTools(server: McpServer): void {
 
   // === MCP Prompts（定型シナリオ） ===
   registerPrompts(server);
+  registerEnhancedPrompts(server);
 
   // === MCP Resources（知識データの公開） ===
-  registerAllResources(server);
+  registerAllResources(server, { goldenRecordsStore: getGoldenRecordsStore() });
 }
 
 /**
