@@ -17,6 +17,10 @@
     "./logger": {
       "types": "./dist/logger/index.d.ts",
       "import": "./dist/logger/index.js"
+    },
+    "./rate-limit": {
+      "types": "./dist/rate-limit/index.d.ts",
+      "import": "./dist/rate-limit/index.js"
     }
   },
   "scripts": {
@@ -27,11 +31,24 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "express-rate-limit": "^7.5.0",
     "neverthrow": "^8.1.1",
     "pino": "^9.5.0"
   },
+  "peerDependencies": {
+    "express": "^4.21.0 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^22.10.5",
+    "@types/supertest": "^6.0.2",
+    "express": "^4.21.2",
+    "supertest": "^7.1.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.4"
   }

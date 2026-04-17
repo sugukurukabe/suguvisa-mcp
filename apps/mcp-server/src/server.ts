@@ -25,6 +25,11 @@ import {
   type AuthConfig,
   type Principal,
 } from "@suguvisa/auth";
+import {
+  createRateLimiter,
+  rateLimitPresets,
+  createRedisStore,
+} from "@suguvisa/core/rate-limit";
 import { supabase } from "./lib/supabase.js";
 import { getToolScopes } from "./lib/tool-scopes.js";
 
@@ -34,12 +39,38 @@ import pluginMetaRouter from "./routes/plugin-meta.js";
 import tenantRouter from "./routes/tenant.js";
 
 const app = express();
-app.use(express.json());
+
+// Cloud Run / Cloud Armor の背後にいるので X-Forwarded-For を信頼する。
+// Trust X-Forwarded-For when running behind Cloud Run / Cloud Armor.
+// Percayai X-Forwarded-For saat berjalan di belakang Cloud Run / Cloud Armor.
+app.set("trust proxy", 1);
+
+app.use(express.json({ limit: "1mb" }));
 app.use(cors({
   origin: "*",
   methods: "GET, POST, DELETE, OPTIONS",
   exposedHeaders: ["Mcp-Session-Id"]
 }));
+
+// ─── レート制限 (第一層: IP グローバル) ───
+// Global IP-based limiter — first line of defense against floods.
+// Pembatas IP global — pertahanan pertama terhadap banjir permintaan.
+const globalRateLimitStore = process.env.REDIS_URL
+  ? await createRedisStore({
+      url: process.env.REDIS_URL,
+      prefix: "suguvisa-rl:global:",
+    }).catch((err) => {
+      console.error("[rate-limit] Redis store failed, falling back to memory:", err.message);
+      return undefined;
+    })
+  : undefined;
+
+app.use(
+  createRateLimiter({
+    ...rateLimitPresets.global,
+    store: globalRateLimitStore,
+  }),
+);
 
 // ─── OAuth 2.1 設定 / OAuth 2.1 Configuration / Konfigurasi OAuth 2.1 ───
 const authConfig: AuthConfig = {
@@ -113,6 +144,18 @@ if (oauthEnabled && authProvider) {
 } else {
   app.use(apiKeyAuth);
 }
+
+// ─── レート制限 (第二層: 機密エンドポイント) ───
+// Sensitive endpoints — aggressive limit to slow down scrapers / brute force.
+// Endpoint sensitif — batas ketat untuk memperlambat scraper / brute force.
+app.use(
+  "/.well-known",
+  createRateLimiter(rateLimitPresets.sensitive),
+);
+
+// ─── レート制限 (第三層: /mcp プラン別) ───
+// Plan-aware per-tenant limit kept for backward compatibility with Supabase tenants.
+// Batas per-tenant berbasis paket tetap untuk kompatibilitas dengan tenant Supabase.
 app.use("/mcp", apiRateLimiter);
 
 // ─── OAuth 2.1 Discovery Endpoints ───

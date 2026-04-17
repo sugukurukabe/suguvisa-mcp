@@ -26,6 +26,14 @@ PII, log terstruktur, dan tipe domain bersama.
 - `DEFAULT_PII_REDACT_PATHS` — 既定の redact パス一覧
 - `maskedString()` — Pii/string どちらでも安全にマスク化するヘルパー
 
+### `@suguvisa/core/rate-limit`
+
+- `createRateLimiter(config)` — express-rate-limit ラッパー (429 + Retry-After)
+- `rateLimitPresets` — `global` / `sensitive` / `mcp` / `toolCallsPerTenant`
+- `ipKey` / `principalKey` / `tenantKey` — キー生成戦略
+- `createRedisStore({ url })` — 本番用 Redis ストア (ioredis + rate-limit-redis)
+- `PLAN_QUOTAS` — プラン別 quota 定義
+
 ## 使用例 / Usage / Penggunaan
 
 ```typescript
