@@ -1,5 +1,11 @@
 # Observability 設計書 / Observability Design / Desain Observability
 
+> **更新 (Phase 2 Task 2.3 水平展開)**: `registerAllTools(server)` のあとに
+> `instrumentMcpServer(server)` を一度呼ぶだけで、全ツール・全プロンプト・全リソースが
+> 自動で OpenTelemetry / Langfuse / metrics に計装される。個別ファイル修正は不要で、
+> `__suguvisa_observability_wrapped__` マーカーにより二重ラップは発生しない。
+> 呼び出し場所は `apps/mcp-server/src/server.ts` と `apps/mcp-server/src/index.ts`。
+
 ## 目的 / Goals / Tujuan
 
 - すべての HTTP リクエスト・MCP ツール呼び出し・LLM 呼び出しを **request_id** で横串に追跡できるようにする
@@ -56,9 +62,15 @@ OAuth 認証後は `updateObsContext({ tenantId, principalSubject })` で追記�
 | --- | --- | --- |
 | `mcp.tool.calls` | counter | tool, status |
 | `mcp.tool.duration_ms` | histogram | tool, status |
+| `mcp.prompt.calls` | counter | prompt, status |
+| `mcp.prompt.duration_ms` | histogram | prompt, status |
+| `mcp.resource.reads` | counter | resource, status |
+| `mcp.resource.duration_ms` | histogram | resource, status |
 
-span: `mcp.tool.${toolName}`
-attributes: `mcp.tool`, `mcp.request_id`, `mcp.tenant_id`, `mcp.principal`
+spans:
+- ツール: `mcp.tool.${toolName}` (attrs: `mcp.tool`, `mcp.request_id`, `mcp.tenant_id`, `mcp.principal`)
+- プロンプト: `mcp.prompt.${promptName}` (attrs: `mcp.prompt`, `mcp.request_id`, `mcp.tenant_id`)
+- リソース: `mcp.resource.read` (attrs: `mcp.resource`, `mcp.request_id`)
 
 ### LLM 層
 
@@ -101,6 +113,25 @@ PII 流出を避けるために:
 | `LANGFUSE_SECRET_KEY` | なし | Langfuse sk |
 | `LANGFUSE_BASE_URL` | `https://cloud.langfuse.com` | Langfuse エンドポイント |
 | `LOG_LEVEL` | `info` | pino level |
+
+## 水平展開 API / Bulk instrumentation API
+
+`packages/observability/src/mcp-server-instrumentation.ts` で以下 4 関数を公開:
+
+```typescript
+import { instrumentMcpServer } from "@suguvisa/observability";
+
+registerAllTools(server);      // 既存の登録処理はそのまま
+instrumentMcpServer(server);   // これ 1 行で全部ラップ
+```
+
+個別に呼びたい場合:
+- `instrumentAllTools(server, { excludeTools: ["legacy_ping"] })`
+- `instrumentAllPrompts(server, { excludePrompts: [...] })`
+- `instrumentAllResources(server)`
+
+各関数は `{ wrapped: string[], skipped: string[] }` を返し、どのハンドラを包んだかを確認できる。
+ラップ済みハンドラは `__suguvisa_observability_wrapped__` マーカー付きの function として保持され、二重ラップされない。
 
 ## 開発環境 / Dev Mode
 

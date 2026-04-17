@@ -9,6 +9,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerAllTools } from "./register-tools.js";
+import { instrumentMcpServer } from "@suguvisa/observability";
 import { z } from "zod";
 
 // ─── Smithery Session Configuration Schema ───
@@ -55,6 +56,7 @@ export default function createServer({
     process.env.GCP_PROJECT_ID = config.gcpProjectId;
 
   registerAllTools(server);
+  instrumentMcpServer(server);
 
   return server.server;
 }
@@ -74,6 +76,7 @@ if (isDirectRun) {
   });
 
   registerAllTools(server);
+  instrumentMcpServer(server);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

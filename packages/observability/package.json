@@ -42,17 +42,33 @@
     "langfuse": "^3.37.0"
   },
   "peerDependenciesMeta": {
-    "@google-cloud/opentelemetry-cloud-trace-exporter": { "optional": true },
-    "@opentelemetry/auto-instrumentations-node": { "optional": true },
-    "@opentelemetry/exporter-trace-otlp-http": { "optional": true },
-    "@opentelemetry/sdk-node": { "optional": true },
-    "@opentelemetry/sdk-trace-node": { "optional": true },
-    "express": { "optional": true },
-    "langfuse": { "optional": true }
+    "@google-cloud/opentelemetry-cloud-trace-exporter": {
+      "optional": true
+    },
+    "@opentelemetry/auto-instrumentations-node": {
+      "optional": true
+    },
+    "@opentelemetry/exporter-trace-otlp-http": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-node": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-trace-node": {
+      "optional": true
+    },
+    "express": {
+      "optional": true
+    },
+    "langfuse": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/express": "^5.0.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod": "^3.25.76"
   }
 }

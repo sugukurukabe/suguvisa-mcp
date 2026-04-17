@@ -39,6 +39,7 @@ import {
   getMetrics,
   getLlmTracer,
   newRequestId,
+  instrumentMcpServer,
 } from "@suguvisa/observability";
 import { supabase } from "./lib/supabase.js";
 import { getToolScopes } from "./lib/tool-scopes.js";
@@ -310,6 +311,7 @@ app.post("/mcp", async (req: AuthRequest, res) => {
     });
 
     registerAllTools(server);
+    instrumentMcpServer(server);
 
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
