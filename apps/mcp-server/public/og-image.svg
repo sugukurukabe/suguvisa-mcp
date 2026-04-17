@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="60%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <g transform="translate(80, 180)">
+    <text font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif" font-weight="800" fill="#ffffff" font-size="96">SuguVisa</text>
+    <text y="80" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif" font-weight="500" fill="#e0e7ff" font-size="42">yš€ýÓ¶3Ë AI ³Í¯¿</text>
+    <text y="150" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif" font-weight="400" fill="#c7d2fe" font-size="28">Claude · ChatGPT · Cursor · Smithery  37+ MCP Tools</text>
+  </g>
+  <g transform="translate(960, 100)" fill="#ffffff" opacity="0.95">
+    <rect x="0" y="0" width="160" height="160" rx="32"/>
+    <text x="80" y="112" text-anchor="middle" font-family="-apple-system, sans-serif" font-weight="800" font-size="96" fill="#2563eb">S</text>
+  </g>
+</svg>

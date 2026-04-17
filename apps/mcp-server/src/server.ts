@@ -46,7 +46,7 @@ import { getToolScopes } from "./lib/tool-scopes.js";
 
 // REST API & Plugin Meta routes
 import toolsRestRouter from "./routes/tools-rest.js";
-import pluginMetaRouter from "./routes/plugin-meta.js";
+import { createDirectoryRouter } from "./routes/directory/index.js";
 import tenantRouter from "./routes/tenant.js";
 import billingRouter, { billingWebhookHandler } from "./routes/billing.js";
 
@@ -177,15 +177,27 @@ if (oauthEnabled && authProvider) {
   });
 
   app.use((req, res, next) => {
-    const publicPaths = [
+    const publicExact = new Set([
+      "/",
       "/health",
-      "/.well-known/",
       "/openapi.yaml",
       "/privacy",
+      "/terms",
+      "/security",
+      "/support",
+      "/docs",
+      "/logo.svg",
+      "/favicon.svg",
+      "/favicon.ico",
+      "/og-image.svg",
+      "/og-image.png",
+      "/robots.txt",
+      "/sitemap.xml",
       "/api/v1/billing/plans",
       "/api/v1/billing/webhook",
-    ];
-    if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
+    ]);
+    const publicPrefixes = ["/.well-known/"];
+    if (publicExact.has(req.path) || publicPrefixes.some(p => req.path.startsWith(p))) {
       return next();
     }
     return oauthMiddleware(req, res, next);
@@ -249,8 +261,9 @@ app.get("/health", (_req, res) => {
   });
 });
 
-// ─── Plugin Discovery & Metadata (GPT) ───
-app.use(pluginMetaRouter);
+// ─── Directory listings & marketing pages (Claude Connectors / ChatGPT Apps) ───
+// ディレクトリ掲載向け manifest / 法務ページ / ブランドアセット / ランディング
+app.use(createDirectoryRouter());
 
 // ─── REST API (GPT Actions / External) ───
 app.use("/api/v1/tools", toolsRestRouter);
