@@ -1,0 +1,36 @@
+{
+  "name": "@suguvisa/dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SuguVisa tenant dashboard / テナント向けダッシュボード / Dasbor penyewa",
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start -p 3100",
+    "lint": "next lint",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@suguvisa/billing": "workspace:*",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.45.0",
+    "next": "^14.2.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.14.0",
+    "eslint-config-next": "^14.2.18",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.4"
+  }
+}

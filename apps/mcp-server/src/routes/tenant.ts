@@ -151,6 +151,34 @@ router.get("/usage", async (req: AuthRequest, res) => {
   }
 });
 
+// ─── GET /api/v1/tenant/keys ───
+// テナントに紐づく API キーの一覧を返す (本体は表示しない)
+// Returns API keys for the tenant (the raw key is never returned).
+// Mengembalikan daftar kunci API penyewa (kunci mentah tidak pernah dikembalikan).
+router.get("/keys", async (req: AuthRequest, res) => {
+  const tenant = req.tenant;
+  if (!tenant || tenant.id === "local-dev-tenant") {
+    res.status(400).json({ status: "error", message: "APIキー管理はSaaSモードでのみ利用可能です" });
+    return;
+  }
+  if (!process.env.SUPABASE_URL) {
+    res.status(400).json({ status: "error", message: "Database not configured" });
+    return;
+  }
+  try {
+    const { data, error } = await supabase
+      .from("api_keys")
+      .select("id, label, status, last_used_at, created_at")
+      .eq("tenant_id", tenant.id)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    res.json({ status: "ok", keys: data ?? [] });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ status: "error", message });
+  }
+});
+
 // ─── POST /api/v1/tenant/keys ───
 // 新しいAPIキーを発行する
 router.post("/keys", async (req: AuthRequest, res) => {
