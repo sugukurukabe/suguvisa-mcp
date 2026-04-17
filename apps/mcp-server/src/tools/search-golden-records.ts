@@ -60,6 +60,15 @@ function getContext(): GoldenRecordsContext {
   return defaultContext;
 }
 
+/**
+ * 他モジュール（Resources 等）から Store を共有するためのアクセサ
+ * Accessor for sharing the Golden Records store with other modules (e.g. resources)
+ * Aksesor untuk berbagi Golden Records store dengan modul lain (misalnya resource)
+ */
+export function getGoldenRecordsStore(): GoldenRecordStore | undefined {
+  return getContext().store;
+}
+
 const searchArgs = {
   query: z
     .string()
