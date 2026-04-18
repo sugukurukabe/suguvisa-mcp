@@ -144,7 +144,7 @@ export async function runVerifyCli(argv: string[]): Promise<number> {
   const baseUrl = (args["--url"] as string | undefined) ?? process.env.SUGUVISA_BASE_URL;
   const stripeKey = (args["--stripe-key"] as string | undefined) ?? process.env.STRIPE_SECRET_KEY;
   if (!baseUrl) {
-    console.error("error: --url https://suguvisa.app (or SUGUVISA_BASE_URL) is required");
+    console.error("error: --url https://mcp.suguvisa.com (or SUGUVISA_BASE_URL) is required");
     return 1;
   }
   const result = await verifyBilling({ baseUrl, stripeSecretKey: stripeKey });

@@ -85,7 +85,7 @@ export function serverCardHandler(_req: Request, res: Response): void {
         apiKey: {
           type: "string",
           title: "API Key",
-          description: "API key from https://suguvisa.app/dashboard/api-keys",
+          description: "API key from https://suguvisa.com/dashboard/api-keys",
           default: "",
           format: "password",
           "x-from": { header: "x-suguvisa-api-key" },

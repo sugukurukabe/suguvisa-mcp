@@ -78,8 +78,8 @@ export interface DirectoryMetadata {
 }
 
 export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): DirectoryMetadata {
-  const baseUrl = env.SUGUVISA_BASE_URL ?? "https://suguvisa-mcp-731026511067.asia-northeast1.run.app";
-  const marketingUrl = env.SUGUVISA_MARKETING_URL ?? "https://sugu-kuru.co.jp/suguvisa";
+  const baseUrl = env.SUGUVISA_BASE_URL ?? "https://mcp.suguvisa.com";
+  const marketingUrl = env.SUGUVISA_MARKETING_URL ?? "https://suguvisa.com";
   const statusUrl = env.SUGUVISA_STATUS_URL ?? `${baseUrl}/status`;
   const auth0Domain = env.AUTH0_DOMAIN;
   const audience = env.AUTH0_AUDIENCE ?? baseUrl;

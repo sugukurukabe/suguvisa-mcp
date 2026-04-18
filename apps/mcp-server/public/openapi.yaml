@@ -24,7 +24,7 @@ info:
     email: a_kabe@sugu-kuru.co.jp
 
 servers:
-  - url: https://suguvisa-mcp-731026511067.asia-northeast1.run.app/api/v1/tools
+  - url: https://mcp.suguvisa.com/api/v1/tools
     description: SuguVisa Production API
 
 paths:

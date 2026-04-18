@@ -5,7 +5,7 @@ import type { AuthConfig } from '../types.js';
 describe('generateResourceMetadata (RFC 9728)', () => {
   const config: AuthConfig = {
     domain: 'suguvisa-dev.auth0.com',
-    audience: 'https://suguvisa-mcp-731026511067.asia-northeast1.run.app',
+    audience: 'https://mcp.suguvisa.com',
     issuerBaseUrl: 'https://suguvisa-dev.auth0.com',
   };
 

@@ -13,7 +13,7 @@
 1. Applications → APIs → Create API
 2. 設定:
    - Name: `SuguVisa MCP Server`
-   - Identifier: `https://suguvisa-mcp-731026511067.asia-northeast1.run.app`
+   - Identifier: `https://mcp.suguvisa.com`
    - Signing Algorithm: `RS256`
 
 ## 3. スコープの追加 / Add Scopes
@@ -60,7 +60,7 @@ APIs → SuguVisa MCP Server → Settings:
 
 ```bash
 AUTH0_DOMAIN="suguvisa-dev.auth0.com"
-AUTH0_AUDIENCE="https://suguvisa-mcp-731026511067.asia-northeast1.run.app"
+AUTH0_AUDIENCE="https://mcp.suguvisa.com"
 AUTH0_ISSUER_BASE_URL="https://suguvisa-dev.auth0.com"
 AUTH0_MGMT_CLIENT_ID="<Management API Client ID>"
 AUTH0_MGMT_CLIENT_SECRET="<Management API Client Secret>"
@@ -72,7 +72,7 @@ ALLOW_LEGACY_API_KEY="true"
 ### PRM エンドポイント
 
 ```bash
-curl https://suguvisa-mcp-...run.app/.well-known/oauth-protected-resource
+curl https://mcp.suguvisa.com/.well-known/oauth-protected-resource
 ```
 
 ### トークン取得 & MCP 呼び出し
