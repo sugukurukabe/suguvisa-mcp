@@ -15,7 +15,6 @@
 # ─────────────────────────────────────────────────────────────
 
 substitutions:
-  _IMAGE: gcr.io/${PROJECT_ID}/suguvisa-dashboard
   _NEXT_PUBLIC_SUPABASE_URL: ""
   _NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
   _NEXT_PUBLIC_SUGUVISA_API_URL: "https://mcp.suguvisa.com"
@@ -29,9 +28,9 @@ steps:
       - -f
       - apps/dashboard/Dockerfile
       - -t
-      - ${_IMAGE}:$BUILD_ID
+      - gcr.io/$PROJECT_ID/suguvisa-dashboard:$BUILD_ID
       - -t
-      - ${_IMAGE}:latest
+      - gcr.io/$PROJECT_ID/suguvisa-dashboard:latest
       - --build-arg
       - NEXT_PUBLIC_SUPABASE_URL=${_NEXT_PUBLIC_SUPABASE_URL}
       - --build-arg
@@ -45,8 +44,8 @@ steps:
       - .
 
 images:
-  - ${_IMAGE}:$BUILD_ID
-  - ${_IMAGE}:latest
+  - gcr.io/$PROJECT_ID/suguvisa-dashboard:$BUILD_ID
+  - gcr.io/$PROJECT_ID/suguvisa-dashboard:latest
 
 options:
   logging: CLOUD_LOGGING_ONLY
