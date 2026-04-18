@@ -240,6 +240,8 @@ if (oauthEnabled && authProvider) {
 
 // ─── ヘルスチェック ───
 app.get("/health", (_req, res) => {
+  const billingConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
+  const webhookConfigured = Boolean(process.env.STRIPE_WEBHOOK_SECRET);
   res.json({
     status: "ok",
     server: "suguvisa-mcp",
@@ -248,11 +250,18 @@ app.get("/health", (_req, res) => {
       oauth21: oauthEnabled ? "enabled" : "disabled",
       legacyApiKey: authConfig.allowLegacyApiKey ? "enabled" : "disabled",
     },
+    billing: {
+      mode: billingConfigured ? "stripe" : "disabled",
+      status: billingConfigured ? "configured" : "not_configured",
+      webhook: webhookConfigured ? "configured" : "not_configured",
+    },
     modes: {
       mcp: "/mcp (Claude.ai Remote MCP)",
       rest: "/api/v1/tools/* (GPT Actions / REST API)",
       tenant: "/api/v1/tenant/* (SaaS Management)",
-      billing: process.env.STRIPE_SECRET_KEY ? "/api/v1/billing/* (Stripe configured)" : "/api/v1/billing/* (Stripe not configured)",
+      billing: billingConfigured
+        ? "/api/v1/billing/* (Stripe configured)"
+        : "/api/v1/billing/* (Stripe not configured)",
       standalone: process.env.ENABLE_STANDALONE_CHAT === "true" ? "enabled" : "disabled",
     },
     tools: 37,
