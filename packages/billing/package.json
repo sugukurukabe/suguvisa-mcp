@@ -11,10 +11,16 @@
       "import": "./dist/index.js"
     }
   },
+  "bin": {
+    "suguvisa-billing": "dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed": "node dist/cli.js seed",
+    "seed:dry": "node dist/cli.js seed --dry-run",
+    "verify": "node dist/cli.js verify"
   },
   "dependencies": {
     "stripe": "^17.5.0",
