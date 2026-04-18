@@ -31,11 +31,13 @@ export interface Plan {
   };
 }
 
+type Localized = string | { ja?: string; en?: string };
+
 /** Raw plan shape returned by the MCP server (snake_case) */
 interface WirePlan {
   key: string;
-  name: string;
-  description: string;
+  name: Localized;
+  description: Localized;
   monthly_price_jpy: number;
   yearly_price_jpy: number;
   features: Plan["features"];
@@ -48,6 +50,12 @@ interface WirePlan {
     monthly_price_id: string | null;
     yearly_price_id: string | null;
   };
+}
+
+function pickLocalized(value: Localized | null | undefined, lang: "ja" | "en" = "ja"): string {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  return value[lang] ?? value.en ?? value.ja ?? "";
 }
 
 export interface TenantSnapshot {
@@ -115,8 +123,8 @@ export async function listPlans(opts: ApiOptions = {}): Promise<Plan[]> {
 function normalizePlan(p: WirePlan): Plan {
   return {
     key: p.key,
-    name: p.name,
-    description: p.description,
+    name: pickLocalized(p.name),
+    description: pickLocalized(p.description),
     monthlyPriceJpy: p.monthly_price_jpy,
     yearlyPriceJpy: p.yearly_price_jpy,
     features: p.features ?? {},
