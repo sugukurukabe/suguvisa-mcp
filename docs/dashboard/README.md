@@ -118,15 +118,31 @@ pnpm --filter @suguvisa/dashboard build  # next build
 
 ### Cloud Run (推奨)
 
-```bash
-gcloud builds submit --tag gcr.io/$PROJECT/suguvisa-dashboard \
-  -f apps/dashboard/Dockerfile .
+**重要**: `NEXT_PUBLIC_*` 変数はクライアント JS に焼き込まれるため、
+Cloud Run の `--set-env-vars` ではなく **ビルド時** に渡す必要があります。
+`apps/dashboard/cloudbuild.yaml` がこれを処理してくれます。
 
+```bash
+# 1. ビルド（NEXT_PUBLIC_* は client bundle に baked in）
+gcloud builds submit \
+  --config apps/dashboard/cloudbuild.yaml \
+  --substitutions \
+_NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co,\
+_NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...,\
+_NEXT_PUBLIC_SUGUVISA_API_URL=https://mcp.suguvisa.com,\
+_NEXT_PUBLIC_SITE_URL=https://suguvisa.com \
+  .
+
+# 2. デプロイ
 gcloud run deploy suguvisa-dashboard \
-  --image gcr.io/$PROJECT/suguvisa-dashboard \
+  --image gcr.io/$PROJECT/suguvisa-dashboard:latest \
   --region asia-northeast1 \
-  --set-env-vars "NEXT_PUBLIC_SUPABASE_URL=...,NEXT_PUBLIC_SUPABASE_ANON_KEY=...,NEXT_PUBLIC_SUGUVISA_API_URL=https://mcp.suguvisa.com,NEXT_PUBLIC_SITE_URL=https://suguvisa.com" \
-  --allow-unauthenticated --port 3100
+  --allow-unauthenticated \
+  --port 3100 \
+  --memory 512Mi \
+  --cpu 1 \
+  --min-instances 0 \
+  --max-instances 10
 ```
 
 ### Vercel
