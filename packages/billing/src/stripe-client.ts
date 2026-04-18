@@ -99,9 +99,6 @@ export class StripeBillingClient implements BillingClient {
       params.customer = args.customerId;
     } else if (args.customerEmail) {
       params.customer_email = args.customerEmail;
-      params.customer_creation = "always";
-    } else {
-      params.customer_creation = "always";
     }
 
     const session = await this.stripe.checkout.sessions.create(params);
