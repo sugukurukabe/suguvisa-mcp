@@ -97,6 +97,7 @@ export class StripeBillingClient implements BillingClient {
     };
     if (args.customerId) {
       params.customer = args.customerId;
+      params.customer_update = { name: "auto", address: "auto" };
     } else if (args.customerEmail) {
       params.customer_email = args.customerEmail;
     }
