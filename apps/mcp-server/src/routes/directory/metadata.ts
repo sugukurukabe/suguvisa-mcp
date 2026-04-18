@@ -60,8 +60,8 @@ export interface DirectoryMetadata {
   };
   /** データの扱い (審査で重要) */
   dataHandling: {
-    piiProcessed: string[];
-    piiStored: string[];
+    piiProcessed: Array<{ ja: string; en: string; id: string }>;
+    piiStored: Array<{ ja: string; en: string; id: string }>;
     retentionDays: number;
     regions: string[];
     encryption: { atRest: string; inTransit: string };
@@ -173,13 +173,44 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
     },
     dataHandling: {
       piiProcessed: [
-        "氏名 (ローマ字/漢字/かな)",
-        "生年月日",
-        "在留カード番号",
-        "パスポート番号",
-        "勤務先企業情報",
+        {
+          ja: "氏名 (ローマ字/漢字/かな)",
+          en: "Name (romaji/kanji/kana)",
+          id: "Nama (romaji/kanji/kana)",
+        },
+        {
+          ja: "生年月日",
+          en: "Date of birth",
+          id: "Tanggal lahir",
+        },
+        {
+          ja: "在留カード番号",
+          en: "Residence card number",
+          id: "Nomor kartu izin tinggal",
+        },
+        {
+          ja: "パスポート番号",
+          en: "Passport number",
+          id: "Nomor paspor",
+        },
+        {
+          ja: "勤務先企業情報",
+          en: "Employer company information",
+          id: "Informasi perusahaan tempat bekerja",
+        },
       ],
-      piiStored: ["監査ログ（任意）", "テナント設定"],
+      piiStored: [
+        {
+          ja: "監査ログ（任意）",
+          en: "Audit log (optional)",
+          id: "Log audit (opsional)",
+        },
+        {
+          ja: "テナント設定",
+          en: "Tenant configuration",
+          id: "Konfigurasi tenant",
+        },
+      ],
       retentionDays: 365,
       regions: ["asia-northeast1 (Tokyo)"],
       encryption: {

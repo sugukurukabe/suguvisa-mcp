@@ -102,7 +102,7 @@ export function serverCardHandler(_req: Request, res: Response): void {
     dataHandling: m.dataHandling,
     plans: m.plans,
     compliance: {
-      apipa: true,
+      appi: true,
       gdpr: false,
       soc2: "in_progress",
       dataResidency: m.dataHandling.regions,

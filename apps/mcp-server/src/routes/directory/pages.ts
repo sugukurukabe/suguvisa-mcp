@@ -88,7 +88,7 @@ export function privacyHandler(_req: Request, res: Response): void {
 
   <h2>1. 収集する情報 / Data We Collect</h2>
   <ul>
-    <li>ユーザーが入力する申請関連データ: ${m.dataHandling.piiProcessed.map((x) => `<code>${escapeHtml(x)}</code>`).join(" / ")}</li>
+    <li>ユーザーが入力する申請関連データ: ${m.dataHandling.piiProcessed.map((x) => `<code>${escapeHtml(x.ja)}</code>`).join(" / ")}</li>
     <li>認証情報 (OAuth / API Key, メールアドレス)</li>
     <li>利用ログ (IP アドレス, ツール呼び出し履歴, エラーログ)</li>
     <li>課金に必要な情報 (Stripe が処理する決済情報、当社は保持しません)</li>
