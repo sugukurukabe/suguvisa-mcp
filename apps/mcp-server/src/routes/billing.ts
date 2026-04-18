@@ -158,6 +158,20 @@ export const billingWebhookHandler = async (req: Request, res: express.Response)
 
   try {
     const rawBody = req.body as Buffer;
+    if (process.env.BILLING_WEBHOOK_DEBUG === "true") {
+      const secret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
+      console.error(
+        JSON.stringify({
+          msg: "[billing] webhook debug",
+          bodyType: Buffer.isBuffer(rawBody) ? "Buffer" : typeof rawBody,
+          bodyLen: Buffer.isBuffer(rawBody) ? rawBody.length : -1,
+          bodyHead: Buffer.isBuffer(rawBody) ? rawBody.toString("utf8").slice(0, 80) : String(rawBody).slice(0, 80),
+          sigHead: signature.slice(0, 40),
+          secretPrefix: secret.slice(0, 14),
+          secretLen: secret.length,
+        })
+      );
+    }
     const event = client.verifyWebhook(rawBody, signature);
 
     // 冪等化: 同一 event.id を 2 回処理しない
