@@ -193,7 +193,21 @@ export const billingWebhookHandler = async (req: Request, res: express.Response)
     res.json({ received: true, kind: intent.kind });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("[billing] webhook failed:", message);
+    console.error(
+      JSON.stringify({
+        msg: "[billing] webhook failed",
+        error_message: message,
+        error_name: error instanceof Error ? error.name : typeof error,
+        error_stack: error instanceof Error ? error.stack?.split("\n").slice(0, 5) : undefined,
+        error_raw: (() => {
+          try {
+            return JSON.stringify(error, Object.getOwnPropertyNames(error ?? {}));
+          } catch {
+            return String(error);
+          }
+        })(),
+      })
+    );
     res.status(400).json({ status: "error", message });
   }
 };
