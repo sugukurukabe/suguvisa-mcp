@@ -18,6 +18,9 @@
     "typecheck": "turbo run typecheck",
     "eval": "pnpm --filter @suguvisa/evals eval",
     "eval:citation": "pnpm --filter @suguvisa/evals build && node packages/evals/dist/cli.js citation --dataset evals/datasets/citations.jsonl",
+    "stripe:seed:dry": "pnpm --filter @suguvisa/billing build && node packages/billing/dist/cli.js seed --dry-run",
+    "stripe:seed": "pnpm --filter @suguvisa/billing build && node packages/billing/dist/cli.js seed",
+    "stripe:verify": "pnpm --filter @suguvisa/billing build && node packages/billing/dist/cli.js verify",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
