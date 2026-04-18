@@ -29,7 +29,7 @@ steps:
       - -f
       - apps/dashboard/Dockerfile
       - -t
-      - ${_IMAGE}:$SHORT_SHA
+      - ${_IMAGE}:$BUILD_ID
       - -t
       - ${_IMAGE}:latest
       - --build-arg
@@ -45,7 +45,7 @@ steps:
       - .
 
 images:
-  - ${_IMAGE}:$SHORT_SHA
+  - ${_IMAGE}:$BUILD_ID
   - ${_IMAGE}:latest
 
 options:
