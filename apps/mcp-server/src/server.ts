@@ -300,9 +300,9 @@ app.get("/health", (_req, res) => {
         : "/api/v1/billing/* (Stripe not configured)",
       standalone: process.env.ENABLE_STANDALONE_CHAT === "true" ? "enabled" : "disabled",
     },
-    tools: 37,
-    prompts: 8,
-    resources: 6,
+    tools: 42,
+    prompts: 14,
+    resources: 70,
   });
 });
 
@@ -387,7 +387,7 @@ app.post("/mcp", async (req: AuthRequest, res) => {
 
     const server = new McpServer({
       name: "suguvisa-mcp",
-      version: "0.3.0",
+      version: "0.9.4",
       description: "特定技能ビザ申請の専門MCPサーバー（Claude & GPT デュアルプラグイン）",
     });
 
