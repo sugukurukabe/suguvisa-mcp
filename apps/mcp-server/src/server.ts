@@ -202,6 +202,42 @@ if (oauthEnabled && authProvider) {
     }
     return oauthMiddleware(req, res, next);
   });
+
+  // principal → tenant ブリッジ
+  // OAuth middleware は req.principal をセットするが、既存ハンドラは req.tenant を参照するため、
+  // principal.tenantId から tenants を解決して AuthRequest.tenant にアタッチする。
+  app.use(async (req: AuthRequest, _res, next) => {
+    const principal = req.principal;
+    if (!principal || req.tenant) return next();
+    if (principal.tenantId === "local-dev-tenant") {
+      req.tenant = {
+        id: "local-dev-tenant",
+        organization_name: "Local Environment",
+        subscription_plan: "unlimited",
+      };
+      return next();
+    }
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+      try {
+        const { data: tenant } = await supabase
+          .from("tenants")
+          .select("id, organization_name, subscription_plan, status")
+          .eq("id", principal.tenantId)
+          .eq("status", "active")
+          .maybeSingle();
+        if (tenant) {
+          req.tenant = {
+            id: tenant.id,
+            organization_name: tenant.organization_name,
+            subscription_plan: tenant.subscription_plan,
+          };
+        }
+      } catch (error) {
+        console.error("[auth-bridge] tenant lookup failed:", error);
+      }
+    }
+    next();
+  });
 } else {
   app.use(apiKeyAuth);
 }
