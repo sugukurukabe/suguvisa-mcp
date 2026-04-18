@@ -1,0 +1,28 @@
+# ─────────────────────────────────────────────────────────────
+# SuguVisa MCP Server — Cloud Build config
+#
+# 使い方 / Usage / Penggunaan:
+#   gcloud builds submit --config apps/mcp-server/cloudbuild.yaml .
+# ─────────────────────────────────────────────────────────────
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - apps/mcp-server/Dockerfile
+      - -t
+      - gcr.io/$PROJECT_ID/suguvisa-mcp:$BUILD_ID
+      - -t
+      - gcr.io/$PROJECT_ID/suguvisa-mcp:latest
+      - .
+
+images:
+  - gcr.io/$PROJECT_ID/suguvisa-mcp:$BUILD_ID
+  - gcr.io/$PROJECT_ID/suguvisa-mcp:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+timeout: 1800s
