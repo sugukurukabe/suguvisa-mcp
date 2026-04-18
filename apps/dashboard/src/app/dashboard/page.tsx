@@ -118,7 +118,7 @@ function Card({
 }
 
 function apiUrl(): string {
-  return (process.env.NEXT_PUBLIC_SUGUVISA_API_URL ?? "https://suguvisa.app").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SUGUVISA_API_URL ?? "https://mcp.suguvisa.com").replace(/\/$/, "");
 }
 
 async function safe<T>(fn: () => Promise<T>): Promise<T | null> {

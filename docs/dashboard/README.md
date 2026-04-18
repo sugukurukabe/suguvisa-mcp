@@ -57,7 +57,7 @@ apps/dashboard/
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase プロジェクト URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (RLS 前提) |
-| `NEXT_PUBLIC_SUGUVISA_API_URL` | MCP サーバーの公開 URL (例: `https://suguvisa.app`) |
+| `NEXT_PUBLIC_SUGUVISA_API_URL` | MCP サーバーの公開 URL (例: `https://mcp.suguvisa.com`) |
 | `NEXT_PUBLIC_SITE_URL` | ダッシュボード自身の公開 URL (Stripe の success/cancel URL に使用) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | (任意) クライアント側でのバリデーション用 |
 
@@ -77,7 +77,7 @@ apps/dashboard/
 [User]  /dashboard/billing
   │
   ├─ 「このプランに変更」ボタン → upgradeAction (Server Action)
-  │     └─ POST https://suguvisa.app/api/v1/billing/checkout
+  │     └─ POST https://mcp.suguvisa.com/api/v1/billing/checkout
   │           (Authorization: Bearer <access_token>)
   │     └─ redirect(Stripe Checkout URL)
   │
@@ -125,7 +125,7 @@ gcloud builds submit --tag gcr.io/$PROJECT/suguvisa-dashboard \
 gcloud run deploy suguvisa-dashboard \
   --image gcr.io/$PROJECT/suguvisa-dashboard \
   --region asia-northeast1 \
-  --set-env-vars "NEXT_PUBLIC_SUPABASE_URL=...,NEXT_PUBLIC_SUPABASE_ANON_KEY=...,NEXT_PUBLIC_SUGUVISA_API_URL=https://suguvisa.app,NEXT_PUBLIC_SITE_URL=https://app.suguvisa.app" \
+  --set-env-vars "NEXT_PUBLIC_SUPABASE_URL=...,NEXT_PUBLIC_SUPABASE_ANON_KEY=...,NEXT_PUBLIC_SUGUVISA_API_URL=https://mcp.suguvisa.com,NEXT_PUBLIC_SITE_URL=https://suguvisa.com" \
   --allow-unauthenticated --port 3100
 ```
 

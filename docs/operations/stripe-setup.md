@@ -110,14 +110,14 @@ Dashboard (`suguvisa-dashboard`) 側では課金関連 env は不要ですが、
 
 ```bash
 node packages/billing/dist/cli.js verify \
-  --url https://suguvisa.app \
+  --url https://mcp.suguvisa.com \
   --stripe-key sk_test_XXXX
 ```
 
 全チェックが ✅ であれば準備完了です:
 
 ```
-▶ verifying https://suguvisa.app ...
+▶ verifying https://mcp.suguvisa.com ...
   ✅ health.billing.status                 configured
   ✅ billing/plans.reachable               3 plans
   ✅ plan(starter).monthly_price_id        price_1NaAaA...
@@ -154,14 +154,20 @@ node packages/billing/dist/cli.js verify \
 
 ## 9. Cloudflare ドメインマッピング (補助メモ)
 
-Stripe 設定とは独立ですが、本番公開前に必要:
+Stripe 設定とは独立ですが、本番公開前に必要。
+詳細手順は [`docs/operations/domain-setup.md`](./domain-setup.md) を参照。
 
-1. Cloudflare で `suguvisa.app` (MCP) と `app.suguvisa.app` (ダッシュボード) を取得
-2. Cloud Run で `gcloud beta run domain-mappings create` か Cloud Run Domain Mappings UI から紐付け
-3. 発行された A/AAAA/CNAME レコードを Cloudflare DNS に設定 (Proxy は OFF のままで OK、後で Proxy ON にする場合は Full (strict) を選ぶ)
-4. HTTPS 証明書が自動発行されるまで 5〜15 分待機
-5. `curl https://suguvisa.app/health` が 200 を返すことを確認
-6. Stripe の Webhook URL を正式ドメインに変更
+ドメイン構成:
+
+| ドメイン | Cloud Run サービス |
+|---|---|
+| `suguvisa.com` / `www.suguvisa.com` | `suguvisa-dashboard` |
+| `mcp.suguvisa.com` | `suguvisa-mcp` |
+
+1. `docs/operations/domain-setup.md` の手順で Cloud Run にドメインマッピングを作成
+2. `curl -I https://mcp.suguvisa.com/health` / `curl -I https://suguvisa.com/` が 200 を返すこと
+3. Stripe の Webhook URL を `https://mcp.suguvisa.com/api/v1/billing/webhook` に更新
+4. `SUGUVISA_BASE_URL=https://mcp.suguvisa.com` / `NEXT_PUBLIC_SUGUVISA_API_URL=https://mcp.suguvisa.com` / `NEXT_PUBLIC_SITE_URL=https://suguvisa.com` を Cloud Run にセット
 
 ## 付録: プランカタログを変更したら
 

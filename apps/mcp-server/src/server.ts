@@ -117,7 +117,7 @@ app.use(
 // ─── OAuth 2.1 設定 / OAuth 2.1 Configuration / Konfigurasi OAuth 2.1 ───
 const authConfig: AuthConfig = {
   domain: process.env.AUTH0_DOMAIN ?? '',
-  audience: process.env.AUTH0_AUDIENCE ?? process.env.SUGUVISA_BASE_URL ?? 'https://suguvisa-mcp-731026511067.asia-northeast1.run.app',
+  audience: process.env.AUTH0_AUDIENCE ?? process.env.SUGUVISA_BASE_URL ?? 'https://mcp.suguvisa.com',
   issuerBaseUrl: process.env.AUTH0_ISSUER_BASE_URL ?? '',
   allowLegacyApiKey: process.env.ALLOW_LEGACY_API_KEY !== 'false',
 };

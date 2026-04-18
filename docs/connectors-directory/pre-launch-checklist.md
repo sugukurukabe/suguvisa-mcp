@@ -5,21 +5,30 @@ Before pressing the submit button, **verify every item on production**.
 
 ## 1. ドメインと TLS
 
-- [ ] 独自ドメイン (例: `suguvisa.app`) が Cloud Run にマッピング済み
-- [ ] Let's Encrypt 自動更新が有効 or GCP managed certificate が ACTIVE
-- [ ] `curl -I https://suguvisa.app/health` で 200 + `strict-transport-security`
+本番構成:
+
+| ドメイン | 役割 | Cloud Run サービス |
+|---|---|---|
+| `suguvisa.com` / `www.suguvisa.com` | マーケ + ダッシュボード | `suguvisa-dashboard` |
+| `mcp.suguvisa.com` | MCP サーバー (connector endpoint) | `suguvisa-mcp` |
+
+- [ ] Cloud Run Domain Mappings に 3 ドメインすべて ACTIVE
+- [ ] managed certificate が ACTIVE (5〜30 分かかる)
+- [ ] `curl -I https://mcp.suguvisa.com/health` で 200 + `strict-transport-security`
+- [ ] `curl -I https://suguvisa.com/` で 200 (ダッシュボードトップ)
 - [ ] HTTP → HTTPS 自動リダイレクト
 
 ## 2. 環境変数 (本番値)
 
-Cloud Run の revision に下記がすべて設定されているか確認:
+Cloud Run `suguvisa-mcp` の revision に下記がすべて設定されているか確認:
 
 | 変数 | 値 |
 |---|---|
-| `SUGUVISA_BASE_URL` | `https://suguvisa.app` |
+| `SUGUVISA_BASE_URL` | `https://mcp.suguvisa.com` |
+| `SUGUVISA_MARKETING_URL` | `https://suguvisa.com` |
 | `SUGUVISA_SUPPORT_EMAIL` | `support@sugu-kuru.co.jp` |
 | `AUTH0_DOMAIN` | `<tenant>.jp.auth0.com` |
-| `AUTH0_AUDIENCE` | `https://suguvisa.app` |
+| `AUTH0_AUDIENCE` | `https://mcp.suguvisa.com` |
 | `STRIPE_SECRET_KEY` | 本番 `sk_live_...` (Stripe 側確認後) |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
 | `SUGUVISA_STRIPE_PRICE_STARTER_MONTHLY` | `price_1...` |
@@ -32,12 +41,21 @@ Cloud Run の revision に下記がすべて設定されているか確認:
 | `OTEL_EXPORTER` | `google` |
 | `APP_VERSION` | タグと一致 (例: `0.10.0`) |
 
+Cloud Run `suguvisa-dashboard` 側:
+
+| 変数 | 値 |
+|---|---|
+| `NEXT_PUBLIC_SUGUVISA_API_URL` | `https://mcp.suguvisa.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://suguvisa.com` |
+| `NEXT_PUBLIC_SUPABASE_URL` | 本番プロジェクト URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key |
+
 ## 3. 法務ページの HTML 検証
 
 ```bash
 for p in / /privacy /terms /security /support; do
   echo "=== $p ==="
-  curl -s -o /dev/null -w 'status=%{http_code} size=%{size_download}\n' https://suguvisa.app$p
+  curl -s -o /dev/null -w 'status=%{http_code} size=%{size_download}\n' https://mcp.suguvisa.com$p
 done
 ```
 
@@ -48,27 +66,29 @@ done
 ## 4. マニフェスト検証
 
 ```bash
-curl -s https://suguvisa.app/.well-known/mcp/server-card.json | jq .
-curl -s https://suguvisa.app/.well-known/ai-plugin.json | jq .
-curl -s https://suguvisa.app/.well-known/openai-app.json | jq .
+curl -s https://mcp.suguvisa.com/.well-known/mcp/server-card.json | jq .
+curl -s https://mcp.suguvisa.com/.well-known/ai-plugin.json | jq .
+curl -s https://mcp.suguvisa.com/.well-known/openai-app.json | jq .
 ```
 
 - [ ] `icon` / `logo_url` が 200 で返る
 - [ ] `privacy_policy_url` / `terms_of_service_url` が 200
 - [ ] `plans[]` に Free + Starter + Professional の 3 件
 - [ ] `auth.oauth2` が null / 空でない
+- [ ] 返ってくる URL が全て `https://mcp.suguvisa.com/...` または `https://suguvisa.com/...`
 
 ## 5. 認証フロー
 
-- [ ] `curl https://suguvisa.app/.well-known/oauth-protected-resource` が 200
+- [ ] `curl https://mcp.suguvisa.com/.well-known/oauth-protected-resource` が 200
 - [ ] Auth0 のテナントに Claude / ChatGPT 用クライアント登録
 - [ ] Auth0 の Allowed Callback URL に Claude / OpenAI の redirect を追加
+- [ ] Auth0 API の Identifier = `https://mcp.suguvisa.com`
 - [ ] スコープ (`visa:read`, `visa:write`, `visa:ocr`, `visa:audit`, `tenant:admin`) が Claude 側に表示される
 
 ## 6. MCP プロトコル疎通
 
 ```bash
-npx -y @modelcontextprotocol/inspector https://suguvisa.app/mcp
+npx -y @modelcontextprotocol/inspector https://mcp.suguvisa.com/mcp
 ```
 
 - [ ] `tools/list` で 37 ツール返る
@@ -78,6 +98,7 @@ npx -y @modelcontextprotocol/inspector https://suguvisa.app/mcp
 
 ## 7. 決済 E2E (テストモード)
 
+- [ ] Stripe Webhook URL = `https://mcp.suguvisa.com/api/v1/billing/webhook`
 - [ ] `POST /api/v1/billing/checkout` で Stripe Checkout URL 生成
 - [ ] テストカード `4242 4242 4242 4242` で決済成功
 - [ ] Webhook が `checkout.session.completed` を受信し、`tenants.subscription_status=active` に更新
