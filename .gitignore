@@ -17,3 +17,8 @@ apps/mcp-server/chat-ui/node_modules/
 apps/mcp-server/chat-ui/dist/
 apps/mcp-server/tmp/
 apps/mcp-server/assets/
+
+# Supabase CLI ローカルキャッシュ / Supabase CLI local cache / Cache lokal Supabase CLI
+# `supabase link` / `db push` 実行時に生成される一時ファイル群を除外
+**/supabase/.temp/
+**/supabase/.branches/
