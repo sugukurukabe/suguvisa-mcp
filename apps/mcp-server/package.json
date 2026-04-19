@@ -59,6 +59,7 @@
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "express-rate-limit": "^8.3.2",
+    "jose": "^6.2.2",
     "xlsx-populate": "^1.21.0",
     "zod": "^3.23.0"
   },

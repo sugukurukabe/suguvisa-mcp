@@ -43,6 +43,7 @@ import {
 } from "@suguvisa/observability";
 import { supabase } from "./lib/supabase.js";
 import { getToolScopes } from "./lib/tool-scopes.js";
+import { verifySupabaseJwt, looksLikeJwt } from "./lib/supabase-jwt.js";
 
 // REST API & Plugin Meta routes
 import toolsRestRouter from "./routes/tools-rest.js";
@@ -138,6 +139,26 @@ async function legacyApiKeyValidator(key: string): Promise<Principal | null> {
     };
   }
 
+  // 1) Supabase Auth JWT (ダッシュボードから直接叩く経路)
+  //    Dashboard が session.access_token をそのまま Authorization ヘッダに載せて送る。
+  //    The dashboard forwards Supabase's session.access_token verbatim.
+  if (looksLikeJwt(key)) {
+    const supaPrincipal = await verifySupabaseJwt(key, authConfig.audience);
+    if (supaPrincipal) {
+      return {
+        sub: supaPrincipal.sub,
+        tenantId: supaPrincipal.tenantId,
+        scopes: [],
+        email: supaPrincipal.email,
+        iss: supaPrincipal.iss,
+        aud: supaPrincipal.aud,
+        exp: supaPrincipal.exp,
+      };
+    }
+    // JWT 形式だが Supabase で検証できない場合はそのまま落として次へ。
+  }
+
+  // 2) Supabase に保存された長期 API キー (従来の svmcp_... プレフィックス)
   if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
     try {
       const { data: apiKeyData } = await supabase
@@ -285,6 +306,7 @@ app.get("/health", (_req, res) => {
     auth: {
       oauth21: oauthEnabled ? "enabled" : "disabled",
       legacyApiKey: authConfig.allowLegacyApiKey ? "enabled" : "disabled",
+      supabaseJwt: process.env.SUPABASE_JWT_SECRET ? "enabled" : "disabled",
     },
     billing: {
       mode: billingConfigured ? "stripe" : "disabled",
