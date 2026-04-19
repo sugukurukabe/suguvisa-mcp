@@ -217,7 +217,7 @@ if (oauthEnabled && authProvider) {
       "/api/v1/billing/plans",
       "/api/v1/billing/webhook",
     ]);
-    const publicPrefixes = ["/.well-known/"];
+    const publicPrefixes = ["/.well-known/", "/assets/"];
     if (publicExact.has(req.path) || publicPrefixes.some(p => req.path.startsWith(p))) {
       return next();
     }
