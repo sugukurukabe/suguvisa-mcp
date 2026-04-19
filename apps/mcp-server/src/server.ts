@@ -306,7 +306,7 @@ app.get("/health", (_req, res) => {
     auth: {
       oauth21: oauthEnabled ? "enabled" : "disabled",
       legacyApiKey: authConfig.allowLegacyApiKey ? "enabled" : "disabled",
-      supabaseJwt: process.env.SUPABASE_JWT_SECRET ? "enabled" : "disabled",
+      supabaseJwt: process.env.SUPABASE_URL ? "enabled" : "disabled",
     },
     billing: {
       mode: billingConfigured ? "stripe" : "disabled",
