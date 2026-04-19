@@ -36,7 +36,7 @@ Cloud Run `suguvisa-mcp` の revision に下記がすべて設定されている
 | `SUGUVISA_STRIPE_PRICE_PROFESSIONAL_MONTHLY` | `price_1...` |
 | `SUGUVISA_STRIPE_PRICE_PROFESSIONAL_YEARLY` | `price_1...` |
 | `SUPABASE_URL` | 本番プロジェクト URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | 本番 service role |
+| `SUPABASE_SERVICE_KEY` | 本番 service role |
 | `PII_ENCRYPTION_KEY_ID` | Cloud KMS resource name |
 | `OTEL_EXPORTER` | `google` |
 | `APP_VERSION` | タグと一致 (例: `0.10.0`) |
@@ -91,9 +91,9 @@ curl -s https://mcp.suguvisa.com/.well-known/openai-app.json | jq .
 npx -y @modelcontextprotocol/inspector https://mcp.suguvisa.com/mcp
 ```
 
-- [ ] `tools/list` で 37 ツール返る
-- [ ] `prompts/list` で 8 プロンプト返る
-- [ ] `resources/list` で リソース返る
+- [x] `tools/list` で 42 ツール返る
+- [x] `prompts/list` で 14 プロンプト返る
+- [x] `resources/list` で 70 リソース返る
 - [ ] `determine_application_type` のテスト呼び出しが成功
 
 ## 7. 決済 E2E (テストモード)
