@@ -6,10 +6,13 @@
 
 | ファイル | 内容 |
 |---|---|
-| [`claude-submission.md`](./claude-submission.md) | Anthropic の Claude Connectors Directory 申請チェックリスト |
-| [`chatgpt-apps-submission.md`](./chatgpt-apps-submission.md) | OpenAI Apps Store (Apps SDK) 申請チェックリスト |
+| [`claude-submission.md`](./claude-submission.md) | Anthropic 申請チェックリスト（技術検証用） |
+| [`claude-form-draft.md`](./claude-form-draft.md) | **Claude Connectors Directory 申請フォーム下書き（コピペ可）** |
+| [`chatgpt-apps-submission.md`](./chatgpt-apps-submission.md) | OpenAI 申請チェックリスト（技術検証用） |
+| [`chatgpt-form-draft.md`](./chatgpt-form-draft.md) | **ChatGPT Apps Store 申請フォーム下書き（コピペ可）** |
 | [`pre-launch-checklist.md`](./pre-launch-checklist.md) | 申請前に本番環境で確認する項目 |
 | [`review-screenshots.md`](./review-screenshots.md) | 審査用スクリーンショット取得ガイド |
+| [`../roadmap/post-launch.md`](../roadmap/post-launch.md) | 公開後ロードマップ（`list_application_patterns` 追加・pattern_id 正規化 等） |
 
 ## エンドポイント早見表 / Endpoint cheat sheet
 
