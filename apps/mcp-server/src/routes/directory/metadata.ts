@@ -147,7 +147,7 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
       support: `${baseUrl}/support`,
       documentation: `${baseUrl}/docs`,
       statusPage: statusUrl,
-      logo: `${baseUrl}/logo.svg`,
+      logo: `${baseUrl}/icon-1024.png`,
       ogImage: `${baseUrl}/og-image.png`,
       favicon: `${baseUrl}/favicon.svg`,
     },

@@ -45,8 +45,13 @@ export function createDirectoryRouter(): Router {
 
   // Static branding assets
   router.get("/logo.svg", staticFileHandler("public/logo.svg", "image/svg+xml"));
+  router.get("/logo.png", staticFileHandler("public/logo.png", "image/png"));
+  router.get("/icon-1024.png", staticFileHandler("public/icon-1024.png", "image/png"));
+  router.get("/icon-256.png", staticFileHandler("public/icon-256.png", "image/png"));
+  router.get("/apple-touch-icon.png", staticFileHandler("public/apple-touch-icon.png", "image/png"));
   router.get("/favicon.svg", staticFileHandler("public/favicon.svg", "image/svg+xml"));
   router.get("/favicon.ico", staticFileHandler("public/favicon.svg", "image/svg+xml"));
+  router.get("/favicon-32.png", staticFileHandler("public/favicon-32.png", "image/png"));
   router.get("/og-image.svg", staticFileHandler("public/og-image.svg", "image/svg+xml"));
   router.get("/og-image.png", staticFileHandler("public/og-image.svg", "image/svg+xml")); // fallback
 

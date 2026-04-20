@@ -54,7 +54,7 @@ describe("/.well-known/mcp/server-card.json", () => {
         name: "suguvisa-mcp",
         displayName: expect.any(String),
         displayNameLocalized: expect.objectContaining({ ja: expect.any(String), en: expect.any(String), id: expect.any(String) }),
-        icon: expect.stringContaining("/logo.svg"),
+        icon: expect.stringContaining("/icon-1024.png"),
       }),
       links: expect.objectContaining({
         privacyPolicy: expect.stringContaining("/privacy"),
@@ -82,7 +82,7 @@ describe("/.well-known/ai-plugin.json", () => {
       name_for_human: expect.stringContaining("SuguVisa"),
       name_for_model: "suguvisa",
       api: expect.objectContaining({ type: "openapi", url: expect.stringContaining("/openapi.yaml") }),
-      logo_url: expect.stringContaining("/logo.svg"),
+      logo_url: expect.stringContaining("/icon-1024.png"),
       contact_email: expect.stringContaining("@"),
       legal_info_url: expect.stringContaining("/terms"),
     });

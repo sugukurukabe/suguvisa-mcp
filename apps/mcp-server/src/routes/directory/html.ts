@@ -63,6 +63,8 @@ export function layout(opts: LayoutOptions): string {
   <meta name="description" content="${escapeHtml(opts.description)}" />
   <link rel="canonical" href="${canonical}" />
   <link rel="icon" href="${meta.urls.favicon}" type="image/svg+xml" />
+  <link rel="icon" href="${meta.urls.baseUrl}/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="${meta.urls.baseUrl}/apple-touch-icon.png" />
   <meta property="og:title" content="${escapeHtml(opts.title)} — SuguVisa" />
   <meta property="og:description" content="${escapeHtml(opts.description)}" />
   <meta property="og:image" content="${meta.urls.ogImage}" />
