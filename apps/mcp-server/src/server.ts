@@ -240,12 +240,44 @@ if (oauthEnabled && authProvider) {
     }
     if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
       try {
-        const { data: tenant } = await supabase
+        // Auth0 発行のトークンかを iss で判定
+        // Detect Auth0-issued tokens by iss
+        // Deteksi token yang diterbitkan Auth0 dari iss
+        const isAuth0Token = typeof principal.iss === "string" && principal.iss.includes(".auth0.com");
+        const auth0Sub = isAuth0Token ? principal.sub : null;
+
+        let { data: tenant } = await supabase
           .from("tenants")
           .select("id, organization_name, subscription_plan, status")
-          .eq("id", principal.tenantId)
+          .eq(auth0Sub ? "auth0_sub" : "id", auth0Sub ?? principal.tenantId)
           .eq("status", "active")
           .maybeSingle();
+
+        // Auth0 ユーザーの初回アクセス時にテナントを自動作成
+        // Auto-provision tenant on first access for Auth0 users
+        // Buat tenant otomatis saat akses pertama untuk user Auth0
+        if (!tenant && auth0Sub) {
+          const defaultOrgName =
+            (principal.email ? principal.email.split("@")[0] : null) ??
+            `Tenant-${auth0Sub.slice(0, 12)}`;
+          const { data: created, error: insertError } = await supabase
+            .from("tenants")
+            .insert({
+              auth0_sub: auth0Sub,
+              organization_name: defaultOrgName,
+              subscription_plan: "free",
+              status: "active",
+            })
+            .select("id, organization_name, subscription_plan, status")
+            .maybeSingle();
+          if (insertError) {
+            console.error("[auth-bridge] auto-provision failed:", insertError);
+          } else {
+            tenant = created;
+            console.log(`[auth-bridge] auto-provisioned tenant for ${auth0Sub}: ${created?.id}`);
+          }
+        }
+
         if (tenant) {
           req.tenant = {
             id: tenant.id,
