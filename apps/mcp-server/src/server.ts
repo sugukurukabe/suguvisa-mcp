@@ -429,14 +429,6 @@ app.post("/mcp", async (req: AuthRequest, res) => {
         const requiredScopes = getToolScopes(toolName);
         const missing = requiredScopes.filter(s => !principal.scopes.includes(s));
         if (missing.length > 0) {
-          console.warn("[scope-check] insufficient scope", {
-            tool: toolName,
-            iss: principal.iss,
-            sub: principal.sub,
-            presentScopes: principal.scopes,
-            requiredScopes,
-            missing,
-          });
           res.status(403).json({
             jsonrpc: "2.0",
             error: { code: -32003, message: `Insufficient scope. Required: ${missing.join(', ')}` },
