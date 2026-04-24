@@ -50,6 +50,40 @@ describe("processStripeEvent", () => {
     expect(intent.kind).toBe("noop");
   });
 
+  it("falls back to free when line_items is missing (pre-refetch payload)", () => {
+    // Stripe Webhook のペイロードは line_items を含まないため、expand 前は free になる
+    // Before refetch, price is unknown → fallback plan (free)
+    const event = makeEvent("checkout.session.completed", {
+      id: "cs_1",
+      client_reference_id: "tenant-abc",
+      customer: "cus_1",
+      subscription: "sub_1",
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("tenant_subscribed");
+    if (intent.kind !== "tenant_subscribed") throw new Error();
+    expect(intent.plan).toBe("free");
+  });
+
+  it("uses expanded subscription.items.data[0].price.id when line_items missing", () => {
+    // Checkout session を expand 再取得した際、subscription 側から price を解決する
+    // Falls back to expanded subscription object when line_items is absent
+    const event = makeEvent("checkout.session.completed", {
+      id: "cs_1",
+      client_reference_id: "tenant-abc",
+      customer: "cus_1",
+      subscription: {
+        id: "sub_1",
+        items: { data: [{ price: { id: "price_pro_m" } }] },
+      },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("tenant_subscribed");
+    if (intent.kind !== "tenant_subscribed") throw new Error();
+    expect(intent.plan).toBe("professional");
+    expect(intent.stripeSubscriptionId).toBe("sub_1");
+  });
+
   it("maps subscription.updated to plan change", () => {
     const event = makeEvent("customer.subscription.updated", {
       id: "sub_1",
@@ -64,6 +98,47 @@ describe("processStripeEvent", () => {
     if (intent.kind !== "tenant_subscription_updated") throw new Error();
     expect(intent.plan).toBe("starter");
     expect(intent.cancelAtPeriodEnd).toBe(true);
+  });
+
+  it("handles Stripe API 2025-03-01+ where current_period_end lives on items", () => {
+    // 新 API では sub 直下の current_period_end は null
+    // In newer Stripe API, current_period_end moved to item level
+    // Di versi API Stripe baru, current_period_end pindah ke level item
+    const event = makeEvent("customer.subscription.updated", {
+      id: "sub_1",
+      status: "active",
+      customer: "cus_1",
+      cancel_at_period_end: false,
+      current_period_end: null,
+      items: {
+        data: [
+          {
+            price: { id: "price_pro_m" },
+            current_period_end: 1_900_000_000,
+          },
+        ],
+      },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("tenant_subscription_updated");
+    if (intent.kind !== "tenant_subscription_updated") throw new Error();
+    expect(intent.plan).toBe("professional");
+    expect(intent.currentPeriodEnd).toBe(new Date(1_900_000_000 * 1000).toISOString());
+  });
+
+  it("falls back to +30d when both subscription and item current_period_end are missing", () => {
+    // どちらにも無い場合はデフォルト 30 日後 (webhook 処理を失敗させない)
+    const event = makeEvent("customer.subscription.updated", {
+      id: "sub_1",
+      status: "active",
+      customer: "cus_1",
+      cancel_at_period_end: false,
+      items: { data: [{ price: { id: "price_pro_m" } }] },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("tenant_subscription_updated");
+    if (intent.kind !== "tenant_subscription_updated") throw new Error();
+    expect(() => new Date(intent.currentPeriodEnd).toISOString()).not.toThrow();
   });
 
   it("falls back to free when price not mapped", () => {

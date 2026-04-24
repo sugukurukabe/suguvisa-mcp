@@ -26,6 +26,8 @@ export class FakeBillingClient implements BillingClient {
   readonly sessions: Array<{ id: string; args: CreateCheckoutArgs }> = [];
   readonly portals: Array<{ id: string; args: CreatePortalArgs }> = [];
   readonly subscriptions = new Map<string, SubscriptionSnapshot>();
+  /** テスト用: retrieveCheckoutSession の返却値をあらかじめ登録する */
+  readonly checkoutSessionsById = new Map<string, Stripe.Checkout.Session>();
   private readonly webhookSecret: string;
   private readonly baseUrl: string;
   private counter = 0;
@@ -58,6 +60,12 @@ export class FakeBillingClient implements BillingClient {
     const snap = this.subscriptions.get(subscriptionId);
     if (!snap) throw new Error(`subscription ${subscriptionId} not found`);
     return snap;
+  }
+
+  async retrieveCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session> {
+    const session = this.checkoutSessionsById.get(sessionId);
+    if (!session) throw new Error(`checkout session ${sessionId} not found`);
+    return session;
   }
 
   /**

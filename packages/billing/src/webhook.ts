@@ -123,7 +123,6 @@ export function processStripeEvent(
       }
       const plan = resolvePlanFromPriceId(priceId, options.priceMappings) ?? fallback;
       const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
-      const periodEnd = (sub as unknown as { current_period_end: number }).current_period_end;
       return {
         kind: "tenant_subscription_updated",
         stripeCustomerId: customerId,
@@ -131,7 +130,7 @@ export function processStripeEvent(
         plan,
         stripePriceId: priceId,
         status: sub.status as SubscriptionStatus,
-        currentPeriodEnd: new Date(periodEnd * 1000).toISOString(),
+        currentPeriodEnd: extractCurrentPeriodEndIso(sub),
         cancelAtPeriodEnd: sub.cancel_at_period_end,
       };
     }
@@ -162,12 +161,46 @@ export function processStripeEvent(
   }
 }
 
+/**
+ * Stripe API 2025-03-01+ では `current_period_end` が Subscription Item 側へ移動。
+ * Subscription 直下・Item 直下の両方を見て、どちらからでも取れるようにする。
+ * Robust extraction of current_period_end across Stripe API versions.
+ * Ekstraksi current_period_end yang tahan banting lintas versi API Stripe.
+ */
+function extractCurrentPeriodEndIso(sub: Stripe.Subscription): string {
+  const legacy = (sub as unknown as { current_period_end?: number | null }).current_period_end;
+  if (typeof legacy === "number" && Number.isFinite(legacy) && legacy > 0) {
+    return new Date(legacy * 1000).toISOString();
+  }
+  const item = sub.items?.data?.[0] as unknown as { current_period_end?: number | null } | undefined;
+  const fromItem = item?.current_period_end;
+  if (typeof fromItem === "number" && Number.isFinite(fromItem) && fromItem > 0) {
+    return new Date(fromItem * 1000).toISOString();
+  }
+  // 最終フォールバック: 30 日後 (period 未確定時)
+  // Final fallback: 30 days from now when period is undetermined
+  return new Date(Date.now() + 30 * 24 * 3_600_000).toISOString();
+}
+
 function extractPriceFromSession(session: Stripe.Checkout.Session): string | null {
-  // line_items は expand しないと取れないため、subscription からの fallback も用意
-  const items = (session as unknown as { line_items?: { data?: Array<{ price?: { id: string } }> } }).line_items;
+  // 1. line_items (expand 済みなら取得可能)
+  // Expanded line_items come from Stripe API refetch with `expand: ['line_items']`
+  const items = (session as unknown as {
+    line_items?: { data?: Array<{ price?: { id: string } }> };
+  }).line_items;
   const fromItems = items?.data?.[0]?.price?.id;
   if (fromItems) return fromItems;
-  // Stripe は session.metadata にも price を入れていないので null を返すしかない
+
+  // 2. subscription.items.data[0].price.id (subscription が expand 済みの場合)
+  // Fallback: expanded subscription object carries items.data[].price.id
+  const sub = (session as unknown as {
+    subscription?: string | { items?: { data?: Array<{ price?: { id: string } }> } };
+  }).subscription;
+  if (sub && typeof sub === "object") {
+    const fromSub = sub.items?.data?.[0]?.price?.id;
+    if (fromSub) return fromSub;
+  }
+
   return null;
 }
 

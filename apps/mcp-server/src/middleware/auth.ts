@@ -46,6 +46,7 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
     "/sitemap.xml",
     "/api/v1/billing/plans",
     "/api/v1/billing/webhook",
+    "/oauth/register",
   ]);
   const publicPrefixes = ["/.well-known/", "/mcp"];
   if (publicExact.has(req.path) || publicPrefixes.some(p => req.path.startsWith(p))) {

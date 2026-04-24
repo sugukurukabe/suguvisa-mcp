@@ -172,7 +172,33 @@ export const billingWebhookHandler = async (req: Request, res: express.Response)
         })
       );
     }
-    const event = client.verifyWebhook(rawBody, signature);
+    let event = client.verifyWebhook(rawBody, signature);
+
+    // checkout.session.completed は webhook payload に line_items を含まないため、
+    // price が解決できない場合だけ Stripe API から再取得して expand する。
+    // Refetch checkout session with line_items expanded when price is missing.
+    // Ambil ulang sesi checkout dengan line_items di-expand saat price tidak ada.
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as { id: string; line_items?: unknown };
+      if (!session.line_items) {
+        try {
+          const expanded = await client.retrieveCheckoutSession(session.id);
+          event = {
+            ...event,
+            data: { ...event.data, object: expanded },
+          } as typeof event;
+        } catch (refetchError) {
+          console.error(
+            JSON.stringify({
+              msg: "[billing] checkout session refetch failed",
+              session_id: session.id,
+              error_message: refetchError instanceof Error ? refetchError.message : String(refetchError),
+            }),
+          );
+          // 続行: price 不明なら processStripeEvent が fallback プランで処理する
+        }
+      }
+    }
 
     // 冪等化: 同一 event.id を 2 回処理しない
     const intent = processStripeEvent(event, { priceMappings: mappings });

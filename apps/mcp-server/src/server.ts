@@ -50,6 +50,8 @@ import toolsRestRouter from "./routes/tools-rest.js";
 import { createDirectoryRouter } from "./routes/directory/index.js";
 import tenantRouter from "./routes/tenant.js";
 import billingRouter, { billingWebhookHandler } from "./routes/billing.js";
+import { oauthRegisterHandler } from "./routes/oauth-register.js";
+import { isAuth0MgmtConfigured } from "./lib/auth0-management.js";
 
 const app = express();
 
@@ -221,6 +223,7 @@ if (oauthEnabled && authProvider) {
       "/sitemap.xml",
       "/api/v1/billing/plans",
       "/api/v1/billing/webhook",
+      "/oauth/register",
     ]);
     const publicPrefixes = ["/.well-known/", "/assets/"];
     if (publicExact.has(req.path) || publicPrefixes.some(p => req.path.startsWith(p))) {
@@ -258,19 +261,22 @@ if (oauthEnabled && authProvider) {
           .eq("status", "active")
           .maybeSingle();
 
-        // Auth0 ユーザーの初回アクセス時にテナントを自動作成
-        // Auto-provision tenant on first access for Auth0 users
-        // Buat tenant otomatis saat akses pertama untuk user Auth0
+        // Auth0 ユーザーの初回アクセス時にテナントを自動作成（14日Professionalトライアル）
+        // Auto-provision tenant with 14-day Professional trial on first Auth0 access
+        // Buat tenant otomatis dengan uji coba Professional 14 hari saat akses pertama
         if (!tenant && auth0Sub) {
           const defaultOrgName =
             (principal.email ? principal.email.split("@")[0] : null) ??
             `Tenant-${auth0Sub.slice(0, 12)}`;
+          const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
           const { data: created, error: insertError } = await supabase
             .from("tenants")
             .insert({
               auth0_sub: auth0Sub,
               organization_name: defaultOrgName,
-              subscription_plan: "free",
+              subscription_plan: "professional",
+              subscription_status: "trialing",
+              trial_ends_at: trialEndsAt,
               status: "active",
             })
             .select("id, organization_name, subscription_plan, status")
@@ -279,7 +285,9 @@ if (oauthEnabled && authProvider) {
             console.error("[auth-bridge] auto-provision failed:", insertError);
           } else {
             tenant = created;
-            console.log(`[auth-bridge] auto-provisioned tenant for ${auth0Sub}: ${created?.id}`);
+            console.log(
+              `[auth-bridge] auto-provisioned tenant for ${auth0Sub}: ${created?.id} (professional trial until ${trialEndsAt})`,
+            );
           }
         }
 
@@ -314,15 +322,44 @@ app.use(
 app.use("/mcp", apiRateLimiter);
 
 // ─── OAuth 2.1 Discovery Endpoints ───
-app.get("/.well-known/oauth-protected-resource", (_req, res) => {
+// DCR Proxy 有効時は自分を authorization_server として広告する。
+// When DCR proxy is enabled we advertise ourselves as the authorization server
+// so that Claude / ChatGPT use our DCR endpoint (first-party clients).
+// Saat proxy DCR aktif, kami mengumumkan diri sebagai authorization server
+// agar klien melakukan DCR melalui proxy dan menjadi klien first-party.
+function resolveMcpBaseUrl(req: express.Request): string {
+  const configured =
+    process.env.SUGUVISA_BASE_URL ?? authConfig.audience ?? undefined;
+  if (configured) return configured.replace(/\/$/, "");
+  const host = req.get("host") ?? "mcp.suguvisa.com";
+  return `${req.protocol}://${host}`.replace(/\/$/, "");
+}
+
+app.get("/.well-known/oauth-protected-resource", (req, res) => {
   const metadata = generateResourceMetadata(authConfig);
+  if (isAuth0MgmtConfigured()) {
+    metadata.authorization_servers = [resolveMcpBaseUrl(req)];
+  }
   res.json(metadata);
 });
 
 if (oauthEnabled && authProvider) {
-  app.get("/.well-known/oauth-authorization-server", async (_req, res) => {
+  // AS メタデータ (RFC 8414)。DCR Proxy が有効なら issuer/registration_endpoint を
+  // 自分のドメインに書き換える。authorize/token/jwks は引き続き Auth0 を指す。
+  // Authorization Server metadata (RFC 8414). When the DCR proxy is enabled we
+  // rewrite issuer and registration_endpoint to our own domain while delegating
+  // authorize/token/jwks to Auth0.
+  app.get("/.well-known/oauth-authorization-server", async (req, res) => {
     try {
       const metadata = await authProvider.getAuthorizationServerMetadata();
+      if (isAuth0MgmtConfigured()) {
+        const baseUrl = resolveMcpBaseUrl(req);
+        const overrides: Record<string, unknown> = {
+          issuer: `${baseUrl}/`,
+          registration_endpoint: `${baseUrl}/oauth/register`,
+        };
+        Object.assign(metadata as Record<string, unknown>, overrides);
+      }
       res.json(metadata);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -330,6 +367,9 @@ if (oauthEnabled && authProvider) {
       res.status(502).json({ error: "Failed to fetch authorization server metadata" });
     }
   });
+
+  // RFC 7591 Dynamic Client Registration endpoint (proxies to Auth0 Management API).
+  app.post("/oauth/register", oauthRegisterHandler);
 }
 
 // ─── ヘルスチェック ───

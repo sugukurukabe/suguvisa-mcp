@@ -57,6 +57,12 @@ export interface BillingClient {
   createCheckoutSession(args: CreateCheckoutArgs): Promise<CheckoutSession>;
   createPortalSession(args: CreatePortalArgs): Promise<PortalSession>;
   getSubscription(subscriptionId: string): Promise<SubscriptionSnapshot>;
+  /**
+   * Checkout session を line_items 込みで再取得する。
+   * Retrieve a checkout session with `line_items` expanded so that the price can be resolved.
+   * Mengambil sesi checkout dengan `line_items` diperluas agar price dapat diresolusi.
+   */
+  retrieveCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session>;
   /** Stripe webhook の署名検証と event パースを委譲する */
   verifyWebhook(payload: string | Buffer, signature: string): Stripe.Event;
 }
@@ -122,6 +128,16 @@ export class StripeBillingClient implements BillingClient {
   async getSubscription(subscriptionId: string): Promise<SubscriptionSnapshot> {
     const sub = await this.stripe.subscriptions.retrieve(subscriptionId);
     return toSnapshot(sub);
+  }
+
+  async retrieveCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session> {
+    // line_items は Checkout Session のペイロードに含まれず、
+    // Stripe Webhook 受信時にも明示 expand が必須
+    // line_items are not included in the webhook payload and must be explicitly expanded
+    // line_items tidak disertakan dalam payload webhook dan harus di-expand secara eksplisit
+    return this.stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["line_items", "line_items.data.price", "subscription"],
+    });
   }
 
   verifyWebhook(payload: string | Buffer, signature: string): Stripe.Event {

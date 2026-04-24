@@ -35,8 +35,8 @@ export interface PlanDefinition {
     annual_report: boolean;
     autonomous_workflow: boolean;
   };
-  /** free プランで利用できるツール (undefined = all) */
-  allowedTools?: string[];
+  /** free プランで利用できるツール ("all" = すべて, undefined = all, 配列 = 指定のみ) */
+  allowedTools?: "all" | string[];
   /** SaaS として公開するか (unlimited は内部専用) */
   publiclyListed: boolean;
 }
@@ -55,13 +55,13 @@ export const PLAN_DEFINITIONS: Record<PlanKey, PlanDefinition> = {
     key: "free",
     name: "Free",
     description: {
-      ja: "無料プラン。基本的な申請判定・期限計算・書類リスト取得が試せます。",
-      en: "Free plan. Try pattern resolution, deadline calculation, and document lists.",
+      ja: "無料プラン。全ツールが試せます（OCR・一括生成・自律ワークフローは除く）。書類 5 件まで、1 日 500 リクエスト。",
+      en: "Free plan. All tools available (except OCR, bulk generation, autonomous workflow). Up to 5 docs, 500 req/day.",
     },
     monthlyPriceJpy: 0,
     yearlyPriceJpy: 0,
-    requestsPerMinute: 10,
-    requestsPerDay: 100,
+    requestsPerMinute: 60,
+    requestsPerDay: 500,
     maxBulkRecords: 5,
     features: {
       ocr: false,
@@ -71,7 +71,10 @@ export const PLAN_DEFINITIONS: Record<PlanKey, PlanDefinition> = {
       annual_report: false,
       autonomous_workflow: false,
     },
-    allowedTools: FREE_TOOLS,
+    // ディレクトリ公開版では全ツールを試せるようにし、機能ゲートは features で制御
+    // Directory users can try all tools; feature gates enforce OCR/bulk limits
+    // Pengguna Directory dapat mencoba semua alat; gerbang fitur membatasi OCR/bulk
+    allowedTools: "all",
     publiclyListed: true,
   },
   starter: {

@@ -28,8 +28,11 @@ describe("plan catalog", () => {
     expect(pub.every((p) => p.publiclyListed)).toBe(true);
   });
 
-  it("free plan has restricted allowedTools, paid plans do not", () => {
-    expect(PLAN_DEFINITIONS.free.allowedTools?.length).toBeGreaterThan(0);
+  it("free plan allows all tools (feature gates restrict OCR/bulk), paid plans do not specify", () => {
+    // Free プランは全ツール試用可（OCR/一括生成などは features フラグで制御）
+    // Free plan allows all tools; OCR/bulk/etc. are gated by `features` flags
+    // Paket gratis mengizinkan semua alat; OCR/bulk dll dikontrol flag `features`
+    expect(PLAN_DEFINITIONS.free.allowedTools).toBe("all");
     expect(PLAN_DEFINITIONS.starter.allowedTools).toBeUndefined();
     expect(PLAN_DEFINITIONS.professional.allowedTools).toBeUndefined();
   });
