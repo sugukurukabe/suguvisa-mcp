@@ -60,8 +60,9 @@ checklists with built-in exemption logic, deadline calculation (14-day
 notification rule, 5-year cumulative cap, renewal windows), residence-card
 OCR, annual-report CSV/Excel generation for the Immigration Services Agency,
 paper-form PDF mapping, law-change tracking, and per-tenant audit logging.
-Built for immigration lawyers (行政書士), registered support organizations, and
-receiving companies. Every response is structured JSON with citations to
+Built for immigration lawyers (行政書士), registered support organizations,
+receiving companies, dispatching-company staff, dispatch-client contacts, and
+applicants. Every response is structured JSON with citations to
 primary sources so Claude can produce grounded, verifiable answers.
 ```
 （97 words）
@@ -942,7 +943,7 @@ form and cross-link this MCP server.
 - [x] **My MCP server is live, published, and ready to accept production traffic.**
   - エンドポイント: <https://mcp.suguvisa.com/mcp> (本番、SLA 99.9% 目標)
 - Cloud Run revision: `suguvisa-mcp-00094-xtw` 100% traffic
-- 公開済み: Smithery (release `187e5a5d-8e73-4234-a530-9c31a3e6352d` accepted)、`/.well-known/mcp/server-card.json` (42 tools)
+- 公開済み: Smithery (release `187e5a5d-8e73-4234-a530-9c31a3e6352d` accepted)、`/.well-known/mcp/server-card.json` (42 tools)、official npm locator `@suguvisa/mcp-server`
 
 - [x] **I work for the company that owns or controls the API endpoint(s) that my server connects to.**
   - 申請者（壁 / KABE）は **スグクル株式会社 (Sugukuru Inc.)** の代表 / Admin。
@@ -991,6 +992,7 @@ form and cross-link this MCP server.
   - ランディング: <https://mcp.suguvisa.com/> (認証不要)
   - サポート / セットアップ / トラブルシューティング: <https://mcp.suguvisa.com/support> ← 2026-04-25 に Setup / Troubleshooting セクションを追記
   - 機械可読仕様: `/.well-known/mcp/server-card.json` (42 tools のスキーマ + annotations)
+  - 公式 npm locator: <https://www.npmjs.com/package/@suguvisa/mcp-server>
   - 全ページ HTTP 200、トリリンガル (日 / 英 / イ) 見出し付き
 
 - [x] **Documentation includes setup instructions, tool descriptions, and troubleshooting guide.**
@@ -1020,7 +1022,7 @@ form and cross-link this MCP server.
   - Claude.ai (web, production build): 2026-04-24 / 2026-04-25 に手動テスト済み (5 ツール呼び出し + 1 OAuth consent スクショ)
   - Claude Desktop (macOS, 最新 build): OAuth 経由 + Bearer 経由の両方で疎通確認
   - MCP Inspector: 全 42 ツールの `tools/list` / 主要 12 ツールの `tools/call` を手動実行
-  - 自動テスト: `pnpm --filter mcp-server test` → **195 passed / 1 skipped** (2026-04-25 時点)
+  - 自動テスト: `pnpm --filter @suguvisa/mcp-server-app test` → **195 passed / 1 skipped** (2026-04-25 時点)
 
 ### Additional Information (free text)
 

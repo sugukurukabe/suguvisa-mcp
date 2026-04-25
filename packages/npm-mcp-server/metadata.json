@@ -1,0 +1,27 @@
+{
+  "name": "SuguVisa MCP Server",
+  "packageName": "@suguvisa/mcp-server",
+  "description": "Official locator package for the hosted SuguVisa remote MCP server.",
+  "company": "Sugukuru Inc.",
+  "mcpEndpoint": "https://mcp.suguvisa.com/mcp",
+  "metadataUrl": "https://mcp.suguvisa.com/.well-known/mcp/server-card.json",
+  "openaiManifestUrl": "https://mcp.suguvisa.com/.well-known/openai-app.json",
+  "smitheryUrl": "https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp",
+  "documentationUrl": "https://mcp.suguvisa.com/docs",
+  "supportEmail": "info@sugu-kuru.co.jp",
+  "toolCount": 42,
+  "promptsCount": 14,
+  "transport": "streamable-http",
+  "authentication": [
+    "OAuth 2.1",
+    "API key"
+  ],
+  "publicPackagePolicy": {
+    "purpose": "locator-and-metadata-only",
+    "serverImplementationIncluded": false,
+    "visaRulesIncluded": false,
+    "goldenRecordsIncluded": false,
+    "templatesIncluded": false,
+    "credentialsIncluded": false
+  }
+}

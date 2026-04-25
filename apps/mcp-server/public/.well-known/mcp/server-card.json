@@ -3,7 +3,7 @@
   "serverInfo": {
     "name": "suguvisa-mcp",
     "version": "0.9.4",
-    "description": "日本の特定技能ビザ申請を完全自動化する業界唯一のAIエージェントサーバー。42ツール搭載、OAuth 2.1 + DCR対応。在留カード→申請判定→書類リスト→理由書生成→テンプレート生成を自動連鎖実行。 | The only AI MCP server that fully automates Japan's Specified Skilled Worker (SSW) visa applications. 42 tools, OAuth 2.1 + DCR."
+    "description": "日本の特定技能ビザ申請を完全自動化する業界唯一のAIエージェントサーバー。42ツール搭載、OAuth 2.1 + DCR対応。本人・登録支援機関・所属機関・派遣元/派遣先・専門家の立場別に支援。 | The only AI MCP server that fully automates Japan's SSW visa workflows with role-aware guidance for applicants, support organizations, employers, dispatching companies, dispatch clients, and professionals."
   },
   "authentication": {
     "required": false,
@@ -32,6 +32,12 @@
         "example": "Authorization: Bearer svmcp_xxxxxxxxxxxxxxxxxxxxxxxx"
       }
     ]
+  },
+  "links": {
+    "npmPackage": "https://www.npmjs.com/package/@suguvisa/mcp-server",
+    "smithery": "https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp",
+    "documentation": "https://mcp.suguvisa.com/docs",
+    "support": "https://mcp.suguvisa.com/support"
   },
   "configSchema": {
     "type": "object",

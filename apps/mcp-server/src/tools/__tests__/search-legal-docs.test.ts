@@ -42,7 +42,10 @@ describe("suguvisa_legal_docs_search (mock mode)", () => {
       (result as { content: { text: string }[] }).content[0].text
     );
     expect(parsed.status).toBe("fallback");
-    expect(parsed.message).toContain("組み込みの基本知識から回答します。");
+    expect(parsed.message).toContain("未検証の参考情報");
+    expect(parsed.grounding_level).toBe("builtin_fallback_unverified");
+    expect(parsed.requires_primary_source_verification).toBe(true);
+    expect(parsed._ai_instructions).toContain("断定してはいけません");
     expect(parsed.results).toBeDefined();
     expect(parsed.results.length).toBeGreaterThan(0);
   });

@@ -8,6 +8,9 @@
 
 [![Smithery](https://smithery.ai/badge/@a-kabe-1qio/suguvisa-mcp)](https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp)
 
+- 公式 npm locator / Official npm locator / Locator npm resmi: [`@suguvisa/mcp-server`](https://www.npmjs.com/package/@suguvisa/mcp-server)
+- 本番 MCP endpoint / Production MCP endpoint / Endpoint MCP produksi: `https://mcp.suguvisa.com/mcp`
+
 ## モノレポ構成 / Monorepo Structure / Struktur Monorepo
 
 ```
@@ -15,6 +18,7 @@ suguvisa-mcp/
 ├── apps/
 │   └── mcp-server/          # MCP サーバー本体 / Main MCP server / Server MCP utama
 ├── packages/
+│   ├── npm-mcp-server/      # npm 公式 locator package / Official npm locator package / Paket locator npm resmi
 │   ├── auth/                # OAuth 2.1 Resource Server
 │   ├── core/                # ビジネスロジック / Business logic / Logika bisnis
 │   ├── llm-router/          # マルチモデル抽象化 / Multi-model routing

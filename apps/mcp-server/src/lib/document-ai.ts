@@ -5,9 +5,9 @@ const PROCESSOR_CONFIG = {
   projectId: process.env.GCP_PROJECT_ID || "mcp-service-492010",
   location: process.env.DOCUMENT_AI_LOCATION || "us",
   // IDドキュメントパーサー（在留カード・パスポート対応）
-  idParserProcessorId: process.env.DOCUMENT_AI_ID_PARSER_ID || "c371a58454ef4c62",
+  idParserProcessorId: process.env.DOCUMENT_AI_ID_PARSER_ID,
   // 汎用OCRプロセッサ（フォールバック用）
-  ocrProcessorId: process.env.DOCUMENT_AI_OCR_PROCESSOR_ID || "19aa187e9929ef69",
+  ocrProcessorId: process.env.DOCUMENT_AI_OCR_PROCESSOR_ID,
 };
 
 const client = new DocumentProcessorServiceClient();
@@ -59,6 +59,10 @@ export async function processDocument(
     entities,
     confidence: document.entities?.[0]?.confidence || 0,
     pageCount: document.pages?.length || 0,
+    dataHandling: {
+      imageStoredBySuguVisa: false,
+      rawImageRetention: "not_persisted_by_application",
+    },
   };
 }
 
@@ -67,4 +71,8 @@ export interface DocumentAIResult {
   entities: Record<string, string>;
   confidence: number;
   pageCount: number;
+  dataHandling: {
+    imageStoredBySuguVisa: false;
+    rawImageRetention: "not_persisted_by_application";
+  };
 }

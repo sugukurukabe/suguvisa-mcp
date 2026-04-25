@@ -1,0 +1,56 @@
+{
+  "name": "@suguvisa/mcp-server",
+  "version": "0.1.0",
+  "description": "Official npm locator for the SuguVisa remote MCP server for Japan Specified Skilled Worker visa workflows.",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    },
+    "./metadata": "./metadata.json"
+  },
+  "bin": {
+    "suguvisa-mcp": "cli.js"
+  },
+  "files": [
+    "README.md",
+    "index.js",
+    "index.d.ts",
+    "cli.js",
+    "metadata.json"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "mcp",
+    "suguvisa",
+    "japan",
+    "visa",
+    "immigration",
+    "specified-skilled-worker",
+    "ssw",
+    "claude",
+    "chatgpt",
+    "cursor",
+    "smithery"
+  ],
+  "homepage": "https://mcp.suguvisa.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sugukurukabe/suguvisa-mcp.git",
+    "directory": "packages/npm-mcp-server"
+  },
+  "bugs": {
+    "email": "info@sugu-kuru.co.jp"
+  },
+  "author": "Sugukuru Inc. <info@sugu-kuru.co.jp>",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -4,6 +4,7 @@
 # Satu-satunya server MCP AI yang sepenuhnya mengotomatisasi permohonan visa SSW Jepang.
 #
 # Registry: https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
+# Official npm locator: https://www.npmjs.com/package/@suguvisa/mcp-server
 
 # ─── Transport: URL-published remote server ───
 # SuguVisa MCP は Cloud Run (asia-northeast1) で自前ホスティングし、Smithery Gateway は
@@ -17,10 +18,16 @@
 # SuguVisa MCP is self-hosted on Cloud Run (asia-northeast1). Smithery Gateway proxies
 # to https://mcp.suguvisa.com/mcp as an URL-published remote server. Full metadata is
 # served from /.well-known/mcp/server-card.json (Static Server Card).
+# npm は公式 locator package としてのみ使い、Smithery は Cloud Run 上の MCP endpoint を
+# 配布する connector distribution surface として継続利用する。
+# npm is used only as an official locator package; Smithery remains the connector
+# distribution surface for the hosted Cloud Run MCP endpoint.
 #
 # SuguVisa MCP di-hosting sendiri di Cloud Run (asia-northeast1). Smithery Gateway
 # mem-proxy ke https://mcp.suguvisa.com/mcp sebagai server remote URL-published.
 # Metadata lengkap disajikan dari /.well-known/mcp/server-card.json (Static Server Card).
+# npm hanya digunakan sebagai paket locator resmi; Smithery tetap menjadi permukaan
+# distribusi konektor untuk endpoint MCP Cloud Run yang di-hosting.
 
 runtime: "typescript"
 

@@ -18,6 +18,7 @@
       （典型例: `https://chat.openai.com/aip/g-xxxxxxxxxxxx/oauth/callback`）を
       Auth0 Applications → 「ChatGPT Production」 → Allowed Callback URLs に追加
 - [ ] Auth0 のその App に DCR 経由で作った Public Client（PKCE）を紐付け済みか確認
+- [ ] `@suguvisa/mcp-server` を npm に公開し、`https://www.npmjs.com/package/@suguvisa/mcp-server` が表示されることを確認
 - [ ] 提出フォーム末尾の **Policy Compliance checklist 全項目 ✅**（§13 を参照）
 - [ ] `POST /api/v1/billing/checkout/ticket` 経由で本番 Stripe 側に
       `SUGUVISA_STRIPE_PRICE_TICKET` (¥2,980) を登録済か env を確認
@@ -71,6 +72,8 @@
 | **Manifest schema version**     | `1.0`                                                                                |
 | **OpenAPI 3.1 URL**             | `https://mcp.suguvisa.com/openapi.yaml`                                              |
 | **Legacy GPT plugin manifest**  | `https://mcp.suguvisa.com/.well-known/ai-plugin.json` (互換性のため維持)             |
+| **Official npm locator**        | `https://www.npmjs.com/package/@suguvisa/mcp-server`                                 |
+| **Smithery listing**            | `https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp`                               |
 | **Availability (regions)**      | Global (data residency は Tokyo `asia-northeast1`)                                   |
 | **Allow inclusion of user email** | `true` (Auth0 claims: email)                                                       |
 
@@ -124,21 +127,25 @@ ChatGPT-native visa desk for Japan's Specified Skilled Worker (SSW) program — 
 SuguVisa is the first ChatGPT Apps Store integration built exclusively for Japan's Specified Skilled Worker (SSW / 特定技能) visa lifecycle.
 
 With 42 MCP tools, ChatGPT can:
-• Determine the correct application type among 18+ conversion patterns (technical intern → SSW1, SSW1 extension, family visa, etc.)
+• Determine the correct application type among 18+ conversion patterns (student → SSW1, technical intern → SSW1, SSW1 extension, family visa, etc.)
 • Emit a document checklist with exam-exemption logic automatically applied
 • Calculate the 14-day notification deadline, 5-year SSW1 cap, and visa expiry reverse schedule
 • Run Document AI OCR on residence cards and passports (image discarded after OCR)
 • Generate immigration-grade artefacts: online CSV, bulk Excel (xlsm), paper-form PDFs, reason letters, and annual periodic-notification CSV
 • Track law updates (MOJ告示 / ISA通達) with citation IDs and confidence scores
+• Enforce practical SSW quality gates: 80% attendance evidence for student-to-SSW changes, same-day online filing review, dispatch-client document collection, and native-language attachments for foreign workers
 • Run a resumable autonomous workflow that asks for missing fields via Slack and resumes from any LangGraph checkpoint
 
 Built for:
 • Immigration lawyers (行政書士) processing dozens of SSW cases per month
 • Registered support organizations (登録支援機関) managing annual reports
 • Receiving companies (受入れ機関) hiring SSW workers directly
-• Labor-dispatch platforms handling hundreds of placements
+• Labor-dispatch platforms and dispatching-company staff handling hundreds of placements
+• Dispatch-client contacts who must provide worksite, supervisor, safety, and dispatch-specific documents
 
 Every answer cites authoritative sources (Immigration Services Agency notices, MOJ ordinances). No hallucinated visa advice.
+SuguVisa adapts the same legal grounding to the user's role: foreign worker, support-organization staff, direct accepting organization, dispatching organization staff, dispatch-client contact, or immigration professional.
+High-risk cases such as illegal-work indications, mismatched job duties, expired/same-day online filing, low student attendance, or ungrounded legal claims are routed to human expert review instead of being auto-finalized.
 
 Security: OAuth 2.1 + PKCE (Auth0, JP-hosted). Per-tool scopes. Tenant isolation via Supabase RLS. PII encrypted at rest with Cloud KMS. Residence-card images are discarded immediately after OCR. Strict Content-Security-Policy (`default-src 'none'`). Data residency: Tokyo (asia-northeast1), APPI-compliant.
 
@@ -273,9 +280,9 @@ else                                                     → subscription_plan (
 ### 6-a. Safety & Responsible AI (OpenAI の "Safety annotations" セクション用)
 
 - **不可逆操作なし**: 入管への実申請送信は行わない。生成された書類は最終確認のうえ **ユーザーが手動で提出**
-- **PII 最小化**: 在留カード・パスポート画像は OCR 後即時破棄、DB に保存しない
+- **PII 最小化**: 在留カード・パスポート画像は Document AI OCR の処理にのみ使い、SuguVisa アプリ側では永続保存しない。保存・生成に使う構造化PIIはユーザー確認後の最小項目に限定
 - **テナント分離**: Supabase Row Level Security で他テナントのデータには一切アクセス不可
-- **出典付き回答**: 法令・通達引用に `golden_record_id` + 信頼スコア付き
+- **出典付き回答**: 法令・通達・参考様式の高リスク回答は Vertex AI Search + GCS 法令コーパスの一次情報に grounded。検索不可時は `unverified fallback` として扱い、最新法令を断定しない
 - **レート制限**: per-principal 100 req/min、per-tenant 10,000 req/day
 - **監査ログ**: 書き込み系ツールは `write:audit_log` と連動、365 日保持、削除リクエスト可
 - **Tool 安全性ヒント**: 全ツールに `readOnlyHint` / `destructiveHint` 注釈あり
@@ -322,6 +329,12 @@ upgrade-insecure-requests
 | APPI compliance                         | ✅                                                                      |
 | GDPR                                    | N/A (primarily JP market)                                               |
 | SOC 2                                   | In progress (targeting FY2027)                                         |
+
+### 6-c-1. GCP RAG / OCR accuracy declaration
+
+SuguVisa は GCS に保管した入管公式ページ、告示、通達、参考様式、届出チェック資料を Vertex AI Search の legal corpus として検索し、`suguvisa_legal_docs_search` が `grounding_level: "primary_source"` を返した場合だけ、最新法令・様式・期限の根拠として扱います。Vertex Search 未設定・権限不足・タイムアウト時の Gemini / built-in fallback は `unverified fallback` と明示され、審査・申請・就労可否などの高リスク判断では断定しません。
+
+Document AI は在留カード・パスポート画像の読み取りに使いますが、SuguVisa アプリ側では raw image を保存しません。OCR 結果は構造化データとしてユーザー確認後に下書き生成へ使い、ログ・trace には PII redaction を適用します。
 
 ### 6-d. Policy Compliance checklist (審査フォームの最終チェック欄 — 全て ✅)
 

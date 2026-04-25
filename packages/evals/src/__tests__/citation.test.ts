@@ -56,8 +56,10 @@ describe("CitationEvaluator", () => {
       cases as Parameters<typeof ev.evaluate>[0][],
     );
     expect(summary.total).toBe(cases.length);
-    // 禁止例 (cite-003) を除く 4 件は合格、cite-003 は forbidden により失敗
-    expect(summary.passed).toBe(4);
-    expect(summary.failed).toBe(1);
+    // 安全化済みデータセットは全件合格する
+    // The hardened dataset should pass every case
+    // Dataset yang sudah diperkuat harus lulus semua kasus
+    expect(summary.passed).toBe(5);
+    expect(summary.failed).toBe(0);
   });
 });

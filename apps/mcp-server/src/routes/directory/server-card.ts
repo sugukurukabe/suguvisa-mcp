@@ -44,6 +44,8 @@ export function serverCardHandler(_req: Request, res: Response): void {
       support: m.urls.support,
       documentation: m.urls.documentation,
       status: m.urls.statusPage,
+      npmPackage: m.urls.npmPackage,
+      smithery: m.urls.smithery,
     },
     authentication: {
       // Claude Connectors expects a structured list of available schemes

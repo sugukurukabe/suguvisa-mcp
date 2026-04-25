@@ -36,7 +36,7 @@ export class InMemoryMetrics implements Metrics {
  */
 export class OtelMetrics implements Metrics {
   readonly #meterName: string;
-  constructor(meterName = "@suguvisa/mcp-server") {
+  constructor(meterName = "@suguvisa/mcp-server-app") {
     this.#meterName = meterName;
   }
   counter(name: string, value: number, attrs?: Record<string, string | number>): void {

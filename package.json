@@ -11,8 +11,8 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@suguvisa/mcp-server",
-    "dev:http": "pnpm --filter @suguvisa/mcp-server dev:http",
+    "dev": "turbo run dev --filter=@suguvisa/mcp-server-app",
+    "dev:http": "pnpm --filter @suguvisa/mcp-server-app dev:http",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

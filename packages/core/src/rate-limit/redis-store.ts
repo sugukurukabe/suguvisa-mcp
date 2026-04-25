@@ -8,7 +8,7 @@
  * store を `createRateLimiter({ ..., store })` に渡す。
  *
  * 依存は optional peer として扱い、本番のみインストールする想定:
- *   pnpm add ioredis rate-limit-redis --filter @suguvisa/mcp-server
+ *   pnpm add ioredis rate-limit-redis --filter @suguvisa/mcp-server-app
  *
  * NOTE: "ioredis" / "rate-limit-redis" は本パッケージの dependencies に
  * 追加しない（アプリ側で管理）。import は遅延評価で行う。
@@ -47,7 +47,7 @@ export async function createRedisStore(
   } catch (err) {
     throw new Error(
       "createRedisStore requires `ioredis` and `rate-limit-redis` to be installed. " +
-        'Install with `pnpm add ioredis rate-limit-redis --filter @suguvisa/mcp-server`. ' +
+        'Install with `pnpm add ioredis rate-limit-redis --filter @suguvisa/mcp-server-app`. ' +
         `Inner error: ${(err as Error).message}`,
     );
   }

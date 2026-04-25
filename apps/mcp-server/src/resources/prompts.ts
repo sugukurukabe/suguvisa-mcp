@@ -8,6 +8,11 @@
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import {
+  SUGUVISA_USER_ROLES,
+  formatUserRoleGuidanceForAi,
+  type SuguVisaUserRole,
+} from "../lib/user-role-guidance.js";
 
 function userText(lines: Array<string | false | null | undefined>): {
   messages: Array<{ role: "user"; content: { type: "text"; text: string } }>;
@@ -32,10 +37,12 @@ export function registerEnhancedPrompts(server: McpServer): void {
     {
       question: z.string().describe("ユーザーの質問（自然言語）"),
       tenant_hint: z.string().optional().describe("テナント ID または組織名（あれば絞り込みに使う）"),
+      user_role: z.enum(SUGUVISA_USER_ROLES).default("unknown").describe("ユーザーの立場。派遣元従業員は dispatching_organization_staff、派遣先担当者は dispatch_client_contact"),
     },
-    async ({ question, tenant_hint }) =>
+    async ({ question, tenant_hint, user_role }) =>
       userText([
         "あなたは特定技能ビザ申請の専門 AI です。以下の質問に回答してください。",
+        formatUserRoleGuidanceForAi(user_role as SuguVisaUserRole),
         "",
         `質問: ${question}`,
         tenant_hint ? `テナントヒント: ${tenant_hint}` : "",
@@ -113,10 +120,12 @@ export function registerEnhancedPrompts(server: McpServer): void {
       pattern_id: z.string().describe("申請パターン ID (例: CHANGE_SSW1_C)"),
       industry_field: z.string().optional().describe("分野"),
       submission_mode: z.enum(["paper", "online"]).describe("提出方式"),
+      user_role: z.enum(SUGUVISA_USER_ROLES).default("unknown").describe("ユーザーの立場。派遣元従業員は dispatching_organization_staff、派遣先担当者は dispatch_client_contact"),
     },
-    async ({ pattern_id, industry_field, submission_mode }) =>
+    async ({ pattern_id, industry_field, submission_mode, user_role }) =>
       userText([
         `${pattern_id} の申請を ${submission_mode === "paper" ? "紙" : "オンライン"} で提出する前の最終チェックを行ってください。`,
+        formatUserRoleGuidanceForAi(user_role as SuguVisaUserRole),
         industry_field ? `分野: ${industry_field}` : "",
         "",
         "手順:",
@@ -127,7 +136,10 @@ export function registerEnhancedPrompts(server: McpServer): void {
         "5. ふりがながカタカナになっていないか、法人番号が13桁か等の機械的検証を再実施",
         submission_mode === "paper"
           ? "6. suguvisa_paper_form_generate で最終 PDF を生成し、手書きエリアの指示を明示"
-          : "6. suguvisa_bulk_xlsm_generate / suguvisa_online_csv_generate で最終データを出力",
+          : "6. suguvisa_bulk_xlsm_generate / suguvisa_online_csv_generate で最終データを出力。公式XLSMのマクロを壊さず、初心者には操作手順、経験者には差分確認を優先",
+        "7. オンライン申請は在留期限日の前日まで。当日または期限切れなら専門家レビューへ回す",
+        "8. 留学から特定技能への変更では出席率80%以上、卒業/中退証明、理由書、資格外活動状況を確認",
+        "9. 外国人の理解言語に合わせ、雇用契約書・雇用条件書・支援計画書等の母国語併記を確認",
         "",
         "最後に、以下のチェックリストを Markdown で出力:",
         "- [ ] 必要書類がすべて揃っているか",
@@ -136,6 +148,8 @@ export function registerEnhancedPrompts(server: McpServer): void {
         "- [ ] 署名・押印欄",
         "- [ ] バイリンガル様式の言語版",
         "- [ ] 管轄入管局の住所",
+        "- [ ] オンライン申請期限（在留期限日の前日まで）",
+        "- [ ] 高リスクレビュー要否（不法就労示唆・業務不一致・根拠不足）",
       ]),
   );
 

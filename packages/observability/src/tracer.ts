@@ -27,7 +27,7 @@ const noopSpan: Span = {
  */
 export class OtelTracer implements Tracer {
   readonly #tracerName: string;
-  constructor(tracerName = "@suguvisa/mcp-server") {
+  constructor(tracerName = "@suguvisa/mcp-server-app") {
     this.#tracerName = tracerName;
   }
 

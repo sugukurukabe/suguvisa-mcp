@@ -111,4 +111,4 @@ store 未接続時 (CI / 開発環境) は template resource を **登録しな�
 - Golden Records template は store 有無で条件付き登録
 - 新規 6 件の prompt が args に応じて本文を生成する
 
-`pnpm --filter @suguvisa/mcp-server test` — 全 **158 passed**
+`pnpm --filter @suguvisa/mcp-server-app test` — 全 **158 passed**

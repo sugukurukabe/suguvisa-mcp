@@ -1,5 +1,5 @@
 {
-  "name": "@suguvisa/mcp-server",
+  "name": "@suguvisa/mcp-server-app",
   "version": "0.9.4",
   "private": true,
   "description": "日本の特定技能ビザ申請を完全自動化する業界唯一のAI MCPサーバー。42種のツールで申請パターン自動判定・ワンショット完全ガイド・申請理由書AI生成・提出前最終チェックリスト（都道府県別最低賃金対応・管轄入管局特定）・特定技能2号分野別書類チェックリスト（11分野×3雇用形態対応・インタラクティブUI付き）・参考様式テンプレート生成（雇用契約書/雇用条件書/支援計画書等11様式対応）・法人番号API検索・必要書類リスト（省略条件自動適用）・期限計算（14日届出ルール・通算5年上限）・在留カードOCR（申請コード自動変換）・パスポートOCR・オンライン一括申請CSV/Excel生成・紙申請PDFマッピング・自律ワークフロー（LangGraph）・法改正追跡・監査ログを提供。OAuth 2.1 + DCR対応でClaude/ChatGPT/Cursor/Windsurfに直接組み込み可能。プラン別アクセス制御・テナント管理API搭載。行政書士・登録支援機関・受入れ機関向け。 | The only AI MCP server that fully automates Japan's Specified Skilled Worker (SSW) visa applications. 42 tools including AI-generated reason letters, pre-submission checklists (prefecture-level min wage + immigration office lookup), SSW2 field-specific document checklists (11 fields × 3 employment types), reference form template generation (11 ISA forms), corporate number API lookup, one-shot guide, residence card & passport OCR with auto code conversion, bulk CSV/Excel for online mass applications, paper form PDF mapping, autonomous LangGraph workflows, law change tracking, and per-tenant audit logging. OAuth 2.1 + Dynamic Client Registration for native Claude / ChatGPT / Cursor / Windsurf integration.",
@@ -37,6 +37,7 @@
     "start:http": "node dist/server.js",
     "lint": "eslint src/",
     "test": "vitest run",
+    "test:gcp": "RUN_GCP_INTEGRATION_TESTS=1 vitest run src/tools/__tests__/gcp-integration.test.ts",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
@@ -65,6 +66,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.0",
     "@types/express-rate-limit": "^5.1.3",
@@ -77,6 +79,7 @@
     "supertest": "^7.2.2",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0",
+    "typescript-eslint": "^8.59.0",
     "vitest": "^3.2.4"
   },
   "engines": {

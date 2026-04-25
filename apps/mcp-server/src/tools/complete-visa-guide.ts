@@ -10,10 +10,23 @@
  *  - UXが「質問1回→完全な回答」に改善
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { createRequire } from "node:module";
 import { z } from "zod";
 import { determinePattern } from "./determine-application.js";
 import { getRequiredDocumentsData } from "./required-documents.js";
 import { calculateDeadlinesData } from "./calculate-deadlines.js";
+import {
+  SUGUVISA_USER_ROLES,
+  formatUserRoleGuidanceForAi,
+  getUserRoleGuidance,
+  type SuguVisaUserRole,
+} from "../lib/user-role-guidance.js";
+
+const require = createRequire(import.meta.url);
+const ruleSets = require("../data/rule-sets.json") as {
+  practical_knowledge: unknown;
+  correction_catalog: unknown;
+};
 
 export function registerCompleteVisaGuide(server: McpServer) {
   server.tool(
@@ -48,11 +61,14 @@ export function registerCompleteVisaGuide(server: McpServer) {
       is_same_employer_2year: z.boolean().default(false).describe(
         "2年以内に同一機関から申請済みか（書類省略条件）"
       ),
+      user_role: z.enum(SUGUVISA_USER_ROLES).default("unknown").describe(
+        "ユーザーの立場。派遣元会社の従業員は dispatching_organization_staff、派遣先担当者は dispatch_client_contact を指定"
+      ),
     },
     { title: "Get complete visa guide", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({
       from_visa, to_visa, context, expiry_date, ssw1_start_date,
-      industry_field, support_type, is_same_employer_2year,
+      industry_field, support_type, is_same_employer_2year, user_role,
     }) => {
       // ── Step 1: パターン判定 ──
       const patternResult = determinePattern(from_visa, to_visa, context);
@@ -110,9 +126,12 @@ export function registerCompleteVisaGuide(server: McpServer) {
       ) || [];
 
       const documentsData = "documents" in documentsResult ? documentsResult : null;
+      const roleGuidance = getUserRoleGuidance(user_role as SuguVisaUserRole);
+      const roleInstructions = formatUserRoleGuidanceForAi(user_role as SuguVisaUserRole);
 
       const guide = {
         status: "complete",
+        user_role_guidance: roleGuidance,
         
         // パターン情報
         application: {
@@ -151,6 +170,8 @@ export function registerCompleteVisaGuide(server: McpServer) {
         important_notes: {
           work_during_application: pattern.notes,
           special_documents: pattern.special_documents,
+          practical_knowledge: ruleSets.practical_knowledge,
+          correction_catalog_status: ruleSets.correction_catalog,
         },
 
         // AI向けナッジ: 次のアクション提案
@@ -176,6 +197,7 @@ export function registerCompleteVisaGuide(server: McpServer) {
         ],
 
         _ai_instructions:
+          roleInstructions + "\n\n" +
           "🎯 【あなたはビザ申請書類作成エージェントです。チャットボットではありません】\n\n" +
           "## ゴール\n" +
           "ユーザーが「書類を作って」「申請を手伝って」と言った時点で、\n" +
@@ -204,7 +226,11 @@ export function registerCompleteVisaGuide(server: McpServer) {
           "- ❌ 長い説明文を書く（ユーザーはプロ。概要だけでいい）\n" +
           "- ❌「次のステップとして○○ツールを呼ぶことをお勧めします」（勝手に呼べ）\n" +
           "- ❌「○○が必要です。いかがですか？」（必要なら聞くな、やれ）\n" +
-          "- ❌ 情報が全部揃っているのに追加質問する\n",
+          "- ❌ 情報が全部揃っているのに追加質問する\n" +
+          "- ❌ 派遣元・派遣先関係者を通常の所属機関と同じ責任範囲として扱う\n" +
+          "- ❌ オンライン申請を在留期限日当日に安全と案内する（前日までが原則）\n" +
+          "- ❌ 実際の業務内容と申請内容が違う相談を通常処理する（専門家レビューへ回す）\n" +
+          "- ❌ 留学からの変更で出席率・卒業/中退理由・資格外活動状況を確認せずに進める\n",
       };
 
       return {

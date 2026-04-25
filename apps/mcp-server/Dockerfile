@@ -12,7 +12,7 @@ RUN pnpm install --frozen-lockfile
 COPY apps/mcp-server/tsconfig.json apps/mcp-server/
 COPY apps/mcp-server/src/ apps/mcp-server/src/
 
-# Turbo 経由で依存関係順（@suguvisa/auth → @suguvisa/mcp-server）にビルド
+# Turbo 経由で依存関係順（@suguvisa/auth → @suguvisa/mcp-server-app）にビルド
 RUN pnpm run build
 
 # ── Stage 2: Production ──

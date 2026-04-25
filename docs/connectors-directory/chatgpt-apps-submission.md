@@ -20,6 +20,12 @@
 - [ ] Scope がマニフェストと一致
 - [ ] すべてのツールで JSON Schema を提供
 - [ ] `content_rating` を設定 (general / teen / mature)
+- [ ] Official npm locator `@suguvisa/mcp-server` が公開済みで、package page が表示される
+- [ ] `suguvisa_legal_docs_search` が Vertex AI Search 経由で `grounding_level: "primary_source"` を返し、fallback 時は最新法令を断定しない
+- [ ] Document AI OCR は raw image をアプリ側で永続保存せず、構造化PIIのみユーザー確認後に下書きへ使う
+- [ ] 留学→特定技能変更は出席率80%・卒業/中退証明・理由書・資格外活動状況の実務チェックを返す
+- [ ] 当日オンライン申請、期限切れ、不法就労示唆、業務内容不一致は自動完結せず専門家レビューへ送る
+- [ ] 一括申請XLSMはマクロ破壊防止、初心者/経験者ガイド切替、母国語併記確認を返す
 
 ## C. マニフェスト確認項目 / Manifest fields
 
@@ -49,13 +55,15 @@ OpenAI の申請コンソールで以下を入力:
 7. **Manifest URL**: `https://<domain>/.well-known/openai-app.json`
 8. **MCP Server URL**: `https://<domain>/mcp`
 9. **OpenAPI URL**: `https://<domain>/openapi.yaml`
-10. **Icon**: `https://<domain>/icon-512.png` (ストア表示) + `/icon-1024.png` (高解像度) + `/logo.png` (ワードマーク 1024×576)
-11. **Screenshots**: 3–5 枚
-12. **Privacy**: `https://<domain>/privacy`
-13. **Terms**: `https://<domain>/terms`
-14. **Support email**: `info@sugu-kuru.co.jp`
-15. **Pricing**: freemium (Free / ¥19,800 / ¥49,800)
-16. **OAuth client**: OpenAI から redirect_uri を受領後、Auth0 で ChatGPT 用クライアント作成
+10. **Official npm locator**: `https://www.npmjs.com/package/@suguvisa/mcp-server`
+11. **Smithery listing**: `https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp`
+12. **Icon**: `https://<domain>/icon-512.png` (ストア表示) + `/icon-1024.png` (高解像度) + `/logo.png` (ワードマーク 1024×576)
+13. **Screenshots**: 3–5 枚
+14. **Privacy**: `https://<domain>/privacy`
+15. **Terms**: `https://<domain>/terms`
+16. **Support email**: `info@sugu-kuru.co.jp`
+17. **Pricing**: freemium (Free / ¥19,800 / ¥49,800)
+18. **OAuth client**: OpenAI から redirect_uri を受領後、Auth0 で ChatGPT 用クライアント作成
 
 ## E. 申請前の自動チェック
 
@@ -73,6 +81,11 @@ curl -s https://<domain>/openapi.yaml | head -5
 curl -s -X POST https://<domain>/mcp \
   -H 'Content-Type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0"}}}'
+
+# GCP / visa accuracy quality gate
+pnpm --filter @suguvisa/mcp-server-app test
+pnpm --filter @suguvisa/mcp-server-app test -- src/tools/__tests__/visa-quality-gate.test.ts
+RUN_GCP_INTEGRATION_TESTS=1 pnpm --filter @suguvisa/mcp-server-app test:gcp
 ```
 
 ## F. レビュー観点 / What reviewers check

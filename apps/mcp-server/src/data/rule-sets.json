@@ -232,10 +232,17 @@
       "skip_conditions": [],
       "special_documents": [
         "卒業証明書または退学証明書",
+        "出席票または成績表（出席率80%以上を証明）",
+        "中退の場合は中退理由書",
+        "必要に応じて学校からの事情説明書",
         "技能試験合格証明書",
         "日本語試験合格証明書（N4以上 or JFT-Basic）"
       ],
       "notes": [
+        "留学からの変更は出席率80%以上を原則の安全ラインとして確認",
+        "出席率80%未満でもインフルエンザ・COVID-19等の合理的理由を証明できる短期欠席なら理由書で補足",
+        "出席率が50%前後など、学校を欠席して就労していた疑いが強い場合は一度帰国後のルートを案内",
+        "中退の場合は、特定技能試験に早期合格したこと、家族支援の必要性、日本語学習継続意思など理由を明確化",
         "資格外活動（アルバイト）の状況が審査で確認される",
         "週28時間超のアルバイトがあった場合、不許可リスクあり",
         "在留期限に余裕がない場合は先に特定活動に変更してから申請"
@@ -757,6 +764,78 @@
       "tl",
       "zh"
     ]
+  },
+  "practical_knowledge": {
+    "student_to_ssw": {
+      "attendance_safe_threshold_percent": 80,
+      "required_evidence": [
+        "出席票",
+        "成績表",
+        "卒業証明書（卒業済みの場合）",
+        "中退理由書（中退の場合）",
+        "学校からの事情説明書（必要な場合）"
+      ],
+      "acceptable_low_attendance_reasons": [
+        "インフルエンザ罹患",
+        "COVID-19罹患",
+        "医師の診断書等で説明できる短期のやむを得ない事情"
+      ],
+      "red_flags": [
+        "出席率が50%前後など著しく低い",
+        "学校を欠席して就労していた疑いが強い",
+        "中退理由が不明確",
+        "資格外活動28時間超過の疑い"
+      ],
+      "recommended_action_if_high_risk": "一度帰国後の認定証明書交付申請または専門家レビューを案内"
+    },
+    "technical_intern_to_ssw": {
+      "preferred_preparation_months": 3,
+      "bridge_route_threshold_months": 1.5,
+      "review_points": [
+        "実習終了予定日から特定技能契約開始日への連続性",
+        "在留資格別審査期間平均をGCS/Vertex Searchで確認",
+        "専門級合格の有無",
+        "技能試験または組合の評価調書の有無",
+        "期限切迫時は特定活動6ヶ月（特定技能1号準備）の検討"
+      ],
+      "waiting_after_training_completion": "実習終了後に申請中で特例期間60日があっても、実習は終了しているため原則待機。必要に応じて一時帰国を案内",
+      "technical_intern_3_note": "技能実習3号からの移行では一時帰国要件・1年以内の帰国済み状況を確認"
+    },
+    "organization_document_lead_times": {
+      "labor_insurance_payment_certificate": {
+        "issuer": "管轄労働局",
+        "lead_time_days": 14,
+        "note": "郵送請求で2週間弱かかるため初動で回収する"
+      },
+      "coe_employment_contract": {
+        "required_timing": "海外からの認定証明書交付申請では最初に契約書締結が必要"
+      }
+    },
+    "dispatch_collection_risks": [
+      "派遣個別契約書",
+      "就業条件明示書",
+      "派遣先の押印が必要な書類",
+      "派遣先概要書",
+      "派遣先事業者誓約書"
+    ],
+    "common_applicant_misunderstandings": [
+      "申請中に新しい会社で働けると思っている",
+      "退職後もそのままの在留資格で別会社で働けると思っている",
+      "証明書郵送・収入印紙・交通費など申請に費用と手間がかかることを理解していない",
+      "雇用契約書の日付と、許可後の実際の就労開始日・契約終了日のズレを誤解する"
+    ],
+    "bulk_application_rules": {
+      "macro_safety": "一括申請Excelはマクロを壊さず、公式テンプレートの入力欄だけを埋める",
+      "experience_modes": ["beginner", "experienced"],
+      "bilingual_requirement": "外国人の国籍・理解言語に合わせて母国語併記が必要な書類を必ず確認する",
+      "online_submission_deadline": "オンライン申請は在留期限日の前日まで。当日は高リスクで人間レビュー"
+    }
+  },
+  "correction_catalog": {
+    "version": "2026-04-26",
+    "status": "awaiting_real_cases",
+    "patch_policy": "補正・差し戻しパターン集を受領後、id・trigger・evidence・recommended_fixを追加する",
+    "patterns": []
   },
   "deadlines": {
     "随時届出": {

@@ -2,14 +2,43 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SearchServiceClient } from "@google-cloud/discoveryengine";
 import { generateText, isVertexAIAvailable } from "../lib/vertex-ai.js";
+import { createLogger } from "@suguvisa/core/logger";
+
+const logger = createLogger({ service: "suguvisa-mcp-legal-search" });
 
 // --- キャッシュ関連の設定 ---
 interface CacheEntry {
   timestamp: number;
-  data: any;
+  data: LegalSearchToolResponse;
 }
 const searchCache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24時間
+
+type GroundingLevel = "primary_source" | "model_fallback_unverified" | "builtin_fallback_unverified";
+
+interface LegalSearchResult {
+  title: string;
+  snippet: string;
+  link?: string;
+  source?: string;
+  confidence?: number;
+}
+
+interface LegalSearchPayload {
+  status: "success" | "fallback";
+  source: "vertex_ai_search" | "gemini_knowledge_base" | "builtin_knowledge";
+  grounding_level: GroundingLevel;
+  requires_primary_source_verification: boolean;
+  query: string;
+  results: LegalSearchResult[];
+  summary?: string;
+  message?: string;
+  _ai_instructions: string;
+}
+
+interface LegalSearchToolResponse extends Record<string, unknown> {
+  content: Array<{ type: "text"; text: string }>;
+}
 
 // --- タイムアウト用ユーティリティ ---
 async function withTimeout<T>(promise: Promise<T>, ms: number, fallbackErrorMsg = 'Timeout'): Promise<T> {
@@ -20,14 +49,27 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, fallbackErrorMsg 
   return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function buildResponse(payload: LegalSearchPayload): LegalSearchToolResponse {
+  return {
+    content: [{
+      type: "text",
+      text: JSON.stringify(payload, null, 2),
+    }],
+  };
+}
+
 /**
  * 入管マニュアル等のRAG検索 (Vertex AI Search / Discovery Engine API)
- * DataStore未設定時は Gemini による法務知識ベースでフォールバック
+ * DataStore未設定時は未検証 fallback として返し、最新法令を断定しない。
  */
 export function registerSearchLegalDocs(server: McpServer) {
   server.tool(
     "suguvisa_legal_docs_search",
-    "【法務文書検索】Vertex AI Searchによるセマンティック検索で、法務マニュアル・契約書テンプレート・行政届出チェックリスト・SuguVisaマニュアル等を自然言語で横断検索。DataStore未設定時はGemini AIが法務知識ベースから直接回答。「特定技能1号 建設 所属機関概要書の書き方」のような質問でも回答可能。 / Semantic search across legal documents using Vertex AI Search, with Gemini AI knowledge base fallback.",
+    "【法務文書検索】Vertex AI Searchによるセマンティック検索で、入管法令・告示・通達・参考様式・行政届出チェックリスト等を自然言語で横断検索。DataStore未設定時は未検証fallbackとして返し、最新法令は断定しません。 / Semantic search across official/legal documents using Vertex AI Search. Fallbacks are marked unverified and must not be treated as current law.",
     {
       query: z.string().describe("検索クエリ（自然言語またはキーワード、例: 「特定技能1号 建設 分野の所属機関概要書の書き方」）"),
       max_results: z.number().optional().describe("最大結果件数（デフォルト: 5）"),
@@ -59,11 +101,28 @@ export function registerSearchLegalDocs(server: McpServer) {
 
           // Vertex AI Search は最大8秒でタイムアウト
           const [searchResults] = await withTimeout(client.search(request), 8000, "Vertex AI Search timeout after 8000ms");
-          const results = searchResults.map((res: any) => {
-            const doc = res.document;
+          const results = searchResults.map((res: unknown) => {
+            const result = res as {
+              document?: {
+                name?: string;
+                structData?: { fields?: Record<string, { stringValue?: string }> };
+                derivedStructData?: {
+                  fields?: {
+                    snippets?: {
+                      listValue?: {
+                        values?: Array<{
+                          structData?: { fields?: { snippet?: { stringValue?: string } } };
+                        }>;
+                      };
+                    };
+                  };
+                };
+              };
+            };
+            const doc = result.document;
             const structData = doc?.structData?.fields;
             const title = structData?.title?.stringValue || doc?.name || "No Title";
-            const extSnippet = res.document?.derivedStructData?.fields?.snippets?.listValue?.values?.[0]?.structData?.fields?.snippet?.stringValue || "";
+            const extSnippet = doc?.derivedStructData?.fields?.snippets?.listValue?.values?.[0]?.structData?.fields?.snippet?.stringValue || "";
             
             return {
               title,
@@ -72,22 +131,21 @@ export function registerSearchLegalDocs(server: McpServer) {
             };
           });
 
-          const responseData = {
-            content: [{
-              type: "text" as const,
-              text: JSON.stringify({
-                status: "success",
-                source: "vertex_ai_search",
-                query,
-                results: results || [],
-              }, null, 2),
-            }],
-          };
+          const responseData = buildResponse({
+            status: "success",
+            source: "vertex_ai_search",
+            grounding_level: "primary_source",
+            requires_primary_source_verification: false,
+            query,
+            results: results || [],
+            _ai_instructions:
+              "Vertex AI Search の一次情報検索結果です。回答では link/source を引用し、検索結果にない最新法令・期限・必要書類は推測しないでください。",
+          });
           
           searchCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
           return responseData;
-        } catch (error: any) {
-          console.error("Vertex AI Search failed, falling back to Gemini:", error.message);
+        } catch (error: unknown) {
+          logger.warn({ error: getErrorMessage(error) }, "Vertex AI Search failed; fallback will be marked unverified");
           // フォールバック: Gemini
         }
       }
@@ -106,25 +164,23 @@ export function registerSearchLegalDocs(server: McpServer) {
           
           searchCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
           return responseData;
-        } catch (err: any) {
-          console.error("Gemini search fallback failed:", err.message);
+        } catch (err: unknown) {
+          logger.warn({ error: getErrorMessage(err) }, "Gemini legal-search fallback failed");
         }
       }
 
       // === Stage 3: 組み込み知識ベース（最終フォールバック）===
-      const responseData = {
-        content: [{
-          type: "text" as const,
-          text: JSON.stringify({
-            status: "fallback",
-            source: "builtin_knowledge",
-            query,
-            message: "Vertex AI Search / Gemini が利用できません（またはタイムアウト）。組み込みの基本知識から回答します。",
-            results: getBuiltinResults(query),
-            _ai_instructions: "検索結果が限定的です。ユーザーの質問に対してあなた自身の入管法の知識で補完してください。",
-          }, null, 2),
-        }],
-      };
+      const responseData = buildResponse({
+        status: "fallback",
+        source: "builtin_knowledge",
+        grounding_level: "builtin_fallback_unverified",
+        requires_primary_source_verification: true,
+        query,
+        message: "Vertex AI Search / Gemini が利用できません（またはタイムアウト）。組み込みの基本知識から未検証の参考情報だけを返します。",
+        results: getBuiltinResults(query),
+        _ai_instructions:
+          "これは一次情報にgroundedされていない未検証fallbackです。最新法令・期限・必要書類を断定せず、入管庁HP・公式様式・行政書士/弁護士確認を促してください。モデル自身の知識で補完して断定してはいけません。",
+      });
       
       // 組み込みの結果も一応キャッシュしておく
       searchCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
@@ -134,10 +190,10 @@ export function registerSearchLegalDocs(server: McpServer) {
 }
 
 // === Gemini AIによるナレッジベース検索 ===
-async function searchWithGemini(query: string, maxResults: number) {
+async function searchWithGemini(query: string, maxResults: number): Promise<LegalSearchPayload> {
   const prompt = `あなたは日本の特定技能ビザ制度に精通した入管法の専門家です。
 
-以下の質問に対して、正確な法令知識に基づいて回答してください。
+以下の質問に対して、未検証の参考回答であることが分かる形で回答してください。最新法令・期限・必要書類の断定は避けてください。
 
 質問: ${query}
 
@@ -151,7 +207,7 @@ async function searchWithGemini(query: string, maxResults: number) {
       "confidence": 0.0-1.0の確信度
     }
   ],
-  "summary": "質問への簡潔な総合回答（300文字以内）"
+  "summary": "質問への簡潔な参考回答（300文字以内）。最新法令の断定は避ける"
 }
 
 重要な知識領域:
@@ -174,12 +230,15 @@ JSONのみを出力してください。`;
   if (jsonMatch) {
     const parsed = JSON.parse(jsonMatch[0]);
     return {
-      status: "success",
+      status: "fallback",
       source: "gemini_knowledge_base",
+      grounding_level: "model_fallback_unverified",
+      requires_primary_source_verification: true,
       query,
       results: parsed.results || [],
       summary: parsed.summary || "",
-      _ai_instructions: "Gemini AIの法務知識による回答です。正確性は高いですが、最新の法改正が反映されていない可能性があります。重要な判断は入管庁HPまたは行政書士に確認してください。",
+      _ai_instructions:
+        "Gemini AIの未検証fallbackです。一次情報検索ではありません。最新法令・期限・必要書類を断定せず、入管庁HP、公式様式、Vertex Search結果、行政書士/弁護士確認を必ず促してください。",
     };
   }
   
@@ -187,7 +246,7 @@ JSONのみを出力してください。`;
 }
 
 // === 組み込みナレッジベース（最終フォールバック）===
-function getBuiltinResults(query: string): Array<{title: string, snippet: string, link: string}> {
+function getBuiltinResults(query: string): LegalSearchResult[] {
   const knowledge = [
     {
       keywords: ["14日", "届出", "随時"],

@@ -1,6 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { createLogger } from "@suguvisa/core/logger";
 import { processDocument, type DocumentAIResult } from "../lib/document-ai.js";
+
+const logger = createLogger({ service: "suguvisa-mcp-ocr" });
 
 interface ParsedResidenceCard {
   name_romaji: string | null;
@@ -35,9 +38,10 @@ export async function parseResidenceCardHandler({
       parsed = mapDocumentAIResult(aiResult);
       parsed._method = "document_ai";
       parsed._confidence = aiResult.confidence;
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Document AIが失敗した場合、正規表現にフォールバック
-      console.error("Document AI failed, falling back to regex:", err.message);
+      const detail = err instanceof Error ? err.message : String(err);
+      logger.warn({ error: detail }, "Document AI failed; falling back to regex when OCR text is available");
       if (ocr_text) {
         parsed = parseWithRegex(ocr_text);
         parsed._method = "regex_fallback";
@@ -47,7 +51,7 @@ export async function parseResidenceCardHandler({
             type: "text" as const,
             text: JSON.stringify({
               error: "Document AI processing failed and no OCR text was provided as fallback",
-              detail: err.message,
+              detail,
               suggestion: "在留カードのテキストを手動で入力するか、Claude Visionで読み取ったテキストをocr_textに渡してください",
             }, null, 2),
           }],
@@ -131,6 +135,11 @@ export async function parseResidenceCardHandler({
         needs_confirmation: true,
         message: "以下の情報を在留カードから読み取りました。正しいか確認してください。",
         warning: "⚠️ 画像はサーバーに保存されません。処理後に即座に破棄されます。",
+        data_handling: {
+          raw_image_stored_by_suguvisa: false,
+          raw_image_retention: "not_persisted_by_application",
+          structured_pii_requires_user_confirmation: true,
+        },
         _ai_instructions:
           "🎯 【エージェントモード：在留カード読み取り完了】\n" +
           "1. 読み取り結果を簡潔な表で表示（3秒で確認できる量）\n" +

@@ -85,7 +85,7 @@
     },
     "別記第30号の5": {
       "name": "在留資格変更許可申請書（特定技能・特定活動）",
-      "used_by": ["CHANGE_TOKKATSU_A", "CHANGE_TOKKATSU_B", "CHANGE_TOKKATSU_C", "CHANGE_TOKKATSU_D", "CHANGE_TOKKATSU_E", "CHANGE_SSW1_A", "CHANGE_SSW1_B", "CHANGE_SSW1_C", "CHANGE_SSW1_D", "CHANGE_SSW1_E", "CHANGE_SSW1_F"],
+      "used_by": ["CHANGE_TOKKATSU_A", "CHANGE_TOKKATSU_B", "CHANGE_TOKKATSU_C", "CHANGE_TOKKATSU_D", "CHANGE_SSW2_A", "CHANGE_TOKKATSU_SSW2", "CHANGE_TOKKATSU_E", "CHANGE_SSW1_A", "CHANGE_SSW1_B", "CHANGE_SSW1_C", "CHANGE_SSW1_D", "CHANGE_SSW1_E", "CHANGE_SSW1_F", "CHANGE_TOKKATSU_SSW2_PREP"],
       "total_pages": 5,
       "sections": [
         {
@@ -177,6 +177,83 @@
           "fields": [
             { "id": "company_name", "label": "契約機関の名称", "type": "text", "required": true },
             { "id": "corporate_number", "label": "法人番号", "type": "text", "required": true },
+            { "id": "representative", "label": "代表者氏名", "type": "text", "required": true },
+            { "id": "company_address", "label": "所在地", "type": "text", "required": true },
+            { "id": "company_phone", "label": "電話番号", "type": "text", "required": true },
+            { "id": "monthly_salary", "label": "報酬（月額）", "type": "number", "required": true, "unit": "円" },
+            { "id": "work_changes", "label": "前回許可後の変更の有無", "type": "text", "required": false },
+            { "id": "applicant_agent_name", "label": "申請取次者", "type": "text", "required": false }
+          ]
+        }
+      ]
+    },
+    "別記第29号": {
+      "name": "在留資格認定証明書交付申請書（特定技能2号）",
+      "used_by": ["GRANT_SSW2"],
+      "total_pages": 6,
+      "sections": [
+        {
+          "section": "申請人等作成用",
+          "page": 1,
+          "fields": [
+            { "id": "nationality", "label": "国籍・地域", "type": "text", "required": true },
+            { "id": "date_of_birth", "label": "生年月日", "type": "date", "required": true },
+            { "id": "name_romaji", "label": "氏名（ローマ字）", "type": "text", "required": true },
+            { "id": "sex", "label": "性別", "type": "select", "options": ["男", "女"], "required": true },
+            { "id": "passport_number", "label": "旅券番号", "type": "text", "required": true },
+            { "id": "passport_expiry", "label": "旅券有効期限", "type": "date", "required": true },
+            { "id": "desired_visa_type", "label": "希望する在留資格", "type": "text", "required": true, "default": "特定技能2号" },
+            { "id": "industry_field", "label": "分野", "type": "text", "required": true },
+            { "id": "work_description", "label": "業務区分", "type": "text", "required": true },
+            { "id": "supervisory_experience", "label": "監督・指導経験", "type": "text", "required": true },
+            { "id": "skill_test_name", "label": "2号技能試験・評価方法", "type": "text", "required": true }
+          ]
+        },
+        {
+          "section": "所属機関等作成用",
+          "page": 2,
+          "fields": [
+            { "id": "company_name", "label": "契約機関の名称", "type": "text", "required": true },
+            { "id": "corporate_number", "label": "法人番号", "type": "text", "required": true, "format": "13桁" },
+            { "id": "representative", "label": "代表者氏名", "type": "text", "required": true },
+            { "id": "company_address", "label": "所在地", "type": "text", "required": true },
+            { "id": "company_phone", "label": "電話番号", "type": "text", "required": true },
+            { "id": "work_location", "label": "就労予定地", "type": "text", "required": true },
+            { "id": "monthly_salary", "label": "報酬（月額）", "type": "number", "required": true, "unit": "円" },
+            { "id": "contract_period_start", "label": "雇用契約期間（開始）", "type": "date", "required": true },
+            { "id": "contract_period_end", "label": "雇用契約期間（終了）", "type": "date", "required": true },
+            { "id": "applicant_agent_name", "label": "申請取次者", "type": "text", "required": false }
+          ]
+        }
+      ]
+    },
+    "別記第30号の4": {
+      "name": "在留期間更新許可申請書（特定技能2号）",
+      "used_by": ["RENEWAL_SSW2"],
+      "total_pages": 4,
+      "sections": [
+        {
+          "section": "申請人等作成用",
+          "page": 1,
+          "fields": [
+            { "id": "nationality", "label": "国籍・地域", "type": "text", "required": true },
+            { "id": "residence_card_number", "label": "在留カード番号", "type": "text", "required": true, "format": "AA12345678BB" },
+            { "id": "date_of_birth", "label": "生年月日", "type": "date", "required": true },
+            { "id": "name_romaji", "label": "氏名（ローマ字）", "type": "text", "required": true },
+            { "id": "passport_number", "label": "旅券番号", "type": "text", "required": true },
+            { "id": "current_visa_type", "label": "現在の在留資格", "type": "text", "required": true, "default": "特定技能2号" },
+            { "id": "current_visa_expiry", "label": "在留期限", "type": "date", "required": true },
+            { "id": "industry_field", "label": "分野", "type": "text", "required": true },
+            { "id": "work_description", "label": "業務区分", "type": "text", "required": true },
+            { "id": "reason_for_renewal", "label": "更新の理由", "type": "text", "required": true, "default": "引き続き特定技能2号として就労するため" }
+          ]
+        },
+        {
+          "section": "所属機関等作成用",
+          "page": 2,
+          "fields": [
+            { "id": "company_name", "label": "契約機関の名称", "type": "text", "required": true },
+            { "id": "corporate_number", "label": "法人番号", "type": "text", "required": true, "format": "13桁" },
             { "id": "representative", "label": "代表者氏名", "type": "text", "required": true },
             { "id": "company_address", "label": "所在地", "type": "text", "required": true },
             { "id": "company_phone", "label": "電話番号", "type": "text", "required": true },

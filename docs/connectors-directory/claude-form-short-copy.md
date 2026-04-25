@@ -40,13 +40,13 @@ Japan Specified Skilled Worker visa automation
 ## Description (Short)
 
 ```text
-SuguVisa is a business-grade AI connector for Japan's Specified Skilled Worker (SSW / 特定技能) visa workflows. It provides 42 MCP tools, 14 prompts, and 70 resources for application-pattern detection, exemption-aware document checklists, deadline calculation, residence-card OCR, annual-report CSV/Excel generation, paper-form PDF mapping, law-change tracking, and audit logs. Built for immigration lawyers, registered support organizations, and receiving companies.
+SuguVisa is a business-grade AI connector for Japan's Specified Skilled Worker (SSW / 特定技能) visa workflows. It provides 42 MCP tools, 14 prompts, and 70 resources for application-pattern detection, document checklists, deadlines, OCR, annual reports, paper-form mapping, law-change tracking, and audit logs. Built for immigration lawyers, support organizations, receiving companies, dispatching-company staff, dispatch-client contacts, and applicants.
 ```
 
 ## Description (Very Short)
 
 ```text
-SuguVisa automates Japan's Specified Skilled Worker visa workflows for immigration lawyers, support organizations, and receiving companies. It provides 42 MCP tools, 14 prompts, and 70 resources covering application classification, document checklists, deadline rules, OCR, official-form generation, law updates, and audit logs.
+SuguVisa automates Japan's Specified Skilled Worker visa workflows for immigration lawyers, support organizations, receiving companies, dispatching-company staff, dispatch-client contacts, and applicants. It covers classification, document checklists, deadlines, OCR, official forms, law updates, and audit logs.
 ```
 
 ## Use Cases
@@ -84,6 +84,7 @@ Terms of service: https://mcp.suguvisa.com/terms
 Server card: https://mcp.suguvisa.com/.well-known/mcp/server-card.json
 OAuth protected resource metadata: https://mcp.suguvisa.com/.well-known/oauth-protected-resource
 OAuth authorization server metadata: https://mcp.suguvisa.com/.well-known/oauth-authorization-server
+Official npm locator: https://www.npmjs.com/package/@suguvisa/mcp-server
 Smithery listing: https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
 Company website: https://sugu-kuru.co.jp/
 Support email: info@sugu-kuru.co.jp
@@ -171,5 +172,6 @@ For full details, please see the public documentation and machine-readable metad
 - Protected resource metadata: https://mcp.suguvisa.com/.well-known/oauth-protected-resource
 - Privacy: https://mcp.suguvisa.com/privacy
 - Terms: https://mcp.suguvisa.com/terms
+- Official npm locator: https://www.npmjs.com/package/@suguvisa/mcp-server
 - Smithery listing: https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
 ```

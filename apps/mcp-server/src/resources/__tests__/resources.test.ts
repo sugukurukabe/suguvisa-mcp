@@ -67,6 +67,7 @@ describe("MCP resources", () => {
         "suguvisa://server/slo",
         "suguvisa://server/changelog",
         "suguvisa://compliance/pii",
+        "suguvisa://super-app/blueprint",
       ]),
     );
   });
@@ -142,6 +143,24 @@ describe("MCP resources", () => {
     );
     expect(result.contents[0]!.mimeType).toBe("text/markdown");
     expect(result.contents[0]!.text).toContain("PII 取扱いポリシー");
+  });
+
+  it("super_app_blueprint exposes calendar and workspace decisions", async () => {
+    const body = parseJsonBody(
+      await resources(server)["suguvisa://super-app/blueprint"]!.readCallback(
+        new URL("suguvisa://super-app/blueprint"),
+      ),
+    ) as {
+      calendarSyncTargets: unknown[];
+      workspaceMcpDecisions: Array<{ type: string; adoptForMvp: boolean }>;
+    };
+
+    expect(body.calendarSyncTargets.length).toBeGreaterThan(0);
+    expect(body.workspaceMcpDecisions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: "google_calendar_official_mcp", adoptForMvp: true }),
+      ]),
+    );
   });
 });
 

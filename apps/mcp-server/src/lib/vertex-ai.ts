@@ -4,19 +4,36 @@
  */
 import { GoogleGenAI, Type } from "@google/genai";
 
-const PROJECT_ID = process.env.GCP_PROJECT_ID || "mcp-service-492010";
+const PROJECT_ID = process.env.GCP_PROJECT_ID;
 const LOCATION = process.env.VERTEX_AI_LOCATION || "us-central1";
-const MODEL_ID = process.env.VERTEX_AI_MODEL || "gemini-3.0-pro";
-const FLASH_MODEL_ID = process.env.VERTEX_AI_FLASH_MODEL || "gemini-3.0-flash";
+
+function getProjectId(): string | undefined {
+  return process.env.GCP_PROJECT_ID;
+}
+
+function getLocation(): string {
+  return process.env.VERTEX_AI_LOCATION || "us-central1";
+}
+
+function getModelId(useFlash: boolean): string {
+  if (useFlash) {
+    return process.env.VERTEX_AI_FLASH_MODEL || "gemini-3.0-flash";
+  }
+  return process.env.VERTEX_AI_MODEL || "gemini-3.0-pro";
+}
 
 let genAI: GoogleGenAI | null = null;
 
 function getGenAI(): GoogleGenAI {
+  const projectId = getProjectId();
+  if (!projectId) {
+    throw new Error("GCP_PROJECT_ID is required for Vertex AI calls");
+  }
   if (!genAI) {
     genAI = new GoogleGenAI({
       vertexai: true,
-      project: PROJECT_ID,
-      location: LOCATION,
+      project: projectId,
+      location: getLocation(),
     });
   }
   return genAI;
@@ -28,7 +45,7 @@ function getGenAI(): GoogleGenAI {
 export async function generateText(prompt: string, useFlash = false): Promise<string> {
   const ai = getGenAI();
   const result = await ai.models.generateContent({
-    model: useFlash ? FLASH_MODEL_ID : MODEL_ID,
+    model: getModelId(useFlash),
     contents: prompt,
     config: {
       temperature: 0.3,  // 法務文書は正確性重視
@@ -49,7 +66,7 @@ export async function generateWithImage(
 ): Promise<string> {
   const ai = getGenAI();
   const result = await ai.models.generateContent({
-    model: MODEL_ID,
+    model: getModelId(false),
     contents: [
       {
         role: "user",
@@ -76,6 +93,9 @@ export async function generateWithImage(
  * Vertex AI が利用可能かチェック
  */
 export function isVertexAIAvailable(): boolean {
+  if (!getProjectId()) {
+    return false;
+  }
   try {
     getGenAI();
     return true;

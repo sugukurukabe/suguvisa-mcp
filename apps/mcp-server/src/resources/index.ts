@@ -15,6 +15,7 @@ import { registerFormResources } from "./forms.js";
 import { registerKnowledgeResources } from "./knowledge.js";
 import { registerGoldenRecordResources } from "./golden-records.js";
 import { registerOperationResources } from "./operations.js";
+import { registerSuperAppResources } from "./super-app.js";
 
 export interface RegisterResourcesOptions {
   goldenRecordsStore?: GoldenRecordStore;
@@ -30,6 +31,7 @@ export function registerAllResources(
   registerKnowledgeResources(server);
   registerGoldenRecordResources(server, { store: options.goldenRecordsStore });
   registerOperationResources(server);
+  registerSuperAppResources(server);
 }
 
 export { registerPatternResources } from "./patterns.js";
@@ -38,3 +40,4 @@ export { registerFormResources } from "./forms.js";
 export { registerKnowledgeResources } from "./knowledge.js";
 export { registerGoldenRecordResources } from "./golden-records.js";
 export { registerOperationResources } from "./operations.js";
+export { registerSuperAppResources } from "./super-app.js";

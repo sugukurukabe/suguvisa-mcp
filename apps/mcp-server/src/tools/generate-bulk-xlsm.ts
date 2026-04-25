@@ -98,9 +98,15 @@ const COLUMN_MAP_V: Partial<Record<keyof OfficialCsvData, number>> = {
 
 export async function generateBulkXlsmHandler(
   application_type: "1" | "2" | "3",
-  applicants: any[]
+  applicants: any[],
+  options: {
+    experience_level?: "beginner" | "experienced";
+    applicant_language?: string;
+    include_beginner_guide?: boolean;
+  } = {}
 ): Promise<any> {
   const appType = application_type;
+  const experienceLevel = options.experience_level ?? "beginner";
 
   if (!Array.isArray(applicants) || applicants.length === 0) {
     return {
@@ -259,6 +265,25 @@ export async function generateBulkXlsmHandler(
           message: "Excelファイル（マクロ付）の生成に成功しました。指定されたOutputPathに保存済みです。",
           applicant_count: parsedApplicants.length,
           output_path: outPath,
+          bulk_application_guidance: {
+            experience_level: experienceLevel,
+            macro_safety:
+              "公式XLSMテンプレートのマクロは変更せず、入力欄だけに値を書き込みます。Excelで開いた後にシート削除・マクロ保存形式変更をしないでください。",
+            bilingual_requirement:
+              "特定技能雇用契約書・雇用条件書・支援計画書等は、申請人の国籍・理解言語に合わせた母国語併記を必ず確認してください。",
+            applicant_language: options.applicant_language ?? "未指定",
+            beginner_steps: experienceLevel === "beginner" || options.include_beginner_guide ? [
+              "出力された .xlsm を開く前にバックアップを残す",
+              "マクロを有効化して入力欄の警告を確認する",
+              "国籍コード・在留資格・分野コード・法人番号13桁を確認する",
+              "母国語併記が必要な関連書類の生成漏れを確認する",
+              "オンライン申請は在留期限日の前日までに完了する",
+            ] : [],
+            experienced_notes: experienceLevel === "experienced" ? [
+              "差分確認と提出直前チェックリストを優先表示",
+              "マクロ・様式バージョン・CSV/XLSM更新日だけ重点確認",
+            ] : [],
+          },
         }, null, 2),
       },
     ],
@@ -272,10 +297,17 @@ export function registerGenerateBulkXlsm(server: McpServer) {
     {
       application_type: z.enum(["1", "2", "3"]).describe("1:認定(COE), 2:更新(Renewal), 3:変更(Change)"),
       applicants: z.array(z.record(z.any())).describe("申請人データの配列。必須要件はcsv-schema.tsによって厳密にチェックされます。"),
+      experience_level: z.enum(["beginner", "experienced"]).default("beginner").describe("一括申請の経験レベル。初心者には手順と注意点を厚めに返す"),
+      applicant_language: z.string().optional().describe("申請人が理解できる言語。母国語併記が必要な書類の確認に使う"),
+      include_beginner_guide: z.boolean().default(false).describe("経験者でも初心者向けの操作手順を含めるか"),
     },
     { title: "Generate bulk application XLSM", readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-    async ({ application_type, applicants }) => {
-       return await generateBulkXlsmHandler(application_type, applicants);
+    async ({ application_type, applicants, experience_level, applicant_language, include_beginner_guide }) => {
+       return await generateBulkXlsmHandler(application_type, applicants, {
+        experience_level,
+        applicant_language,
+        include_beginner_guide,
+       });
     }
   );
 }

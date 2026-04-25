@@ -12,7 +12,7 @@ export function registerSyncVertexDatastore(server: McpServer) {
     "suguvisa_vertex_datastore_sync",
     "GCSバケット（例: gs://sugukuru-vertex-search/immigration-law/*）の入管法律関連ファイルをVertex AI Searchに同期・インポートし、最新の法務マニュアルとしてRAG検索可能にする / Import GCS documents to Vertex AI Search Data Store",
     {
-      gcsUri: z.string().default("gs://sugukuru-vertex-search/immigration-law/*")
+      gcsUri: z.string().default(process.env.VERTEX_LEGAL_CORPUS_GCS_URI ?? "gs://sugukuru-vertex-search/immigration-law/*")
         .describe("インポート元のGCS URI"),
       dataStoreId: z.string().optional()
         .describe("DataStore ID (省略時は環境変数 VERTEX_SEARCH_DATA_STORE_ID を使用)"),
@@ -57,7 +57,8 @@ export function registerSyncVertexDatastore(server: McpServer) {
               status: "success",
               message: `Import operation started for ${gcsUri} into DataStore ${actualDataStoreId}. It may take a few minutes for the documents to become searchable.`,
               operationName: operation.name,
-              _ai_instruction: "インポートが完了するまでしばらく時間がかかります。ユーザーにはバックグラウンドで学習中とお伝え下さい。"
+              grounding_policy: "After import completes, use suguvisa_legal_docs_search and require source links before making current-law claims.",
+              _ai_instruction: "インポートが完了するまでしばらく時間がかかります。完了後に suguvisa_legal_docs_search で source/link が返ることを確認するまで、最新法令の根拠として扱わないでください。"
             }, null, 2),
           }],
         };
