@@ -62,4 +62,4 @@ pnpm run test
 
 ## ライセンス / License / Lisensi
 
-MIT — [スグクル株式会社](https://sugu-kuru.co.jp) (Sugukuru Inc.)
+MIT — [スグクル株式会社](https://sugu-kuru.co.jp) (SugukuruCo., Ltd)

@@ -36,8 +36,8 @@
 
 | Field                                      | Value                                                                        |
 | ------------------------------------------ | ---------------------------------------------------------------------------- |
-| **Developer name (public)**                | `Sugukuru Inc.`                                                              |
-| **Developer legal name**                   | `スグクル株式会社 (Sugukuru Inc.)`                                           |
+| **Developer name (public)**                | `SugukuruCo., Ltd`                                                              |
+| **Developer legal name**                   | `スグクル株式会社 (SugukuruCo., Ltd)`                                           |
 | **Country / jurisdiction**                 | `Japan`                                                                      |
 | **Registered address**                     | `〒899-4332 鹿児島県霧島市国分中央3丁目42-8 翔陽A103`                        |
 | **Corporate website**                      | `https://sugu-kuru.co.jp`                                                    |
@@ -52,7 +52,7 @@
 
 | Field                   | Value                                                                           |
 | ----------------------- | ------------------------------------------------------------------------------- |
-| **App display name**    | `SuguVisa — Japan SSW Visa AI`                                                  |
+| **App display name**    | `SuguVisa — Japan Visa AI`                                                      |
 | **App ID (slug)**       | `suguvisa-mcp`                                                                  |
 | **App version**         | `0.9.4`                                                                         |
 | **Product website**     | `https://suguvisa.com`                                                          |
@@ -111,9 +111,9 @@ done
 
 | Locale | ≤ 60 chars                                                      |
 | ------ | --------------------------------------------------------------- |
-| `en`   | `Full automation for Japan's SSW visa applications.`            |
-| `ja`   | `日本の特定技能ビザを完全自動化。`                              |
-| `id`   | `Otomatisasi penuh visa SSW Jepang.`                            |
+| `en`   | `Japan visa workflows, automated`                               |
+| `ja`   | `日本のビザ業務を自動化。`                                      |
+| `id`   | `Alur visa Jepang otomatis.`                                    |
 
 ### 3-b. Short description (≤ 160 chars, en)
 
@@ -164,8 +164,8 @@ Pricing: Free plan (5 tools, 100 calls/day). Case Ticket ¥2,980 / 30-day pass (
 
 | Asset                                                  | Spec                 | URL                                                             |
 | ------------------------------------------------------ | -------------------- | --------------------------------------------------------------- |
-| **App icon 512×512 PNG**                               | 正方形・透過可       | `https://mcp.suguvisa.com/icon-512.png`                         |
-| **Store icon 1024×1024 PNG**                           | 不透過 (白背景)      | `https://mcp.suguvisa.com/icon-1024.png`                        |
+| **App icon square PNG**                                | 正方形・角丸なし     | `https://mcp.suguvisa.com/app-icon-square.png`                  |
+| **Store icon 1024×1024 PNG**                           | 不透過 (白背景)      | `https://mcp.suguvisa.com/app-icon-square.png`                  |
 | **Wordmark 1024×576 PNG**                              | ロゴ                 | `https://mcp.suguvisa.com/logo.png`                             |
 | **Screenshot 1 — パターン判定 + 書類 + 逆算スケジュール** | ≥ 1600×1000 推奨 | `https://mcp.suguvisa.com/assets/screenshot-1.png`              |
 | **Screenshot 2 — 届出期限の緊急度順計算**              | ≥ 1600×1000 推奨     | `https://mcp.suguvisa.com/assets/screenshot-2.png`              |
@@ -346,7 +346,7 @@ Document AI は在留カード・パスポート画像の読み取りに使い�
 - [ ] **cross-service automation を行わない** （当 app は入管ビザ関連の自社 API のみ）
 - [ ] **送金・暗号通貨・金融取引を行わない** （ユーザー向け決済は自社サブスク/ticket のみ、直 Stripe）
 - [ ] 本 app は **live / production** で動作中 (`https://mcp.suguvisa.com/health` 200 OK)
-- [ ] この MCP が叩く API は **自社が所有・運営** (`mcp.suguvisa.com` = Sugukuru Inc.)
+- [ ] この MCP が叩く API は **自社が所有・運営** (`mcp.suguvisa.com` = SugukuruCo., Ltd)
 - [ ] 全 tool で OAuth 2.0 (PKCE) を実装している
 - [ ] 全 tool に `readOnlyHint` / `destructiveHint` アノテーション有り（当 app の destructive 数 = 0）
 - [ ] HTTPS のみ（HTTP アクセスは Cloudflare で 308 redirect）

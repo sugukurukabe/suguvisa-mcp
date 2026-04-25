@@ -39,6 +39,7 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
     "/docs",
     "/logo.svg",
     "/logo.png",
+    "/app-icon-square.png",
     "/icon-1024.png",
     "/icon-512.png",
     "/icon-256.png",

@@ -664,8 +664,8 @@ downscaling.
 
 ```
 https://mcp.suguvisa.com/logo.svg      (square SVG, 24 KB)
-https://mcp.suguvisa.com/icon-1024.png (1024×1024 PNG — reviewer fallback)
-https://mcp.suguvisa.com/icon-512.png  (512×512 PNG)
+https://mcp.suguvisa.com/app-icon-square.png (1024×1024 PNG — square, no rounded corners)
+https://mcp.suguvisa.com/icon-512.png  (512×512 PNG legacy fallback)
 https://mcp.suguvisa.com/icon-256.png  (256×256 PNG)
 ```
 
@@ -836,7 +836,7 @@ Supplemental:
 
 Logo + icon bundle:
   https://mcp.suguvisa.com/logo.svg
-  https://mcp.suguvisa.com/icon-1024.png
+  https://mcp.suguvisa.com/app-icon-square.png
   https://mcp.suguvisa.com/icon-512.png
   https://mcp.suguvisa.com/icon-256.png
   https://mcp.suguvisa.com/og-image.png    (1200×630 OG card)
@@ -946,7 +946,7 @@ form and cross-link this MCP server.
 - 公開済み: Smithery (release `187e5a5d-8e73-4234-a530-9c31a3e6352d` accepted)、`/.well-known/mcp/server-card.json` (42 tools)、official npm locator `@suguvisa/mcp-server`
 
 - [x] **I work for the company that owns or controls the API endpoint(s) that my server connects to.**
-  - 申請者（壁 / KABE）は **スグクル株式会社 (Sugukuru Inc.)** の代表 / Admin。
+  - 申請者（壁 / KABE）は **スグクル株式会社 (SugukuruCo., Ltd)** の代表 / Admin。
   - ドメイン `suguvisa.com` / `mcp.suguvisa.com`、GCP プロジェクト `mcp-service-492010`、Supabase org、Auth0 tenant、いずれも当社が保有・管理。
 
 ### Technical Requirements *
@@ -1168,7 +1168,7 @@ a runtime error so we can trace it immediately in our logs).
 
 Thank you again, from Kagoshima.
 
-— 壁 / KABE, Founder, スグクル株式会社 / Sugukuru Inc.
+— 壁 / KABE, Founder, スグクル株式会社 / SugukuruCo., Ltd
   〒899-4332 鹿児島県霧島市国分中央 3 丁目 42-8 翔陽 A103
   TEL 0995-73-9939   https://sugu-kuru.co.jp/
 ```

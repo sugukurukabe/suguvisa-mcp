@@ -28,7 +28,7 @@
 
 ### Scene 1 — Title card (0:00 - 0:04, 4s)
 
-**映像**: 白背景 + SuguVisa ロゴ + 「Japan SSW Visa AI for ChatGPT」
+**映像**: 白背景 + SuguVisa ロゴ + 「Japan Visa AI for ChatGPT」
 **字幕 (EN)**:
 
 ```

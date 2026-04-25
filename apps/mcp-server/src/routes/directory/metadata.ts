@@ -103,9 +103,9 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
   return {
     slug: "suguvisa-mcp",
     displayName: {
-      ja: "SuguVisa — 特定技能ビザ申請AI",
-      en: "SuguVisa — Japan SSW Visa AI",
-      id: "SuguVisa — AI Visa SSW Jepang",
+      ja: "SuguVisa — 日本ビザ申請AI",
+      en: "SuguVisa — Japan Visa AI",
+      id: "SuguVisa — AI Visa Jepang",
     },
     shortDescription: {
       ja: "日本の特定技能ビザ申請を完全自動化。申請パターン判定・期限計算・書類生成・電子届出CSV・年次報告まで一気通貫。",
@@ -130,8 +130,8 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
       "ocr",
     ],
     publisher: {
-      legalName: "スグクル株式会社 / Sugukuru Inc.",
-      displayName: "Sugukuru Inc.",
+      legalName: "スグクル株式会社 / SugukuruCo., Ltd",
+      displayName: "SugukuruCo., Ltd",
       website: marketingUrl,
       supportEmail: env.SUGUVISA_SUPPORT_EMAIL ?? "info@sugu-kuru.co.jp",
       country: "JP",
@@ -151,7 +151,7 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
       statusPage: statusUrl,
       npmPackage: "https://www.npmjs.com/package/@suguvisa/mcp-server",
       smithery: "https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp",
-      logo: `${baseUrl}/icon-1024.png`,
+      logo: `${baseUrl}/app-icon-square.png`,
       ogImage: `${baseUrl}/og-image.png`,
       favicon: `${baseUrl}/favicon.svg`,
     },

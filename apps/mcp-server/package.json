@@ -15,7 +15,7 @@
     "gpt-actions",
     "claude-mcp"
   ],
-  "author": "Sugukuru Inc. <a_kabe@sugu-kuru.co.jp>",
+  "author": "SugukuruCo., Ltd <a_kabe@sugu-kuru.co.jp>",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",

@@ -50,7 +50,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-slate-200 py-10 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 sm:flex-row sm:items-center sm:justify-between">
-        <p>© {new Date().getFullYear()} スグクル株式会社 / Sugukuru Inc.</p>
+        <p>© {new Date().getFullYear()} スグクル株式会社 / SugukuruCo., Ltd</p>
         <nav className="flex flex-wrap gap-4">
           <Link href="/privacy" className="hover:text-brand-600">Privacy</Link>
           <Link href="/terms" className="hover:text-brand-600">Terms</Link>

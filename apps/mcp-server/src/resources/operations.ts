@@ -22,7 +22,7 @@ export function registerOperationResources(server: McpServer): void {
       return jsonResource("suguvisa://server/info", {
         name: "suguvisa-mcp",
         version: SERVER_VERSION,
-        vendor: "Sugukuru Inc.",
+        vendor: "SugukuruCo., Ltd",
         description:
           "日本の特定技能ビザ申請を自動化する MCP サーバー。行政書士・登録支援機関・受入れ機関向け。",
         endpoints: {

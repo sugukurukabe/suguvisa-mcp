@@ -46,6 +46,7 @@ export function createDirectoryRouter(): Router {
   // Static branding assets
   router.get("/logo.svg", staticFileHandler("public/logo.svg", "image/svg+xml"));
   router.get("/logo.png", staticFileHandler("public/logo.png", "image/png"));
+  router.get("/app-icon-square.png", staticFileHandler("public/app-icon-square.png", "image/png"));
   router.get("/icon-1024.png", staticFileHandler("public/icon-1024.png", "image/png"));
   router.get("/icon-512.png", staticFileHandler("public/icon-512.png", "image/png"));
   router.get("/icon-256.png", staticFileHandler("public/icon-256.png", "image/png"));

@@ -6,7 +6,7 @@
 
 ## 運営者 / Operator / Operator
 
-スグクル株式会社（Sugukuru Inc.）
+スグクル株式会社（SugukuruCo., Ltd）
 〒899-4332 鹿児島県霧島市国分中央3丁目42-8 翔陽A103
 
 ## 収集する情報 / Information Collected / Informasi yang Dikumpulkan

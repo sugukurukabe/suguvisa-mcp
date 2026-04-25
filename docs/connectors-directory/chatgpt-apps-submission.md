@@ -46,18 +46,18 @@
 
 OpenAI の申請コンソールで以下を入力:
 
-1. **App name**: `SuguVisa — Japan SSW Visa AI`
+1. **App name**: `SuguVisa — Japan Visa AI`
 2. **App ID**: `suguvisa-mcp` (小文字 / ハイフン可)
-3. **Developer**: `Sugukuru Inc.`
+3. **Developer**: `SugukuruCo., Ltd`
 4. **Category**: `Business`, `Legal`
-5. **Short tagline** (60 chars): `Full automation for Japan's SSW visa applications.`
+5. **Short tagline** (30 chars): `Japan visa workflows, automated`
 6. **Description**: (`openai-app.json` の `description`)
 7. **Manifest URL**: `https://<domain>/.well-known/openai-app.json`
 8. **MCP Server URL**: `https://<domain>/mcp`
 9. **OpenAPI URL**: `https://<domain>/openapi.yaml`
 10. **Official npm locator**: `https://www.npmjs.com/package/@suguvisa/mcp-server`
 11. **Smithery listing**: `https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp`
-12. **Icon**: `https://<domain>/icon-512.png` (ストア表示) + `/icon-1024.png` (高解像度) + `/logo.png` (ワードマーク 1024×576)
+12. **Icon**: `https://<domain>/app-icon-square.png` (正方形・角丸なし) + `/logo.png` (ワードマーク 1024×576)
 13. **Screenshots**: 3–5 枚
 14. **Privacy**: `https://<domain>/privacy`
 15. **Terms**: `https://<domain>/terms`

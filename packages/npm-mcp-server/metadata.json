@@ -2,7 +2,7 @@
   "name": "SuguVisa MCP Server",
   "packageName": "@suguvisa/mcp-server",
   "description": "Official locator package for the hosted SuguVisa remote MCP server.",
-  "company": "Sugukuru Inc.",
+  "company": "SugukuruCo., Ltd",
   "mcpEndpoint": "https://mcp.suguvisa.com/mcp",
   "metadataUrl": "https://mcp.suguvisa.com/.well-known/mcp/server-card.json",
   "openaiManifestUrl": "https://mcp.suguvisa.com/.well-known/openai-app.json",

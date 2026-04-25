@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "description": "SuguVisa MCP monorepo — 特定技能ビザ申請自動化 / SSW visa automation / Otomatisasi visa SSW",
-  "author": "Sugukuru Inc. <a_kabe@sugu-kuru.co.jp>",
+  "author": "SugukuruCo., Ltd <a_kabe@sugu-kuru.co.jp>",
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0"

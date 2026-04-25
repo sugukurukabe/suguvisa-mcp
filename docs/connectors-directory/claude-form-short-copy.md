@@ -150,13 +150,13 @@ Quick test:
 ## Checklist Summary
 
 ```text
-SuguVisa is live in production and ready for review. OAuth 2.1 + PKCE + Dynamic Client Registration is implemented. HTTPS and CORS are configured. All 42 tools include safety annotations. Documentation, setup instructions, troubleshooting, privacy policy, terms, server card, and OAuth metadata are public. The server does not enable cross-service automation and does not transfer money or cryptocurrency. Sugukuru Inc. owns and controls the relevant domains, endpoint, cloud project, Auth0 tenant, and backend systems.
+SuguVisa is live in production and ready for review. OAuth 2.1 + PKCE + Dynamic Client Registration is implemented. HTTPS and CORS are configured. All 42 tools include safety annotations. Documentation, setup instructions, troubleshooting, privacy policy, terms, server card, and OAuth metadata are public. The server does not enable cross-service automation and does not transfer money or cryptocurrency. SugukuruCo., Ltd owns and controls the relevant domains, endpoint, cloud project, Auth0 tenant, and backend systems.
 ```
 
 ## Additional Information (Short)
 
 ```text
-Sugukuru Inc. is a rural Kagoshima company that dispatches and supports foreign workers in Japanese agriculture. We built SuguVisa from our own daily visa, notification, renewal, housing, payroll, and worker-support operations. Japan's immigration paperwork is complex and time-sensitive; too much support staff time is consumed by forms instead of helping foreign workers live and work well. SuguVisa is our attempt to move that burden into correct, auditable automation so people can focus on people.
+SugukuruCo., Ltd is a rural Kagoshima company that dispatches and supports foreign workers in Japanese agriculture. We built SuguVisa from our own daily visa, notification, renewal, housing, payroll, and worker-support operations. Japan's immigration paperwork is complex and time-sensitive; too much support staff time is consumed by forms instead of helping foreign workers live and work well. SuguVisa is our attempt to move that burden into correct, auditable automation so people can focus on people.
 
 Claude and MCP made it possible for a small rural Japanese company to build a production AI product in a field where deep domain experience matters more than company size. We are grateful for that opportunity and will keep improving SuguVisa through real cases, golden records, tests, and daily operational feedback.
 ```
