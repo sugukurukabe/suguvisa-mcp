@@ -16,7 +16,7 @@ export async function getVisaAuditLogsHandler(
   const supabaseKey = rawSupabaseKey.trim();
 
   if (!supabaseUrl || !supabaseKey) {
-    console.log("[MOCK] get_visa_audit_logs requested with:", args);
+    console.log("[MOCK] suguvisa_audit_logs_list requested with:", args);
     return {
       content: [
         {
@@ -98,10 +98,10 @@ export async function getVisaAuditLogsHandler(
 
 export function registerGetVisaAuditLogs(server: any) {
   server.tool(
-    "get_visa_audit_logs",
+    "suguvisa_audit_logs_list",
     "【監査ログ取得】特定のリソース（申請人・企業等）やイベントに紐づく過去の操作履歴を取得。誰がいつ何をしたかをタイムライン表示し、業務の透明性を担保。 / Retrieves past audit logs for specific resources or events, providing a full timeline of who did what and when.",
     getVisaAuditLogsSchema.shape,
-    { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Get visa audit logs", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async (args: any, extra: any) => {
       // 処理のキャンセルを可能にする対応
       if (extra?._cancel && extra._cancel.isCanceled) {

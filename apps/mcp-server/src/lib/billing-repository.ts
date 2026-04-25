@@ -70,9 +70,72 @@ export class SupabaseBillingRepository implements BillingRepository {
           .eq("stripe_customer_id", intent.stripeCustomerId);
         return;
       }
+      case "tenant_ticket_granted": {
+        await this.grantTicket({
+          tenantId: intent.tenantId,
+          stripeCustomerId: intent.stripeCustomerId,
+          stripeCheckoutSessionId: intent.stripeCheckoutSessionId,
+          stripePaymentIntentId: intent.stripePaymentIntentId,
+          passKey: intent.passKey,
+          grantsPlan: intent.grantsPlan,
+          durationDays: intent.durationDays,
+          amountJpy: intent.amountJpy,
+        });
+        return;
+      }
       case "noop":
         return;
     }
+  }
+
+  /**
+   * チケット (N日パス) を付与して ticket_expires_at を延長する。
+   * 既存 expires_at が未来なら stack (existing + durationDays)、過去/NULL なら now() + durationDays。
+   *
+   * Grant a ticket (N-day pass) by extending ticket_expires_at.
+   * Stacks on top of existing future expiry, or restarts from now() if past/null.
+   */
+  private async grantTicket(args: {
+    tenantId: string;
+    stripeCustomerId: string | null;
+    stripeCheckoutSessionId: string;
+    stripePaymentIntentId: string | null;
+    passKey: string;
+    grantsPlan: string;
+    durationDays: number;
+    amountJpy: number;
+  }): Promise<void> {
+    const now = Date.now();
+    const { data: tenantRow } = await this.supabase
+      .from("tenants")
+      .select("ticket_expires_at")
+      .eq("id", args.tenantId)
+      .maybeSingle();
+    const previous = (tenantRow as { ticket_expires_at?: string | null } | null)?.ticket_expires_at ?? null;
+    const previousMs = previous ? new Date(previous).getTime() : 0;
+    const baseMs = previousMs > now ? previousMs : now;
+    const newExpiresAt = new Date(baseMs + args.durationDays * 24 * 3600_000).toISOString();
+
+    await this.supabase
+      .from("tenants")
+      .update({
+        ticket_expires_at: newExpiresAt,
+        // Stripe customer が今回初めて紐づくならセット（サブスク側の紐付けと共用）。
+        ...(args.stripeCustomerId ? { stripe_customer_id: args.stripeCustomerId } : {}),
+        subscription_updated_at: new Date().toISOString(),
+      })
+      .eq("id", args.tenantId);
+
+    await this.supabase.from("ticket_purchases").insert({
+      tenant_id: args.tenantId,
+      stripe_checkout_session_id: args.stripeCheckoutSessionId,
+      stripe_payment_intent_id: args.stripePaymentIntentId,
+      amount_jpy: args.amountJpy,
+      duration_days: args.durationDays,
+      granted_plan: args.grantsPlan,
+      previous_expires_at: previous,
+      new_expires_at: newExpiresAt,
+    });
   }
 
   /**

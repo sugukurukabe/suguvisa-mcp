@@ -72,7 +72,7 @@ interface Citation {
 ┌──────────────────────────────────────────────────────────────────┐
 │                       LLM Agent (Claude/GPT)                      │
 └──────────────────────┬───────────────────────────────────────────┘
-                       │ MCP tool: search_golden_records
+                       │ MCP tool: suguvisa_golden_records_search
                        ↓
 ┌──────────────────────────────────────────────────────────────────┐
 │                    @suguvisa/golden-records                       │
@@ -135,7 +135,7 @@ Context に含まれない情報は「根拠がない」と回答してくださ
 - [x] `FirestoreStore` — 本番用アダプタ（ioc 注入で FirebaseApp を受ける）
 - [x] `VertexEmbeddingProvider` — `text-embedding-004` 呼び出し
 - [x] `HybridRetriever` — RRF で結合
-- [x] MCP ツール `search_golden_records`（scope: `knowledge:read`）
+- [x] MCP ツール `suguvisa_golden_records_search`（scope: `knowledge:read`）
 - [x] Vitest（型、retriever、RRF、Firestore モック）
 - [x] Terraform: Firestore DB + Vector Search index draft
 - [x] Auth0 Action による scope の自動付与（既存の仕組みを活用）

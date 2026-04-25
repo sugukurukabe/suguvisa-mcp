@@ -14,6 +14,7 @@
 import type { Request, Response } from "express";
 import {
   createFirstPartyClient,
+  findFirstPartyClient,
   isAuth0MgmtConfigured,
   loadAuth0MgmtConfig,
   type CreateClientInput,
@@ -141,23 +142,47 @@ export async function oauthRegisterHandler(
 
   try {
     const config = loadAuth0MgmtConfig();
-    const created = await createFirstPartyClient(config, input);
 
-    // RFC 7591 に沿った最小セットを返す。
-    // Return the minimum RFC 7591-compliant registration response.
-    // Kembalikan respons pendaftaran minimum sesuai RFC 7591.
+    // 冪等性: 同名 + 同じ redirect_uris の既存 first-party client があれば再利用する。
+    // Idempotency: reuse an existing first-party client with the same name and
+    // redirect URIs if one already exists, to avoid hitting the Auth0 tenant
+    // client limit on repeated reconnections.
+    // Idempotensi: gunakan kembali klien first-party yang ada dengan nama dan
+    // redirect URI yang sama untuk menghindari batas client tenant Auth0.
+    const existing = await findFirstPartyClient(config, {
+      name: input.name,
+      redirectUris: input.redirectUris,
+    });
+
+    const client = existing ?? (await createFirstPartyClient(config, input));
+
+    // RFC 7591 は成功時のステータスを 201 Created のみと規定している。
+    // 冪等に既存クライアントを再利用した場合でも 201 を返さないと、
+    // 厳格に検証するクライアント (oauth4webapi / Smithery scanner) は
+    // "response is not a conform Dynamic Client Registration Endpoint response
+    //  (unexpected HTTP status code)" で失敗する。
+    //
+    // RFC 7591 mandates HTTP 201 Created for successful registrations. Even
+    // when we idempotently reuse an existing client, we must still return 201;
+    // returning 200 breaks strict validators such as oauth4webapi used by the
+    // Smithery scanner and Claude Desktop.
+    //
+    // RFC 7591 mewajibkan HTTP 201 Created untuk pendaftaran yang berhasil.
+    // Meski kita menggunakan kembali klien yang ada secara idempoten, kita tetap
+    // harus mengembalikan 201; mengembalikan 200 merusak validator ketat seperti
+    // oauth4webapi yang digunakan oleh Smithery scanner dan Claude Desktop.
     const response: Record<string, unknown> = {
-      client_id: created.clientId,
-      client_name: created.name,
-      redirect_uris: created.callbacks,
-      grant_types: created.grantTypes,
-      token_endpoint_auth_method: created.tokenEndpointAuthMethod,
-      client_id_issued_at: created.createdAt,
-      client_secret_expires_at: created.clientSecretExpiresAt,
+      client_id: client.clientId,
+      client_name: client.name,
+      redirect_uris: client.callbacks,
+      grant_types: client.grantTypes,
+      token_endpoint_auth_method: client.tokenEndpointAuthMethod,
+      client_id_issued_at: client.createdAt,
+      client_secret_expires_at: client.clientSecretExpiresAt,
       response_types: ["code"],
     };
-    if (created.clientSecret) {
-      response.client_secret = created.clientSecret;
+    if (client.clientSecret) {
+      response.client_secret = client.clientSecret;
     }
 
     res.status(201).json(response);

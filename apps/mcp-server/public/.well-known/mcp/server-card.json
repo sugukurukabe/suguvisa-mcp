@@ -1,12 +1,37 @@
 {
+  "_note": "This file is served dynamically by src/routes/directory/server-card.ts. The disk copy here is only a fallback for static hosts and is kept in sync with the runtime handler.",
   "serverInfo": {
     "name": "suguvisa-mcp",
-    "version": "0.9.1",
-    "description": "特定技能ビザ申請を完全自動化するAIエージェントサーバー。24ツール搭載。在留カード→申請判定→書類リスト→理由書生成→テンプレート生成を自動連鎖実行。 | The only AI MCP server that fully automates Japan's Specified Skilled Worker (SSW) visa applications."
+    "version": "0.9.4",
+    "description": "日本の特定技能ビザ申請を完全自動化する業界唯一のAIエージェントサーバー。42ツール搭載、OAuth 2.1 + DCR対応。在留カード→申請判定→書類リスト→理由書生成→テンプレート生成を自動連鎖実行。 | The only AI MCP server that fully automates Japan's Specified Skilled Worker (SSW) visa applications. 42 tools, OAuth 2.1 + DCR."
   },
   "authentication": {
     "required": false,
-    "schemes": []
+    "schemes": [
+      {
+        "type": "oauth2",
+        "flow": "authorization_code",
+        "issuer": "https://suguvisa-dev.jp.auth0.com/",
+        "authorizationUrl": "https://suguvisa-dev.jp.auth0.com/authorize",
+        "tokenUrl": "https://suguvisa-dev.jp.auth0.com/oauth/token",
+        "pkce": "required",
+        "scopes": {
+          "visa:read": "Read visa rules, patterns, and reference data",
+          "visa:write": "Generate application CSVs, Excels, and paper form PDFs",
+          "visa:ocr": "Run OCR on residence cards and passports",
+          "visa:audit": "Read and write audit logs for your tenant",
+          "tenant:admin": "Manage API keys and subscription"
+        },
+        "resourceIndicator": "https://mcp.suguvisa.com"
+      },
+      {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "scheme": "Bearer",
+        "example": "Authorization: Bearer svmcp_xxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    ]
   },
   "configSchema": {
     "type": "object",
@@ -14,15 +39,16 @@
       "plan": {
         "type": "string",
         "title": "Subscription Plan",
-        "description": "Select your plan tier. free=5 basic tools (pattern detection, document list, deadline calc), pro=all 24 tools (AI reason letter, reference forms, SSW2 checklist, OCR), enterprise=audit logs & tenant management",
+        "description": "Select your subscription tier. free = all 42 tools available for trial (OCR/bulk/autonomous gated), starter = production with OCR + bulk + audit + annual report, professional = full feature set with legal search + autonomous workflow.",
         "default": "free",
-        "enum": ["free", "pro", "enterprise"]
+        "enum": ["free", "starter", "professional"]
       },
       "apiKey": {
         "type": "string",
-        "title": "API Key (Enterprise only)",
-        "description": "API key for Enterprise plan. Not required for free/pro plans.",
+        "title": "API Key",
+        "description": "SuguVisa API key from https://suguvisa.com/dashboard/api-keys. Required for starter / professional plans.",
         "default": "",
+        "format": "password",
         "x-from": {
           "header": "x-suguvisa-api-key"
         }
@@ -30,7 +56,7 @@
       "gcpProjectId": {
         "type": "string",
         "title": "GCP Project ID (Optional)",
-        "description": "Google Cloud Project ID for residence card OCR (Document AI) and legal document search (Vertex AI). Leave empty if not needed.",
+        "description": "Your own Google Cloud Project ID for residence card OCR (Document AI) and legal document search (Vertex AI). Leave empty to use SuguVisa's managed quota.",
         "default": ""
       }
     },

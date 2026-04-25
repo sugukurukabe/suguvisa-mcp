@@ -94,7 +94,7 @@ SUGUVISA_STRIPE_PRICE_PROFESSIONAL_MONTHLY=price_1xxxx
 SUGUVISA_STRIPE_PRICE_PROFESSIONAL_YEARLY=price_1xxxx
 
 # 公開 URL (Checkout の success/cancel URL や Portal の return URL で使う)
-SUGUVISA_BASE_URL=https://app.sugukuru.co.jp
+SUGUVISA_BASE_URL=https://app.sugu-kuru.co.jp
 ```
 
 `STRIPE_SECRET_KEY` と `STRIPE_WEBHOOK_SECRET` が両方セットされていない
@@ -163,8 +163,8 @@ curl -X POST http://localhost:3000/api/v1/billing/checkout \
   -H "Content-Type: application/json" \
   -d '{
     "price_id": "price_1xxx_starter_monthly",
-    "success_url": "https://app.sugukuru.co.jp/billing/success",
-    "cancel_url": "https://app.sugukuru.co.jp/billing/cancel"
+    "success_url": "https://app.sugu-kuru.co.jp/billing/success",
+    "cancel_url": "https://app.sugu-kuru.co.jp/billing/cancel"
   }'
 ```
 
@@ -177,7 +177,7 @@ curl -X POST http://localhost:3000/api/v1/billing/checkout \
 ```bash
 curl -X POST http://localhost:3000/api/v1/billing/portal \
   -H "Authorization: Bearer $SUGUVISA_API_KEY" \
-  -d '{"return_url":"https://app.sugukuru.co.jp/settings/billing"}'
+  -d '{"return_url":"https://app.sugu-kuru.co.jp/settings/billing"}'
 ```
 
 ## 7. 内部設計

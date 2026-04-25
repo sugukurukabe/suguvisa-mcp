@@ -27,39 +27,9 @@ router.get("/me", async (req: AuthRequest, res) => {
   }
 
   const plan = getPlanConfig(tenant.subscription_plan);
-
-  let billing:
-    | {
-        stripe_customer_id: string | null;
-        stripe_subscription_id: string | null;
-        subscription_status: string | null;
-        current_period_end: string | null;
-        cancel_at_period_end: boolean;
-      }
-    | undefined;
-
-  if (process.env.SUPABASE_URL && tenant.id !== "local-dev-tenant") {
-    try {
-      const { data } = await supabase
-        .from("tenants")
-        .select(
-          "stripe_customer_id, stripe_subscription_id, subscription_status, subscription_current_period_end, subscription_cancel_at_period_end",
-        )
-        .eq("id", tenant.id)
-        .maybeSingle();
-      if (data) {
-        billing = {
-          stripe_customer_id: data.stripe_customer_id ?? null,
-          stripe_subscription_id: data.stripe_subscription_id ?? null,
-          subscription_status: data.subscription_status ?? null,
-          current_period_end: data.subscription_current_period_end ?? null,
-          cancel_at_period_end: Boolean(data.subscription_cancel_at_period_end),
-        };
-      }
-    } catch (error) {
-      console.error("[tenant/me] failed to load billing fields:", error);
-    }
-  }
+  const ticketExpiresAt = tenant.ticket_expires_at ?? null;
+  const ticketActive =
+    typeof ticketExpiresAt === "string" && new Date(ticketExpiresAt).getTime() > Date.now();
 
   res.json({
     status: "ok",
@@ -67,6 +37,9 @@ router.get("/me", async (req: AuthRequest, res) => {
       id: tenant.id,
       organization_name: tenant.organization_name,
       subscription_plan: tenant.subscription_plan,
+      raw_subscription_plan: tenant.raw_subscription_plan ?? tenant.subscription_plan,
+      ticket_expires_at: ticketExpiresAt,
+      ticket_active: ticketActive,
       plan_details: {
         name: plan.name,
         requests_per_minute: plan.requests_per_minute,
@@ -75,7 +48,6 @@ router.get("/me", async (req: AuthRequest, res) => {
         features: plan.features,
         allowed_tools: plan.allowed_tools === "all" ? "全ツール利用可能" : `${plan.allowed_tools.length}ツールのみ`,
       },
-      billing,
     },
   });
 });
@@ -148,34 +120,6 @@ router.get("/usage", async (req: AuthRequest, res) => {
     });
   } catch (error: any) {
     res.status(500).json({ status: "error", message: error.message });
-  }
-});
-
-// ─── GET /api/v1/tenant/keys ───
-// テナントに紐づく API キーの一覧を返す (本体は表示しない)
-// Returns API keys for the tenant (the raw key is never returned).
-// Mengembalikan daftar kunci API penyewa (kunci mentah tidak pernah dikembalikan).
-router.get("/keys", async (req: AuthRequest, res) => {
-  const tenant = req.tenant;
-  if (!tenant || tenant.id === "local-dev-tenant") {
-    res.status(400).json({ status: "error", message: "APIキー管理はSaaSモードでのみ利用可能です" });
-    return;
-  }
-  if (!process.env.SUPABASE_URL) {
-    res.status(400).json({ status: "error", message: "Database not configured" });
-    return;
-  }
-  try {
-    const { data, error } = await supabase
-      .from("api_keys")
-      .select("id, label, status, last_used_at, created_at")
-      .eq("tenant_id", tenant.id)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    res.json({ status: "ok", keys: data ?? [] });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    res.status(500).json({ status: "error", message });
   }
 });
 

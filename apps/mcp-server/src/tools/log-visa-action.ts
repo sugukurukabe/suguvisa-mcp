@@ -22,7 +22,7 @@ export async function logVisaActionHandler(
 
   // ローカル環境等でDB接続先がない場合はモックとして成功を返す（安全なフォールバック）
   if (!supabaseUrl || !supabaseKey) {
-    console.log("[MOCK] log_visa_action:", {
+    console.log("[MOCK] suguvisa_audit_action_log:", {
       tenant_id: tenantIdToUse || "mock-tenant-id",
       actor: args.actor,
       action_type: args.action_type,
@@ -105,10 +105,10 @@ export async function logVisaActionHandler(
 
 export function registerLogVisaAction(server: any) {
   server.tool(
-    "log_visa_action",
+    "suguvisa_audit_action_log",
     "【操作ログ記録】ビザ申請業務の全アクション（書類確認・提出・結果受領等）を監査ログとしてSupabaseに記録。コンプライアンス対応と業務トレーサビリティを確保。 / Records all visa processing actions as audit logs in Supabase for compliance and traceability.",
     logVisaActionSchema.shape,
-    { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+    { title: "Log visa action", readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     async (args: any, extra: any) => {
       // 処理のキャンセルを可能にする対応
       if (extra?._cancel && extra._cancel.isCanceled) {

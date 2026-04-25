@@ -9,7 +9,7 @@ const client = new DocumentServiceClient();
  */
 export function registerSyncVertexDatastore(server: McpServer) {
   server.tool(
-    "sync_vertex_datastore",
+    "suguvisa_vertex_datastore_sync",
     "GCSバケット（例: gs://sugukuru-vertex-search/immigration-law/*）の入管法律関連ファイルをVertex AI Searchに同期・インポートし、最新の法務マニュアルとしてRAG検索可能にする / Import GCS documents to Vertex AI Search Data Store",
     {
       gcsUri: z.string().default("gs://sugukuru-vertex-search/immigration-law/*")
@@ -17,7 +17,7 @@ export function registerSyncVertexDatastore(server: McpServer) {
       dataStoreId: z.string().optional()
         .describe("DataStore ID (省略時は環境変数 VERTEX_SEARCH_DATA_STORE_ID を使用)"),
     },
-    { destructiveHint: true }, // データ更新を伴うため
+    { title: "Sync Vertex datastore", readOnlyHint: false, destructiveHint: true }, // データ更新を伴うため
     async ({ gcsUri, dataStoreId }) => {
       try {
         const projectId = process.env.VERTEX_SEARCH_PROJECT_ID || process.env.GCP_PROJECT_ID;

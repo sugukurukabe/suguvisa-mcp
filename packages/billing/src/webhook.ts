@@ -17,6 +17,8 @@ import {
   type PlanKey,
   type PriceMapping,
   resolvePlanFromPriceId,
+  getOneTimePass,
+  type OneTimePassDefinition,
 } from "./plans.js";
 
 export type SubscriptionStatus =
@@ -67,6 +69,22 @@ export type BillingIntent =
       stripeCustomerId: string;
       stripeSubscriptionId: string | null;
     }
+  | {
+      /**
+       * チケット (ワンタイム 30日パス等) が購入された。
+       * tenants.ticket_expires_at を stackable に延長する。
+       * Ticket (one-time N-day pass) was purchased. Extend tenants.ticket_expires_at.
+       */
+      kind: "tenant_ticket_granted";
+      tenantId: string;
+      stripeCustomerId: string | null;
+      stripeCheckoutSessionId: string;
+      stripePaymentIntentId: string | null;
+      passKey: string;
+      grantsPlan: PlanKey;
+      durationDays: number;
+      amountJpy: number;
+    }
   | { kind: "noop"; reason: string };
 
 export interface WebhookHandlerOptions {
@@ -88,12 +106,54 @@ export function processStripeEvent(
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const tenantId = session.client_reference_id ?? undefined;
+      const customerId =
+        typeof session.customer === "string" ? session.customer : session.customer?.id;
+
+      // ── ワンタイム購入 (mode=payment) の分岐 ───────────────────────────────
+      // `mode=payment` + `metadata.plan=<ticket|...>` の場合、ticket (N日パス) として扱う。
+      // サブスク側の重い処理 (customer/subscription 紐付け) は不要で、
+      // tenants.ticket_expires_at を延長するだけ。
+      //
+      // Handle one-time ticket purchases: `mode=payment` + `metadata.plan=<passKey>`
+      // Extend tenants.ticket_expires_at instead of setting subscription_plan.
+      if (session.mode === "payment") {
+        const metaPlan = session.metadata?.plan ?? "";
+        const pass: OneTimePassDefinition | null = getOneTimePass(metaPlan);
+        if (!pass) {
+          return {
+            kind: "noop",
+            reason: `checkout.session.completed mode=payment but unknown pass key: ${metaPlan}`,
+          };
+        }
+        if (!tenantId) {
+          return {
+            kind: "noop",
+            reason: "checkout.session.completed mode=payment missing client_reference_id (tenant_id)",
+          };
+        }
+        const paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id ?? null;
+        const amountJpy = typeof session.amount_total === "number" ? session.amount_total : pass.priceJpy;
+        return {
+          kind: "tenant_ticket_granted",
+          tenantId,
+          stripeCustomerId: customerId ?? null,
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: paymentIntentId,
+          passKey: pass.key,
+          grantsPlan: pass.grantsPlan,
+          durationDays: pass.durationDays,
+          amountJpy,
+        };
+      }
+
+      // ── サブスク購入 (mode=subscription) の既存フロー ──────────────────────
       const subscriptionId =
         typeof session.subscription === "string"
           ? session.subscription
           : session.subscription?.id;
-      const customerId =
-        typeof session.customer === "string" ? session.customer : session.customer?.id;
       if (!tenantId || !subscriptionId || !customerId) {
         return {
           kind: "noop",

@@ -107,6 +107,65 @@ interface Auth0ClientResponse {
   third_party_security_mode?: string;
 }
 
+// redirect_uris 一致判定のための正規化。末尾スラッシュ差異などを吸収。
+// Normalize redirect URIs so we can compare them regardless of trailing slash or case.
+// Normalisasi redirect URI agar perbandingan tidak terpengaruh slash atau huruf besar.
+function normalizeUri(uri: string): string {
+  return uri.trim().replace(/\/+$/, "").toLowerCase();
+}
+
+function sameRedirectSet(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const normA = new Set(a.map(normalizeUri));
+  for (const item of b) {
+    if (!normA.has(normalizeUri(item))) return false;
+  }
+  return true;
+}
+
+/**
+ * 既存の first-party クライアントを name + redirect_uris で検索する。
+ * 見つかった場合は `client_id` を返す。
+ * Find an existing first-party client by matching name + redirect URIs.
+ * Mencari client first-party yang sudah ada berdasarkan name + redirect URIs.
+ */
+export async function findFirstPartyClient(
+  config: Auth0MgmtConfig,
+  params: { name: string; redirectUris: string[] },
+): Promise<CreatedClient | null> {
+  const token = await fetchMgmtToken(config);
+  // client_secret は `read:client_keys` 権限が必要で、我々の M2M には付与していない。
+  // 冪等化のユースケースでは PKCE (token_endpoint_auth_method=none) を想定しているため、
+  // secret なしで再利用できれば十分。
+  const url = `https://${config.domain}/api/v2/clients?per_page=100&fields=client_id,name,callbacks,grant_types,token_endpoint_auth_method,is_first_party&include_fields=true`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Auth0 list clients failed: ${res.status} ${body}`);
+  }
+  const list = (await res.json()) as Auth0ClientResponse[];
+  const targetName = params.name.slice(0, 128);
+  for (const c of list) {
+    if (!c.is_first_party) continue;
+    if (c.name !== targetName) continue;
+    if (!c.callbacks || !sameRedirectSet(c.callbacks, params.redirectUris)) continue;
+    const now = Math.floor(Date.now() / 1000);
+    return {
+      clientId: c.client_id,
+      clientSecret: undefined,
+      name: c.name,
+      callbacks: c.callbacks,
+      grantTypes: c.grant_types ?? ["authorization_code", "refresh_token"],
+      tokenEndpointAuthMethod: c.token_endpoint_auth_method ?? "none",
+      createdAt: now,
+      clientSecretExpiresAt: 0,
+    };
+  }
+  return null;
+}
+
 export async function createFirstPartyClient(
   config: Auth0MgmtConfig,
   input: CreateClientInput,

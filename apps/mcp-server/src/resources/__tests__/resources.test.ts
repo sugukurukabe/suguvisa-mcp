@@ -199,40 +199,40 @@ describe("Enhanced prompts", () => {
     registerEnhancedPrompts(server);
     expect(Object.keys(prompts(server))).toEqual(
       expect.arrayContaining([
-        "citation_based_answer",
-        "ssw2_field_eligibility",
-        "weekly_visa_status_review",
-        "pre_submission_final_check",
-        "incident_triage",
-        "onboarding_new_tenant",
+        "suguvisa_citation_answer_generate",
+        "suguvisa_ssw2_field_eligibility_check",
+        "suguvisa_weekly_visa_status_review",
+        "suguvisa_pre_submission_final_check",
+        "suguvisa_incident_triage",
+        "suguvisa_tenant_onboarding",
       ]),
     );
   });
 
-  it("citation_based_answer builds a user message with the question", async () => {
+  it("suguvisa_citation_answer_generate builds a user message with the question", async () => {
     const server = new McpServer({ name: "test", version: "0.0.0" });
     registerEnhancedPrompts(server);
-    const p = prompts(server).citation_based_answer!;
+    const p = prompts(server).suguvisa_citation_answer_generate!;
     const result = (await p.callback({ question: "更新申請の期限は？" })) as {
       messages: Array<{ content: { text: string } }>;
     };
     expect(result.messages[0]!.content.text).toContain("更新申請の期限は？");
-    expect(result.messages[0]!.content.text).toContain("search_golden_records");
+    expect(result.messages[0]!.content.text).toContain("suguvisa_golden_records_search");
   });
 
-  it("pre_submission_final_check adapts to paper vs online", async () => {
+  it("suguvisa_pre_submission_final_check adapts to paper vs online", async () => {
     const server = new McpServer({ name: "test", version: "0.0.0" });
     registerEnhancedPrompts(server);
-    const p = prompts(server).pre_submission_final_check!;
+    const p = prompts(server).suguvisa_pre_submission_final_check!;
     const paper = (await p.callback({
       pattern_id: "CHANGE_SSW1_C",
       submission_mode: "paper",
     })) as { messages: Array<{ content: { text: string } }> };
-    expect(paper.messages[0]!.content.text).toContain("generate_paper_form");
+    expect(paper.messages[0]!.content.text).toContain("suguvisa_paper_form_generate");
     const online = (await p.callback({
       pattern_id: "CHANGE_SSW1_C",
       submission_mode: "online",
     })) as { messages: Array<{ content: { text: string } }> };
-    expect(online.messages[0]!.content.text).toContain("generate_bulk_xlsm");
+    expect(online.messages[0]!.content.text).toContain("suguvisa_bulk_xlsm_generate");
   });
 });

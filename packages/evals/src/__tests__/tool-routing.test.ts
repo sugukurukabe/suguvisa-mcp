@@ -11,7 +11,7 @@ describe("ToolRoutingEvaluator", () => {
     });
     const res = await ev.evaluate({
       id: "t",
-      input: { toolName: "determine_application_type", args: {} },
+      input: { toolName: "suguvisa_application_type_determine", args: {} },
       expected: { outputHasPath: ["structuredContent.pattern_id"] },
     });
     expect(res.passed).toBe(true);
@@ -23,7 +23,7 @@ describe("ToolRoutingEvaluator", () => {
     });
     const res = await ev.evaluate({
       id: "t",
-      input: { toolName: "determine_application_type", args: {} },
+      input: { toolName: "suguvisa_application_type_determine", args: {} },
       expected: { outputContains: { structuredContent: { pattern_id: "GRANT_01" } } },
     });
     expect(res.passed).toBe(false);

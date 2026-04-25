@@ -23,14 +23,14 @@ const lawUpdatesData = require("../data/law-updates.json") as LawUpdatesData;
 
 export function registerLawUpdates(server: McpServer) {
   server.tool(
-    "get_law_updates",
+    "suguvisa_law_updates_list",
     "【法改正情報】特定技能制度に関する最新の法改正・制度変更・運用要領の変更情報を取得。施行日、影響範囲、対応方法を含む。日付・キーワード・ステータスで絞り込み可能。 / Retrieves latest legal updates, regulatory changes, and operational guideline revisions for the Specified Skilled Worker system.",
     {
       since: z.string().optional().describe("この日付以降の更新を取得（YYYY-MM-DD） / Get updates since this date (YYYY-MM-DD) / Dapatkan pembaruan sejak tanggal ini (YYYY-MM-DD)"),
       keyword: z.string().optional().describe("キーワードで絞り込み / Filter by keyword / Saring berdasarkan kata kunci"),
       status: z.string().optional().describe("ステータスで絞り込み（'施行済み', '施行準備中'） / Filter by status (e.g. '施行済み', '施行準備中') / Saring berdasarkan status"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Get law updates", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ since, keyword, status }) => {
       let updates = [...lawUpdatesData.updates];
 

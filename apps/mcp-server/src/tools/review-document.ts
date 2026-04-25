@@ -7,7 +7,7 @@ import { generateText, generateWithImage, isVertexAIAvailable } from "../lib/ver
  */
 export function registerReviewDocument(server: McpServer) {
   server.tool(
-    "review_document",
+    "suguvisa_document_review",
     "【AI書類レビュー】申請書類の画像またはテキストをGemini AIが審査官目線でレビュー。記入漏れ・誤記・不許可リスクの高い表現を検出し、修正アドバイスを返す。対応書類: 申請書・雇用契約書・雇用条件書・支援計画書・所属機関概要書・理由書等。 / AI-powered document review using Gemini. Detects missing fields, errors, and risky expressions from an immigration officer's perspective.",
     {
       document_type: z.enum([
@@ -33,7 +33,7 @@ export function registerReviewDocument(server: McpServer) {
         "申請パターンID（例: CHANGE_SSW1_C）。指定するとパターン固有のチェックが追加される"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Review document with AI", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ document_type, image_base64, image_mime_type, document_text, application_pattern }) => {
       if (!image_base64 && !document_text) {
         return {

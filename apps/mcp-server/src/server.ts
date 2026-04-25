@@ -17,11 +17,13 @@ import { apiKeyAuth } from "./middleware/auth.js";
 import { logUsage } from "./middleware/usage-logger.js";
 import type { AuthRequest } from "./middleware/auth.js";
 import { apiRateLimiter, checkToolAccess } from "./middleware/rate-limiter.js";
+import { securityHeaders } from "./middleware/security-headers.js";
 
 import {
   createAuthProvider,
   createAuthMiddleware,
   generateResourceMetadata,
+  ALL_SCOPES,
   type AuthConfig,
   type Principal,
 } from "@suguvisa/auth";
@@ -59,6 +61,13 @@ const app = express();
 // Trust X-Forwarded-For when running behind Cloud Run / Cloud Armor.
 // Percayai X-Forwarded-For saat berjalan di belakang Cloud Run / Cloud Armor.
 app.set("trust proxy", 1);
+
+// ─── セキュリティヘッダ (CSP / HSTS / nosniff / frame-options) ───
+// ChatGPT Apps Store / Claude Connectors Directory のどちらも提出要件として CSP を求める。
+// 全レスポンスに共通で付与し、HTML 以外 (JSON / アセット) でも同じ値を返す。
+// 注意: Stripe webhook (raw body) ハンドラより前に入れると webhook レスポンスにも
+// 影響するが、webhook は Stripe 以外読まないためヘッダ有無はどちらでも動作する。
+app.use(securityHeaders());
 
 // ─── OpenTelemetry 初期化（optional） ───
 // Initialize OpenTelemetry if OTEL_* env vars are set.
@@ -128,6 +137,30 @@ const authConfig: AuthConfig = {
 const oauthEnabled = Boolean(authConfig.domain && authConfig.issuerBaseUrl);
 const authProvider = oauthEnabled ? createAuthProvider(authConfig) : null;
 
+/**
+ * 実効プラン判定 / Effective plan resolution / Resolusi paket efektif
+ *
+ * ルール:
+ *   - subscription_plan が starter / professional / unlimited → それをそのまま採用
+ *   - それ以外 (free など) で ticket_expires_at が未来なら 'starter' として扱う (チケット効果)
+ *   - それ以外はサブスクの値 (typically 'free') をそのまま返す
+ *
+ * Rules:
+ *   - If subscription_plan is starter/professional/unlimited, return it as-is.
+ *   - Else if ticket_expires_at > now(), return 'starter' (ticket grants Starter access).
+ *   - Else return the raw subscription_plan (usually 'free').
+ */
+function resolveEffectivePlan(tenant: {
+  subscription_plan?: string | null;
+  ticket_expires_at?: string | null;
+}): string {
+  const sub = (tenant.subscription_plan ?? "free").toString();
+  if (sub === "starter" || sub === "professional" || sub === "unlimited") return sub;
+  const expiry = tenant.ticket_expires_at ? new Date(tenant.ticket_expires_at).getTime() : 0;
+  if (expiry > Date.now()) return "starter";
+  return sub;
+}
+
 async function legacyApiKeyValidator(key: string): Promise<Principal | null> {
   const localApiKey = process.env.SUGUVISA_API_KEY;
   if (localApiKey && key === localApiKey) {
@@ -165,7 +198,7 @@ async function legacyApiKeyValidator(key: string): Promise<Principal | null> {
     try {
       const { data: apiKeyData } = await supabase
         .from("api_keys")
-        .select("id, key, status, tenant_id, tenants (id, organization_name, subscription_plan, status)")
+        .select("id, key, status, tenant_id, tenants (id, organization_name, subscription_plan, ticket_expires_at, status)")
         .eq("key", key)
         .eq("status", "active")
         .single();
@@ -212,6 +245,7 @@ if (oauthEnabled && authProvider) {
       "/logo.svg",
       "/logo.png",
       "/icon-1024.png",
+      "/icon-512.png",
       "/icon-256.png",
       "/apple-touch-icon.png",
       "/favicon.svg",
@@ -224,9 +258,17 @@ if (oauthEnabled && authProvider) {
       "/api/v1/billing/plans",
       "/api/v1/billing/webhook",
       "/oauth/register",
+      "/authorize",
     ]);
     const publicPrefixes = ["/.well-known/", "/assets/"];
-    if (publicExact.has(req.path) || publicPrefixes.some(p => req.path.startsWith(p))) {
+    // Google Search Console の HTML ファイル検証パス (例: /googleabc123.html) も
+    // 認証不要 (Google クローラが匿名アクセスするため)。
+    const isGoogleVerification = /^\/google[a-z0-9]+\.html$/i.test(req.path);
+    if (
+      publicExact.has(req.path) ||
+      publicPrefixes.some((p) => req.path.startsWith(p)) ||
+      isGoogleVerification
+    ) {
       return next();
     }
     return oauthMiddleware(req, res, next);
@@ -256,7 +298,7 @@ if (oauthEnabled && authProvider) {
 
         let { data: tenant } = await supabase
           .from("tenants")
-          .select("id, organization_name, subscription_plan, status")
+          .select("id, organization_name, subscription_plan, ticket_expires_at, status")
           .eq(auth0Sub ? "auth0_sub" : "id", auth0Sub ?? principal.tenantId)
           .eq("status", "active")
           .maybeSingle();
@@ -279,7 +321,7 @@ if (oauthEnabled && authProvider) {
               trial_ends_at: trialEndsAt,
               status: "active",
             })
-            .select("id, organization_name, subscription_plan, status")
+            .select("id, organization_name, subscription_plan, ticket_expires_at, status")
             .maybeSingle();
           if (insertError) {
             console.error("[auth-bridge] auto-provision failed:", insertError);
@@ -295,7 +337,9 @@ if (oauthEnabled && authProvider) {
           req.tenant = {
             id: tenant.id,
             organization_name: tenant.organization_name,
-            subscription_plan: tenant.subscription_plan,
+            subscription_plan: resolveEffectivePlan(tenant),
+            raw_subscription_plan: (tenant.subscription_plan ?? "free").toString(),
+            ticket_expires_at: tenant.ticket_expires_at ?? null,
           };
         }
       } catch (error) {
@@ -309,12 +353,23 @@ if (oauthEnabled && authProvider) {
 }
 
 // ─── レート制限 (第二層: 機密エンドポイント) ───
-// Sensitive endpoints — aggressive limit to slow down scrapers / brute force.
-// Endpoint sensitif — batas ketat untuk memperlambat scraper / brute force.
-app.use(
-  "/.well-known",
-  createRateLimiter(rateLimitPresets.sensitive),
-);
+// /.well-known discovery endpoints (RFC 8414 / 9728 / MCP Authorization spec) are
+// intentionally open and must remain highly available — OAuth クライアント
+// (Claude / Smithery の oauth4webapi / ChatGPT) は短時間に AS metadata・PRM bare・
+// PRM suffix・JWKS を連続で取得するため、厳しい rate limit に当たると 429 で
+// "unexpected HTTP status code" として discovery 全体が失敗する。
+// Use the `global` preset (100 req/min/IP) here and keep the `sensitive` preset
+// for true abuse-prone endpoints (DCR, login).
+//
+// OAuth クライアントの discovery フローは短時間に複数の well-known URL を叩くため、
+// /.well-known 全体を緩めにし、実際にブルートフォースされる恐れのある /oauth/register
+// にのみ sensitive レート制限を残す。
+//
+// Endpoint penemuan /.well-known harus tetap responsif; klien OAuth memanggil
+// AS metadata, PRM, dan JWKS secara cepat. Kami pakai preset `global` di sini
+// dan simpan `sensitive` untuk endpoint yang benar-benar rawan brute-force.
+app.use("/.well-known", createRateLimiter(rateLimitPresets.global));
+app.use("/oauth/register", createRateLimiter(rateLimitPresets.sensitive));
 
 // ─── レート制限 (第三層: /mcp プラン別) ───
 // Plan-aware per-tenant limit kept for backward compatibility with Supabase tenants.
@@ -335,13 +390,46 @@ function resolveMcpBaseUrl(req: express.Request): string {
   return `${req.protocol}://${host}`.replace(/\/$/, "");
 }
 
-app.get("/.well-known/oauth-protected-resource", (req, res) => {
-  const metadata = generateResourceMetadata(authConfig);
-  if (isAuth0MgmtConfigured()) {
-    metadata.authorization_servers = [resolveMcpBaseUrl(req)];
-  }
-  res.json(metadata);
-});
+// RFC 9728 + MCP Authorization spec (2025-06-18): clients probe the resource
+// metadata using the suffix path pattern
+// `/.well-known/oauth-protected-resource/<resource-path>`.
+// For SuguVisa MCP the resource lives at `/mcp`, so we expose both the bare
+// path (`/.well-known/oauth-protected-resource`) and the suffix path
+// (`/.well-known/oauth-protected-resource/mcp`). The bare path describes the
+// server itself and the suffix path describes the `/mcp` endpoint; strict
+// OAuth clients (Smithery scanner, Claude Desktop) only accept HTTP 200 here
+// and fail with OAUTH_RESPONSE_IS_NOT_CONFORM otherwise.
+//
+// RFC 9728 + MCP 認可仕様 (2025-06-18): クライアントは suffix path パターン
+// `/.well-known/oauth-protected-resource/<resource-path>` で保護リソースメタデータ
+// を取得する。SuguVisa MCP の資源は `/mcp` にあるため、bare path と suffix path の
+// 両方を返す。厳格な検証ライブラリ (oauth4webapi) は 200 以外を受け付けない。
+//
+// RFC 9728 + spesifikasi otorisasi MCP (2025-06-18): klien mem-probe metadata
+// resource menggunakan pola suffix path `/.well-known/oauth-protected-resource/
+// <resource-path>`. Resource SuguVisa MCP berada di `/mcp`, jadi kami memapar
+// keduanya. Validator ketat (oauth4webapi) tidak menerima status selain 200.
+function resourceMetadataHandler(resourcePath: "" | "/mcp") {
+  return (req: express.Request, res: express.Response) => {
+    const metadata = generateResourceMetadata(authConfig);
+    const baseUrl = resolveMcpBaseUrl(req);
+    // DCR proxy 有効時は authorization_servers を自分のドメインに揃える。
+    // AS メタデータの issuer (`${baseUrl}/`) と一致させるため末尾スラッシュを付ける。
+    if (isAuth0MgmtConfigured()) {
+      metadata.authorization_servers = [`${baseUrl}/`];
+    }
+    if (resourcePath) {
+      metadata.resource = `${baseUrl}${resourcePath}`;
+    }
+    res.json(metadata);
+  };
+}
+
+app.get("/.well-known/oauth-protected-resource", resourceMetadataHandler(""));
+app.get(
+  "/.well-known/oauth-protected-resource/mcp",
+  resourceMetadataHandler("/mcp"),
+);
 
 if (oauthEnabled && authProvider) {
   // AS メタデータ (RFC 8414)。DCR Proxy が有効なら issuer/registration_endpoint を
@@ -351,20 +439,121 @@ if (oauthEnabled && authProvider) {
   // authorize/token/jwks to Auth0.
   app.get("/.well-known/oauth-authorization-server", async (req, res) => {
     try {
-      const metadata = await authProvider.getAuthorizationServerMetadata();
+      const metadata = (await authProvider.getAuthorizationServerMetadata()) as Record<string, unknown>;
       if (isAuth0MgmtConfigured()) {
         const baseUrl = resolveMcpBaseUrl(req);
-        const overrides: Record<string, unknown> = {
-          issuer: `${baseUrl}/`,
-          registration_endpoint: `${baseUrl}/oauth/register`,
-        };
-        Object.assign(metadata as Record<string, unknown>, overrides);
+        metadata.issuer = `${baseUrl}/`;
+        metadata.registration_endpoint = `${baseUrl}/oauth/register`;
+
+        // authorize を自前プロキシに向ける。これにより Smithery / Claude が送る
+        // RFC 8707 `resource` パラメータを Auth0 固有の `audience` に変換でき、
+        // MCP リソース用 access token が取得できる（audience が無いと Auth0 は
+        // 単なる OIDC access token を返してしまい、/mcp で 401 になる）。
+        //
+        // Route /authorize through our proxy so the RFC 8707 `resource` parameter
+        // that Smithery/Claude send is translated into Auth0's mandatory
+        // `audience` parameter. Without this translation, Auth0 issues a plain
+        // OIDC access token and our /mcp endpoint returns 401.
+        //
+        // Arahkan /authorize melalui proxy kami agar parameter `resource` (RFC 8707)
+        // yang dikirim Smithery/Claude diterjemahkan menjadi `audience` milik Auth0.
+        // Tanpa terjemahan ini, Auth0 mengeluarkan token OIDC polos dan /mcp 401.
+        metadata.authorization_endpoint = `${baseUrl}/authorize`;
+
+        // Auth0 が返す token_endpoint_auth_methods_supported には "none" が含まれない
+        // ことがあり、MCP クライアント (Claude Desktop 等) は PKCE + public client
+        // (auth_method=none) でトークン交換を行うため、ここで "none" を補う。
+        // Auth0's metadata may omit "none" even though we register PKCE public clients;
+        // MCP clients like Claude Desktop rely on this flag to proceed with token exchange.
+        // Metadata dari Auth0 kadang tidak mencantumkan "none", padahal klien PKCE public
+        // (Claude, dsb.) membutuhkan informasi tersebut agar pertukaran token berjalan.
+        const current = Array.isArray(metadata.token_endpoint_auth_methods_supported)
+          ? (metadata.token_endpoint_auth_methods_supported as string[])
+          : [];
+        if (!current.includes("none")) {
+          metadata.token_endpoint_auth_methods_supported = ["none", ...current];
+        }
+
+        // MCP クライアントが期待する PKCE の最低要件を明示する。
+        // Advertise PKCE support explicitly for MCP clients.
+        if (!Array.isArray(metadata.code_challenge_methods_supported)) {
+          metadata.code_challenge_methods_supported = ["S256"];
+        }
+
+        // PRM が広告している MCP カスタム scope を AS メタデータにも合流させる。
+        // oauth4webapi などの厳格な scanner は PRM.scopes_supported が AS.scopes_supported
+        // の部分集合であることを期待するため、両者を一致させないと検出エラーになる。
+        // Merge MCP custom scopes advertised in PRM into AS metadata so that
+        // strict scanners (oauth4webapi) accept the PRM↔AS consistency check.
+        // Gabungkan scope kustom MCP di PRM ke metadata AS agar scanner ketat
+        // seperti oauth4webapi menerima konsistensi PRM↔AS.
+        const currentScopes = Array.isArray(metadata.scopes_supported)
+          ? (metadata.scopes_supported as string[])
+          : [];
+        const mergedScopes = Array.from(new Set([...ALL_SCOPES, ...currentScopes]));
+        metadata.scopes_supported = mergedScopes;
+
+        // RFC 8707 のサポートも明示。
+        // Advertise RFC 8707 resource indicator support explicitly.
+        metadata.resource_parameter_supported = true;
       }
       res.json(metadata);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Unknown error";
       console.error("[OAuth] Failed to fetch AS metadata:", message);
       res.status(502).json({ error: "Failed to fetch authorization server metadata" });
+    }
+  });
+
+  // /authorize プロキシ: Smithery / Claude が送る RFC 8707 `resource` を Auth0 の
+  // `audience` に変換して Auth0 の /authorize にリダイレクトする。
+  //
+  // /authorize proxy: translate RFC 8707 `resource` sent by Smithery/Claude into
+  // Auth0's `audience` parameter, then 302 to Auth0's native /authorize endpoint.
+  //
+  // Proxy /authorize: terjemahkan `resource` (RFC 8707) dari Smithery/Claude
+  // menjadi `audience` milik Auth0, lalu 302 ke /authorize Auth0.
+  app.get("/authorize", (req, res) => {
+    try {
+      const auth0Domain = authConfig.domain;
+      if (!auth0Domain) {
+        res.status(500).json({ error: "auth0_domain_not_configured" });
+        return;
+      }
+      const incoming = new URL(
+        req.originalUrl,
+        `${req.protocol}://${req.get("host") ?? "mcp.suguvisa.com"}`,
+      );
+      const target = new URL(`https://${auth0Domain}/authorize`);
+      incoming.searchParams.forEach((value, key) => {
+        target.searchParams.set(key, value);
+      });
+
+      // MCP spec の RFC 8707 `resource` は MCP endpoint の URL (例: /mcp サフィックス付き)
+      // を指すが、Auth0 の API identifier はスラッシュ付き root (`authConfig.audience`)
+      // で登録されている。Auth0 は audience が登録済みでなければ invalid_audience を返し、
+      // ログイン画面すら出さずにエラー画面に飛ぶため、ここでは必ず authConfig.audience を
+      // audience として上書きし、resource パラメータはそのまま Auth0 に渡す（参考情報として）。
+      //
+      // MCP's RFC 8707 `resource` points at the MCP endpoint (e.g. the /mcp suffix),
+      // but the Auth0 API identifier is the slash-terminated root. Auth0 refuses
+      // an unregistered audience with invalid_audience and never shows its login
+      // page, so we force `audience` to authConfig.audience while leaving the
+      // `resource` parameter intact for downstream introspection.
+      //
+      // `resource` (RFC 8707) MCP menunjuk ke endpoint MCP (mis. akhiran /mcp),
+      // sementara Auth0 mengenali API hanya dengan identifier root-nya. Auth0
+      // akan menolak audience yang tidak terdaftar dan tidak menampilkan layar
+      // login, jadi kami memaksa audience = authConfig.audience.
+      if (authConfig.audience) {
+        target.searchParams.set("audience", authConfig.audience);
+      }
+
+      res.redirect(302, target.toString());
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("[OAuth] /authorize proxy failed:", message);
+      res.status(500).json({ error: "authorize_proxy_failed", message });
     }
   });
 
@@ -460,6 +649,11 @@ app.post("/mcp", async (req: AuthRequest, res) => {
     if (isToolCall && toolName) {
       const access = checkToolAccess(toolName, req.tenant?.subscription_plan);
       if (!access.allowed) {
+        console.error(
+          `[mcp-plan] tool=${toolName} tenant=${req.tenant?.id ?? "?"} ` +
+            `plan=${req.tenant?.subscription_plan ?? "?"} ` +
+            `reason="${access.reason ?? "not allowed"}"`,
+        );
         res.status(403).json({
           jsonrpc: "2.0",
           error: { code: -32003, message: access.reason || "Tool not available on your plan" },
@@ -474,6 +668,13 @@ app.post("/mcp", async (req: AuthRequest, res) => {
         const requiredScopes = getToolScopes(toolName);
         const missing = requiredScopes.filter(s => !principal.scopes.includes(s));
         if (missing.length > 0) {
+          console.error(
+            `[mcp-scope] tool=${toolName} sub=${principal.sub} ` +
+              `iss=${principal.iss} aud=${principal.aud} ` +
+              `required=${JSON.stringify(requiredScopes)} ` +
+              `present=${JSON.stringify(principal.scopes)} ` +
+              `missing=${JSON.stringify(missing)}`,
+          );
           res.status(403).json({
             jsonrpc: "2.0",
             error: { code: -32003, message: `Insufficient scope. Required: ${missing.join(', ')}` },

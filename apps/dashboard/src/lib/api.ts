@@ -61,7 +61,14 @@ function pickLocalized(value: Localized | null | undefined, lang: "ja" | "en" = 
 export interface TenantSnapshot {
   id: string;
   organizationName?: string;
+  /** Effective plan (subscription 優先、次いで active ticket なら starter) */
   plan: string;
+  /** サブスク本体の raw な値 (free / starter / ...) — チケット独立表示用 */
+  rawSubscriptionPlan?: string;
+  /** チケット (30日パス) の有効期限 */
+  ticketExpiresAt?: string | null;
+  /** ticket_expires_at > now() */
+  ticketActive?: boolean;
   planDetails?: {
     name?: string;
     requestsPerMinute?: number;
@@ -76,6 +83,27 @@ export interface TenantSnapshot {
     currentPeriodEnd?: string | null;
     cancelAtPeriodEnd?: boolean | null;
   };
+}
+
+/** 30日パスなどのワンタイム購入オプション / One-time pass (e.g. 30-day ticket) */
+export interface OneTimePass {
+  key: string;
+  name: string;
+  description: string;
+  priceJpy: number;
+  durationDays: number;
+  grantsPlan: string;
+  stripePriceId: string | null;
+}
+
+interface WireOneTimePass {
+  key: string;
+  name: Localized;
+  description: Localized;
+  price_jpy: number;
+  duration_days: number;
+  grants_plan: string;
+  stripe?: { price_id: string | null };
 }
 
 export interface ApiKeySummary {
@@ -120,6 +148,51 @@ export async function listPlans(opts: ApiOptions = {}): Promise<Plan[]> {
   return res.plans.map(normalizePlan);
 }
 
+/**
+ * 30日パス等のワンタイム購入オプションを取得する。
+ * List publicly available one-time passes (tickets).
+ */
+export async function listOneTimePasses(opts: ApiOptions = {}): Promise<OneTimePass[]> {
+  const res = await request<{ one_time_passes?: WireOneTimePass[] }>("/api/v1/billing/plans", {
+    method: "GET",
+    ...opts,
+  });
+  return (res.one_time_passes ?? []).map((p) => ({
+    key: p.key,
+    name: pickLocalized(p.name),
+    description: pickLocalized(p.description),
+    priceJpy: p.price_jpy,
+    durationDays: p.duration_days,
+    grantsPlan: p.grants_plan,
+    stripePriceId: p.stripe?.price_id ?? null,
+  }));
+}
+
+/**
+ * ワンタイムチケット購入用の Stripe Checkout URL を発行する。
+ * Create a Stripe Checkout URL for one-time ticket purchase.
+ */
+export async function createTicketCheckout(
+  params: { passKey?: string; successPath?: string; cancelPath?: string; customerEmail?: string },
+  opts: ApiOptions = {},
+): Promise<CheckoutResponse> {
+  const siteUrl = resolveSiteUrl();
+  const raw = await request<{ status: string; checkout_url: string; session_id?: string }>(
+    "/api/v1/billing/checkout/ticket",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        pass_key: params.passKey ?? "ticket",
+        success_url: `${siteUrl}${params.successPath ?? "/dashboard/billing?status=ticket_success"}`,
+        cancel_url: `${siteUrl}${params.cancelPath ?? "/dashboard/billing?status=ticket_canceled"}`,
+        customer_email: params.customerEmail,
+      }),
+      ...opts,
+    },
+  );
+  return { url: raw.checkout_url, sessionId: raw.session_id };
+}
+
 function normalizePlan(p: WirePlan): Plan {
   return {
     key: p.key,
@@ -147,6 +220,9 @@ export async function getMe(opts: ApiOptions = {}): Promise<TenantSnapshot> {
       id: string;
       organization_name?: string;
       subscription_plan: string;
+      raw_subscription_plan?: string;
+      ticket_expires_at?: string | null;
+      ticket_active?: boolean;
       plan_details?: {
         name?: string;
         requests_per_minute?: number;
@@ -168,6 +244,9 @@ export async function getMe(opts: ApiOptions = {}): Promise<TenantSnapshot> {
     id: t.id,
     organizationName: t.organization_name,
     plan: t.subscription_plan,
+    rawSubscriptionPlan: t.raw_subscription_plan ?? t.subscription_plan,
+    ticketExpiresAt: t.ticket_expires_at ?? null,
+    ticketActive: t.ticket_active ?? false,
     planDetails: t.plan_details && {
       name: t.plan_details.name,
       requestsPerMinute: t.plan_details.requests_per_minute,

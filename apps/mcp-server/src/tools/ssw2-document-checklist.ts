@@ -1,5 +1,5 @@
 /**
- * get_ssw2_document_checklist — 特定技能2号 分野別書類チェックリスト
+ * suguvisa_ssw2_checklist_get — 特定技能2号 分野別書類チェックリスト
  *
  * 出入国在留管理庁の公式必要書類一覧（令和8年4月改定版）に基づき、
  * ユーザーが選択した分野・雇用形態に応じた書類チェックリストを返す。
@@ -157,20 +157,20 @@ function getSSW2Checklist(params: {
       "- 🔴 ユーザー用意 → 書類名の前に🔴を付け、取得先（issuer）を明記\n" +
       "- 省略可能な書類は ⚡ アイコンで条件を表示\n\n" +
       "## 次のアクション\n" +
-      "- 🟢自動生成書類 → generate_reference_form で一括生成を提案\n" +
+      "- 🟢自動生成書類 → suguvisa_reference_form_generate で一括生成を提案\n" +
       "- 🔴ユーザー用意書類 → 取得先と目安期間をアドバイス\n" +
       "- チェックリストUI → checklist_url のリンクを案内",
     _next_actions: [
       {
-        tool: "generate_reference_form",
+        tool: "suguvisa_reference_form_generate",
         reason: `🟢自動生成可能な${autoGenCount}件の参考様式を一括生成`,
       },
       {
-        tool: "get_required_documents",
+        tool: "suguvisa_required_documents_list",
         reason: "SSW1パターンの詳細書類リスト（省略条件含む）を取得",
       },
       {
-        tool: "calculate_deadlines",
+        tool: "suguvisa_deadlines_calculate",
         reason: "申請期限・提出スケジュールを計算",
       },
     ],
@@ -194,7 +194,7 @@ export { getSSW2Checklist };
 
 export function registerSSW2DocumentChecklist(server: McpServer) {
   server.tool(
-    "get_ssw2_document_checklist",
+    "suguvisa_ssw2_checklist_get",
     "【特定技能2号 書類チェックリスト】分野（11分野対応）と雇用形態を選ぶだけで、入管提出に必要な全書類を一覧化。共通書類（第1表）＋所属機関書類（第2表）＋分野別書類（第3表）をセクション分けで表示。🟢自動生成可能 / 🔴ユーザー用意を色分けし、省略条件・取得先・必要入力情報も付記。チェックリストUIのリンクも提供。 / Returns the complete SSW2 document checklist by field and employment type.",
     {
       industry_field: z.enum([
@@ -218,7 +218,7 @@ export function registerSSW2DocumentChecklist(server: McpServer) {
         "所属機関書類（第2表）の内容が変わります。"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Get SSW2 document checklist", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
       const result = getSSW2Checklist(params);
       return {

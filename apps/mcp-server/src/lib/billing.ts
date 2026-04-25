@@ -15,6 +15,7 @@ import { supabase } from "./supabase.js";
 let cachedClient: BillingClient | null = null;
 let cachedRepository: SupabaseBillingRepository | null = null;
 let cachedMappings: PriceMapping[] | null = null;
+let cachedTicketPrices: Record<string, string> | null = null;
 
 export function getBillingClient(): BillingClient {
   if (cachedClient) return cachedClient;
@@ -43,11 +44,29 @@ export function getPriceMappings(): PriceMapping[] {
   return cachedMappings;
 }
 
+/**
+ * ワンタイム購入 (チケット) の passKey → Stripe price_id マッピング。
+ * 環境変数: SUGUVISA_STRIPE_PRICE_TICKET など。
+ * Map of ticket pass key → Stripe price id, read from SUGUVISA_STRIPE_PRICE_* envs.
+ */
+export function getTicketPriceIds(): Record<string, string> {
+  if (cachedTicketPrices) return cachedTicketPrices;
+  const env = process.env;
+  const mapping: Record<string, string> = {};
+  const ticket = env.SUGUVISA_STRIPE_PRICE_TICKET;
+  if (ticket && ticket.trim().length > 0) {
+    mapping.ticket = ticket.trim();
+  }
+  cachedTicketPrices = mapping;
+  return cachedTicketPrices;
+}
+
 /** テスト / 起動時リセット用 */
 export function resetBillingCache(): void {
   cachedClient = null;
   cachedRepository = null;
   cachedMappings = null;
+  cachedTicketPrices = null;
 }
 
 export function isBillingConfigured(): boolean {

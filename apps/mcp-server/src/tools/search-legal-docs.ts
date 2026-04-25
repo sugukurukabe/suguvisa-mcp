@@ -26,13 +26,13 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, fallbackErrorMsg 
  */
 export function registerSearchLegalDocs(server: McpServer) {
   server.tool(
-    "search_legal_docs",
+    "suguvisa_legal_docs_search",
     "【法務文書検索】Vertex AI Searchによるセマンティック検索で、法務マニュアル・契約書テンプレート・行政届出チェックリスト・SuguVisaマニュアル等を自然言語で横断検索。DataStore未設定時はGemini AIが法務知識ベースから直接回答。「特定技能1号 建設 所属機関概要書の書き方」のような質問でも回答可能。 / Semantic search across legal documents using Vertex AI Search, with Gemini AI knowledge base fallback.",
     {
       query: z.string().describe("検索クエリ（自然言語またはキーワード、例: 「特定技能1号 建設 分野の所属機関概要書の書き方」）"),
       max_results: z.number().optional().describe("最大結果件数（デフォルト: 5）"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Search legal documents", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ query, max_results }) => {
       // === キャッシュの確認 ===
       const cacheKey = `${query}_${max_results || 5}`;

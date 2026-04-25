@@ -112,14 +112,14 @@ export function validateSSW2Test(value: string): ValidationResult {
 
 export function registerValidateData(server: McpServer) {
   server.tool(
-    "validate_application_data",
+    "suguvisa_application_data_validate",
     "【申請データ検証】在留カード番号（12桁英数字）、法人番号（13桁）、日付形式、電話番号等の入力値をリアルタイムにチェック。入管への提出前にデータ不備を検出し、補正指示のリスクを大幅に低減。 / Real-time validation of residence card numbers, corporate numbers, dates, and phone formats to prevent submission errors.",
     {
       fields: z.record(z.string()).describe(
         "検証するフィールドのキー/値 / Key/value fields to validate / Bidang kunci/nilai untuk divalidasi"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Validate application data", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ fields }) => {
       const results: Record<string, ValidationResult> = {};
       let allValid = true;
@@ -180,7 +180,7 @@ export function registerValidateData(server: McpServer) {
                   "4. 在留期限が14日以内の場合は > [!CAUTION] で緊急警告を出す"
                 : warningCount > 0
                 ? "⚠️ すべて有効ですが警告があります。警告項目を > [!WARNING] で強調表示してください。在留期限や通算期間の残りが少ない場合は特に目立たせてください。"
-                : "✅ すべてのフィールドが有効です。次のステップ（書類生成: generate_online_csv or generate_bulk_xlsm）を提案してください。",
+                : "✅ すべてのフィールドが有効です。次のステップ（書類生成: suguvisa_online_csv_generate or suguvisa_bulk_xlsm_generate）を提案してください。",
           }, null, 2),
         }],
       };
@@ -188,14 +188,14 @@ export function registerValidateData(server: McpServer) {
   );
 
   server.tool(
-    "check_csv_missing_fields",
+    "suguvisa_csv_missing_fields_check",
     "オンライン申請のCSV生成前に、必須フィールドが揃っているか、およびスキーマに沿って正しく入力されているかをチェックする。 / Pre-check missing/invalid CSV fields.",
     {
       applicant: z.record(z.any()).describe(
         "事前チェックしたい申請人データ1件 / Single applicant data object to pre-check"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Check CSV missing fields", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ applicant }) => {
       // 動的インポートを利用して依存関係を引き込む (循環参照防止)
       const { officialCsvSchema } = await import("../data/csv-schema.js");
@@ -208,7 +208,7 @@ export function registerValidateData(server: McpServer) {
             text: JSON.stringify({
               status: "ready",
               message: "すべての必須データが揃っており、形式も正しいです。",
-              _ai_instructions: "✅ CSV生成の準備完了です。generate_online_csv または generate_bulk_xlsm でCSV/Excelを生成できることをユーザーに伝えてください。",
+              _ai_instructions: "✅ CSV生成の準備完了です。suguvisa_online_csv_generate または suguvisa_bulk_xlsm_generate でCSV/Excelを生成できることをユーザーに伝えてください。",
             }, null, 2)
           }]
         };

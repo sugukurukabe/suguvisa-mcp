@@ -154,7 +154,7 @@ describe("api client", () => {
           today_limit: 1000,
           today_remaining: 988,
           this_month: 123,
-          by_tool_today: { determine_application_type: { success: 10, error: 1 } },
+          by_tool_today: { suguvisa_application_type_determine: { success: 10, error: 1 } },
         },
       },
     });
@@ -162,7 +162,7 @@ describe("api client", () => {
     expect(u.today).toBe(12);
     expect(u.todayRemaining).toBe(988);
     expect(u.thisMonth).toBe(123);
-    expect(u.byToolToday.determine_application_type.success).toBe(10);
+    expect(u.byToolToday.suguvisa_application_type_determine.success).toBe(10);
   });
 
   it("throws ApiError with status and body on 4xx", async () => {

@@ -4,15 +4,16 @@
     "plan": {
       "type": "string",
       "title": "Subscription Plan",
-      "description": "Select your plan tier. free=5 basic tools (pattern detection, document list, deadline calc), pro=all 24 tools (AI reason letter, reference forms, SSW2 checklist, OCR), enterprise=audit logs & tenant management",
+      "description": "Select your subscription tier. free = all 42 tools available for trial (with OCR / bulk / autonomous workflow gated), starter = production use with OCR + bulk generation + audit log + annual report (19,800 JPY/mo), professional = full feature set with legal search + autonomous workflow (49,800 JPY/mo).",
       "default": "free",
-      "enum": ["free", "pro", "enterprise"]
+      "enum": ["free", "starter", "professional"]
     },
     "apiKey": {
       "type": "string",
-      "title": "API Key (Enterprise only)",
-      "description": "API key for Enterprise plan. Not required for free/pro plans. Get yours at the SuguVisa dashboard.",
+      "title": "API Key",
+      "description": "SuguVisa API key issued from https://suguvisa.com/dashboard/api-keys. Required for starter / professional plans; optional for the free tier (unauthenticated access uses stricter rate limits).",
       "default": "",
+      "format": "password",
       "x-from": {
         "header": "x-suguvisa-api-key"
       }
@@ -20,7 +21,7 @@
     "gcpProjectId": {
       "type": "string",
       "title": "GCP Project ID (Optional)",
-      "description": "Google Cloud Project ID for residence card OCR (Document AI) and legal document search (Vertex AI). Leave empty if you don't need these features.",
+      "description": "Your own Google Cloud Project ID for residence card OCR (Document AI) and legal document search (Vertex AI). Leave empty to use SuguVisa's managed quota.",
       "default": ""
     }
   },

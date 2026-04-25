@@ -26,7 +26,7 @@ Cloud Run `suguvisa-mcp` の revision に下記がすべて設定されている
 |---|---|
 | `SUGUVISA_BASE_URL` | `https://mcp.suguvisa.com` |
 | `SUGUVISA_MARKETING_URL` | `https://suguvisa.com` |
-| `SUGUVISA_SUPPORT_EMAIL` | `support@sugu-kuru.co.jp` |
+| `SUGUVISA_SUPPORT_EMAIL` | `info@sugu-kuru.co.jp` |
 | `AUTH0_DOMAIN` | `<tenant>.jp.auth0.com` |
 | `AUTH0_AUDIENCE` | `https://mcp.suguvisa.com` |
 | `STRIPE_SECRET_KEY` | 本番 `sk_live_...` (Stripe 側確認後) |
@@ -94,7 +94,7 @@ npx -y @modelcontextprotocol/inspector https://mcp.suguvisa.com/mcp
 - [x] `tools/list` で 42 ツール返る
 - [x] `prompts/list` で 14 プロンプト返る
 - [x] `resources/list` で 70 リソース返る
-- [ ] `determine_application_type` のテスト呼び出しが成功
+- [ ] `suguvisa_application_type_determine` のテスト呼び出しが成功
 
 ## 7. 決済 E2E (テストモード)
 

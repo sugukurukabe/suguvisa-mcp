@@ -44,13 +44,13 @@ Anthropic のコンソールで以下を入力:
 
 1. **Display Name**: `SuguVisa — Japan SSW Visa AI`
 2. **Publisher**: `Sugukuru Inc. (スグクル株式会社)`
-3. **Contact Email**: `support@sugu-kuru.co.jp`
+3. **Contact Email**: `info@sugu-kuru.co.jp`
 4. **Server URL**: `https://<your-domain>/mcp`
 5. **Server Card URL**: `https://<your-domain>/.well-known/mcp/server-card.json`
 6. **Categories**: `Legal`, `Business`, `Productivity`
 7. **Short description**: (サーバーカードの `shortDescription.en` をコピー)
 8. **Long description**: (サーバーカードの `longDescription.en`)
-9. **Icon**: `https://<your-domain>/logo.svg`
+9. **Icon**: `https://<your-domain>/icon-1024.png` (正方形・不透過) / SVG 版は `/logo.svg`
 10. **Privacy policy**: `https://<your-domain>/privacy`
 11. **Terms of service**: `https://<your-domain>/terms`
 12. **Support URL**: `https://<your-domain>/support`

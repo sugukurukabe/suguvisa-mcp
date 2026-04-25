@@ -8,7 +8,12 @@ export interface AuthRequest extends Request {
   tenant?: {
     id: string;
     organization_name: string;
+    /** チケットを考慮した実効プラン / Ticket-aware effective plan */
     subscription_plan: string;
+    /** 生のサブスクリプションプラン (チケット判定に使う前の値) */
+    raw_subscription_plan?: string;
+    /** チケット (30日パス) の有効期限。未来なら Starter 相当付与中 */
+    ticket_expires_at?: string | null;
   };
 }
 
@@ -35,6 +40,7 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
     "/logo.svg",
     "/logo.png",
     "/icon-1024.png",
+    "/icon-512.png",
     "/icon-256.png",
     "/apple-touch-icon.png",
     "/favicon.svg",
@@ -48,8 +54,14 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
     "/api/v1/billing/webhook",
     "/oauth/register",
   ]);
-  const publicPrefixes = ["/.well-known/", "/mcp"];
-  if (publicExact.has(req.path) || publicPrefixes.some(p => req.path.startsWith(p))) {
+  const publicPrefixes = ["/.well-known/", "/mcp", "/assets/"];
+  // Google Search Console HTML-file verification path (e.g. /googleabc123.html)
+  const isGoogleVerification = /^\/google[a-z0-9]+\.html$/i.test(req.path);
+  if (
+    publicExact.has(req.path) ||
+    publicPrefixes.some((p) => req.path.startsWith(p)) ||
+    isGoogleVerification
+  ) {
     next();
     return;
   }
@@ -101,6 +113,7 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
             id,
             organization_name,
             subscription_plan,
+            ticket_expires_at,
             status
           )
         `)
@@ -128,11 +141,14 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
         return;
       }
 
-      // テナント情報をリクエストにアタッチ
+      // テナント情報をリクエストにアタッチ（チケット有効期限を考慮した実効プラン）
+      // Attach tenant with ticket-aware effective plan
       req.tenant = {
         id: tenant.id,
         organization_name: tenant.organization_name,
-        subscription_plan: tenant.subscription_plan
+        subscription_plan: resolveEffectivePlanForTenant(tenant),
+        raw_subscription_plan: (tenant.subscription_plan ?? "free").toString(),
+        ticket_expires_at: tenant.ticket_expires_at ?? null,
       };
 
       next();
@@ -154,4 +170,22 @@ export async function apiKeyAuth(req: AuthRequest, res: Response, next: NextFunc
     error: { code: -32002, message: "Invalid API key" },
     id: null,
   });
+}
+
+/**
+ * チケット (30日パス) を考慮して実効プランを判定する共通ヘルパー。
+ * Resolve effective plan considering ticket_expires_at (30-day pass).
+ *
+ * - サブスク (starter/professional/unlimited) はそのまま維持
+ * - それ以外で ticket_expires_at が未来なら 'starter' として扱う
+ */
+function resolveEffectivePlanForTenant(tenant: {
+  subscription_plan?: string | null;
+  ticket_expires_at?: string | null;
+}): string {
+  const sub = (tenant.subscription_plan ?? "free").toString();
+  if (sub === "starter" || sub === "professional" || sub === "unlimited") return sub;
+  const expiry = tenant.ticket_expires_at ? new Date(tenant.ticket_expires_at).getTime() : 0;
+  if (expiry > Date.now()) return "starter";
+  return sub;
 }

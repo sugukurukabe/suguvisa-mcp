@@ -7,7 +7,7 @@ import os from "os";
 
 export function registerGeneratePeriodicNotification(server: McpServer) {
   server.tool(
-    "generate_periodic_notification_forms",
+    "suguvisa_periodic_notification_forms_generate",
     "【定期届出】Supabaseや解析されたデータをもとに、定期届出（参考様式第3-6号等）のExcelまたは電子届出用CSVを自動生成し、ダウンロードリンク（ローカルパス）を提供するツール。 / Autogenerate the Reference Form 3-6 (Excel/CSV) for the actual periodic notification using collected data and return the file path.",
     {
       company_name: z.string().describe("届出を行う法人名"),
@@ -21,7 +21,7 @@ export function registerGeneratePeriodicNotification(server: McpServer) {
         status: z.enum(["active", "resigned", "on_leave"])
       })).optional().describe("届出対象となる特定技能外国人のリスト。省略時はダミーデータでテスト生成します。"),
     },
-    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Generate periodic notification forms", readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ company_name, reporting_year, output_format, workers_data }) => {
       
       const workers = workers_data || [

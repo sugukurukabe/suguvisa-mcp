@@ -103,14 +103,14 @@ const searchArgs = {
 };
 
 /**
- * MCP ツール: search_golden_records
+ * MCP ツール: suguvisa_golden_records_search
  */
 export function registerSearchGoldenRecords(server: McpServer): void {
   server.tool(
-    "search_golden_records",
+    "suguvisa_golden_records_search",
     "【Golden Records 検索】信頼できる知識ベース（入管ルール、公式文書、産業分野マスタ、匿名化済み事例など）をハイブリッド検索（BM25 + Vector）で横断検索。結果は引用付きで返却されるため、LLM の回答根拠として利用可能。 / Hybrid search (BM25 + Vector) across the Golden Records knowledge base for citation-grounded answers.",
     searchArgs,
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Search golden records", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ query, topK, tenant_id, include_global, types }) => {
       try {
         const ctx = getContext();
@@ -148,7 +148,7 @@ export function registerSearchGoldenRecords(server: McpServer): void {
           ],
         };
       } catch (error) {
-        console.error("search_golden_records エラー:", error);
+        console.error("suguvisa_golden_records_search エラー:", error);
         return {
           content: [
             {

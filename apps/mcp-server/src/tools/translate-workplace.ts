@@ -127,7 +127,7 @@ const DOMAIN_GLOSSARY: Record<string, Record<string, string>> = {
 export function registerTranslateWorkplaceMessage(server: McpServer) {
   // === ツール1: AI自由翻訳 ===
   server.tool(
-    "translate_workplace_message",
+    "suguvisa_workplace_message_translate",
     "【多言語翻訳】業務連絡や安全指示を外国人スタッフの母語に翻訳。農業・製造の専門用語辞書を内蔵し、Google翻訳より正確な現場用語の翻訳を実現。日本語→多言語、多言語→日本語の双方向対応。「やさしい日本語」への変換も可能。 / Translates workplace messages to/from foreign staff's native language with built-in agriculture & manufacturing glossary.",
     {
       message: z.string().describe(
@@ -143,7 +143,7 @@ export function registerTranslateWorkplaceMessage(server: McpServer) {
         "true にすると「やさしい日本語」にも変換する / Also convert to Easy Japanese"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Translate workplace message", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ message, target_languages, domain, to_easy_japanese }) => {
       const langs = target_languages || ["id", "vi"];
       const domainKey = domain || "general";
@@ -262,7 +262,7 @@ JSONのみを出力してください。`;
 
   // === ツール2: 定型文テンプレート翻訳 ===
   server.tool(
-    "get_workplace_template",
+    "suguvisa_workplace_template_get",
     "【定型文テンプレート】「早出」「残業」「雨天中止」「農薬注意」など、現場でよく使う定型連絡を10言語に瞬時翻訳。AIを使わないので即レスポンス。変数（時間・日付等）の差し込みにも対応。 / Instantly translates common workplace phrases to 10 languages without AI. Supports variable substitution.",
     {
       template_id: z.string().describe(
@@ -275,7 +275,7 @@ JSONのみを出力してください。`;
         "表示する言語コード（省略時は全言語） / Language codes to show"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Get workplace template", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ template_id, variables, target_languages }) => {
       const template = TEMPLATES[template_id];
       if (!template) {
@@ -333,10 +333,10 @@ ${Object.entries(results).map(([lang, text]) => `${FLAG_MAP[lang] || "🏳️"} 
 
   // === ツール3: テンプレート一覧 ===
   server.tool(
-    "list_workplace_templates",
+    "suguvisa_workplace_templates_list",
     "【定型文一覧】利用可能な定型文テンプレートの一覧を取得。「どんな定型文がある？」と聞かれたらこのツールを使用。 / Lists all available workplace message templates.",
     {},
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "List workplace templates", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async () => {
       const list = Object.entries(TEMPLATES).map(([id, msgs]) => ({
         id,

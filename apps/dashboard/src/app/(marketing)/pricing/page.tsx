@@ -43,7 +43,7 @@ export default async function PricingPage() {
           50 名以上の行政書士事務所・登録支援機関、専用インフラ、SLA、監査ログの長期保管などが必要な場合は個別にご相談ください。
         </p>
         <a
-          href="mailto:support@sugu-kuru.co.jp?subject=SuguVisa%20Enterprise%20Inquiry"
+          href="mailto:info@sugu-kuru.co.jp?subject=SuguVisa%20Enterprise%20Inquiry"
           className="mt-4 inline-block rounded-lg border border-brand-600 px-4 py-2 text-sm font-semibold text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/40"
         >
           お問い合わせ

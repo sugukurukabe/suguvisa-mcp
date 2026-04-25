@@ -114,7 +114,7 @@ export function registerAllTools(server: McpServer): void {
 function registerPrompts(server: McpServer): void {
   // 1. 技能実習→特定技能の移行手続き一式
   server.prompt(
-    "titp_to_ssw1_workflow",
+    "suguvisa_titp_to_ssw1_workflow",
     "技能実習から特定技能1号への移行手続きを一通り案内するワークフロー",
     {
       from_visa: z.string().describe("現在の在留資格（例: '技能実習2号'）"),
@@ -131,10 +131,10 @@ function registerPrompts(server: McpServer): void {
             industry_field ? `分野: ${industry_field}` : "",
             "",
             "以下のステップで進めてください:",
-            "1. determine_application_type で申請パターンを判定",
-            "2. get_required_documents で必要書類リストを取得",
-            "3. generate_intake_sheet で入力シートを生成",
-            "4. calculate_deadlines で期限を確認",
+            "1. suguvisa_application_type_determine で申請パターンを判定",
+            "2. suguvisa_required_documents_list で必要書類リストを取得",
+            "3. suguvisa_intake_sheet_generate で入力シートを生成",
+            "4. suguvisa_deadlines_calculate で期限を確認",
             "",
             "各ステップの結果をわかりやすくまとめてください。試験免除の条件も確認してください。",
           ].filter(Boolean).join("\n"),
@@ -145,7 +145,7 @@ function registerPrompts(server: McpServer): void {
 
   // 2. 転職時の手続きガイド
   server.prompt(
-    "job_change_checklist",
+    "suguvisa_job_change_checklist",
     "特定技能1号スタッフの転職（雇用先変更）時に必要な手続き一式",
     {
       applicant_name: z.string().optional().describe("申請人氏名"),
@@ -161,9 +161,9 @@ function registerPrompts(server: McpServer): void {
             resignation_date ? `退職日: ${resignation_date}` : "",
             "",
             "以下を確認してください:",
-            "1. determine_application_type で CHANGE_SSW1_D（転職パターン）を確認",
-            resignation_date ? `2. calculate_deadlines で随時届出の期限を計算（event_date: ${resignation_date}）` : "2. calculate_deadlines で随時届出の期限を計算",
-            "3. get_required_documents で必要書類を取得",
+            "1. suguvisa_application_type_determine で CHANGE_SSW1_D（転職パターン）を確認",
+            resignation_date ? `2. suguvisa_deadlines_calculate で随時届出の期限を計算（event_date: ${resignation_date}）` : "2. suguvisa_deadlines_calculate で随時届出の期限を計算",
+            "3. suguvisa_required_documents_list で必要書類を取得",
             "4. 申請中の就労ルールを説明（前の雇用主のもとでは就労可能、新しい雇用主のもとでは不可）",
           ].filter(Boolean).join("\n"),
         },
@@ -173,7 +173,7 @@ function registerPrompts(server: McpServer): void {
 
   // 3. 更新申請の準備リスト
   server.prompt(
-    "renewal_preparation",
+    "suguvisa_renewal_preparation",
     "特定技能1号の在留期間更新申請の準備ガイド",
     {
       expiry_date: z.string().optional().describe("在留期限（YYYY-MM-DD）"),
@@ -190,10 +190,10 @@ function registerPrompts(server: McpServer): void {
             ssw1_start_date ? `通算開始日: ${ssw1_start_date}` : "",
             "",
             "以下のステップで進めてください:",
-            expiry_date ? `1. calculate_deadlines で更新申請可能開始日と期限を計算（expiry_date: ${expiry_date}${ssw1_start_date ? `, ssw1_start_date: ${ssw1_start_date}` : ""})` : "1. calculate_deadlines で期限を計算",
-            "2. determine_application_type で RENEWAL_01 を確認",
-            "3. get_required_documents で必要書類を取得（更新時の省略条件に注意）",
-            "4. generate_intake_sheet で入力シートを生成",
+            expiry_date ? `1. suguvisa_deadlines_calculate で更新申請可能開始日と期限を計算（expiry_date: ${expiry_date}${ssw1_start_date ? `, ssw1_start_date: ${ssw1_start_date}` : ""})` : "1. suguvisa_deadlines_calculate で期限を計算",
+            "2. suguvisa_application_type_determine で RENEWAL_01 を確認",
+            "3. suguvisa_required_documents_list で必要書類を取得（更新時の省略条件に注意）",
+            "4. suguvisa_intake_sheet_generate で入力シートを生成",
             ssw1_start_date ? "5. 通算在留期間の残りも確認し、2号移行の検討を促す" : "",
           ].filter(Boolean).join("\n"),
         },
@@ -203,7 +203,7 @@ function registerPrompts(server: McpServer): void {
 
   // 4. 在留カード情報の確認 & 検証
   server.prompt(
-    "verify_residence_card",
+    "suguvisa_residence_card_verify",
     "在留カードOCR結果の検証と申請データへの反映",
     {
       ocr_text: z.string().describe("在留カードのOCR読み取り結果テキスト"),
@@ -220,8 +220,8 @@ function registerPrompts(server: McpServer): void {
             ocr_text,
             "```",
             "",
-            "1. parse_residence_card でOCRテキストを構造化データに変換",
-            "2. validate_application_data で各フィールドを検証（在留カード番号、在留期限等）",
+            "1. suguvisa_residence_card_parse でOCRテキストを構造化データに変換",
+            "2. suguvisa_application_data_validate で各フィールドを検証（在留カード番号、在留期限等）",
             "3. 結果をまとめて、不足情報や要確認事項を報告",
           ].join("\n"),
         },
@@ -230,7 +230,7 @@ function registerPrompts(server: McpServer): void {
   );
   // 5. ビジュアル期限チェッカー
   server.prompt(
-    "visual_deadline_calculator",
+    "suguvisa_deadline_timeline_visualize",
     "Mermaidを活用した視覚的な期限タイムラインと手続き提案",
     {
       expiry_date: z.string().optional().describe("在留期限（YYYY-MM-DD）"),
@@ -247,7 +247,7 @@ function registerPrompts(server: McpServer): void {
             event_date ? `届出発生日: ${event_date}` : "",
             "",
             "以下の手順で回答を出力してください:",
-            "1. calculate_deadlines を使用して期限データを取得",
+            "1. suguvisa_deadlines_calculate を使用して期限データを取得",
             "2. 取得したデータを元に、Mermaid記法によるガントチャートまたはタイムライン（`mermaid` コードブロック）を描画する",
             "3. ツールから返却された _ai_summary_guidelines の指示に従い、警告や注意喚起を Markdown アラートで提示する",
             "4. 最後に、次のアクション（書類の準備など）をガイドする",
@@ -259,7 +259,7 @@ function registerPrompts(server: McpServer): void {
 
   // 6. 自律型ビザ申請ウィザード (LangGraph 連動)
   server.prompt(
-    "autonomous_visa_wizard",
+    "suguvisa_autonomous_visa_wizard",
     "ユーザーと対話しながら不足データを集め、書類を一括生成するウィザード",
     {
       applicant_name: z.string().optional().describe("申請人氏名"),
@@ -274,11 +274,11 @@ function registerPrompts(server: McpServer): void {
             applicant_name ? `対象者: ${applicant_name}` : "",
             "",
             "以下の手順で進めてください:",
-            "1. start_autonomous_visa_workflow を呼び出す（持っている情報があれば applicant_data に含める）",
+            "1. suguvisa_autonomous_workflow_start を呼び出す（持っている情報があれば applicant_data に含める）",
             "2. もし status が 'waiting_for_human' で返ってきたら:",
             "   - _ai_instructions の指示に従い、不足フィールドの一覧を美しいMarkdownのチェックリストとして提示する",
             "   - ユーザーに「これらの情報を教えてください」と優しく尋ねる",
-            "3. ユーザーが回答したら、 resume_autonomous_visa_workflow を呼び出して再開する",
+            "3. ユーザーが回答したら、 suguvisa_autonomous_workflow_resume を呼び出して再開する",
             "4. 書類生成が完了するまで2〜3を繰り返す",
           ].filter(Boolean).join("\n"),
         },
@@ -288,8 +288,8 @@ function registerPrompts(server: McpServer): void {
 
   // 7. 申請結果フィードバック（HITL自己改善ループ）
   server.prompt(
-    "submission_feedback",
-    "入管から申請結果が返ってきた際に、track_submission_outcome で記録するフィードバックワークフロー",
+    "suguvisa_submission_feedback_record",
+    "入管から申請結果が返ってきた際に、suguvisa_submission_outcome_track で記録するフィードバックワークフロー",
     {
       pattern_id: z.string().optional().describe("申請パターンID（例: 'CHANGE_SSW1_C'）"),
       applicant_name: z.string().optional().describe("申請人氏名"),
@@ -304,12 +304,12 @@ function registerPrompts(server: McpServer): void {
             pattern_id ? `パターンID: ${pattern_id}` : "",
             "",
             "以下の手順で進めてください:",
-            pattern_id ? "" : "1. まず申請パターンを確認します — determine_application_type で from_visa と to_visa を特定",
+            pattern_id ? "" : "1. まず申請パターンを確認します — suguvisa_application_type_determine で from_visa と to_visa を特定",
             "2. ユーザーに入管からの結果を聞いてください:",
             "   - 許可（ACCEPTED）",
             "   - 補正指示（REVISION_REQUIRED）→ 補正内容の詳細も聞く",
             "   - 不許可（REJECTED）",
-            "3. track_submission_outcome で結果を記録",
+            "3. suguvisa_submission_outcome_track で結果を記録",
             "4. 統計情報（同一パターンの補正率・通過率）が返ってくるので、分かりやすく提示",
             "5. 補正の場合は、次回申請への改善提案をまとめる",
             "6. 許可の場合は、次のステップ（在留カード受取・届出）を案内",
@@ -321,7 +321,7 @@ function registerPrompts(server: McpServer): void {
 
   // 8. 特定技能2号 申請準備ワークフロー
   server.prompt(
-    "ssw2_application_preparation",
+    "suguvisa_ssw2_application_prepare",
     "特定技能2号の申請準備を分野選択から書類チェックリストまで一通り案内するワークフロー",
     {
       industry_field: z.string().optional().describe("分野（例: '農業', '建設'）"),
@@ -340,10 +340,10 @@ function registerPrompts(server: McpServer): void {
             "",
             "以下のステップで進めてください:",
             "1. 分野が未指定の場合は、11分野から選択してもらう",
-            "2. get_ssw2_document_checklist で分野・雇用形態別の必要書類チェックリストを取得",
+            "2. suguvisa_ssw2_checklist_get で分野・雇用形態別の必要書類チェックリストを取得",
             "3. 🟢自動生成可能な書類と🔴ユーザーが用意する書類を分けて提示",
             "4. 🔴ユーザー用意の書類については取得先と目安期間をアドバイス",
-            "5. 🟢自動生成の書類については generate_reference_form での一括生成を提案",
+            "5. 🟢自動生成の書類については suguvisa_reference_form_generate での一括生成を提案",
             "6. チェックリストUIのリンクも案内",
             "",
             "特定技能2号は支援計画が不要な点、日本語要件は分野による点も説明してください。",

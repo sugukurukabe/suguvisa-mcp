@@ -42,12 +42,12 @@ export interface PlanDefinition {
 }
 
 const FREE_TOOLS = [
-  "determine_application_type",
-  "get_required_documents",
-  "calculate_deadlines",
-  "validate_application_data",
-  "get_complete_visa_guide",
-  "get_law_updates",
+  "suguvisa_application_type_determine",
+  "suguvisa_required_documents_list",
+  "suguvisa_deadlines_calculate",
+  "suguvisa_application_data_validate",
+  "suguvisa_visa_guide_get",
+  "suguvisa_law_updates_list",
 ];
 
 export const PLAN_DEFINITIONS: Record<PlanKey, PlanDefinition> = {
@@ -157,6 +157,54 @@ export function isPlanKey(value: string): value is PlanKey {
 
 export function listPublicPlans(): PlanDefinition[] {
   return Object.values(PLAN_DEFINITIONS).filter((p) => p.publiclyListed);
+}
+
+/**
+ * 一回払いパス定義 / One-time pass definitions / Definisi pass sekali bayar
+ *
+ * サブスクとは別概念で、指定期間だけ特定 PlanKey 相当の機能を開放する。
+ * Webhook の `checkout.session.completed` で `mode=payment` + `metadata.plan=<key>`
+ * を受けると `tenants.ticket_expires_at` を延長する。
+ *
+ * - grantsPlan: チケット有効期間中に適用される実効プラン (例: starter)
+ * - durationDays: 1 回の購入で延長する日数
+ *
+ * 複数チケットのスタック: 既存 expires_at が未来なら「既存 expires_at + durationDays」、
+ *                        過去 / NULL なら「now() + durationDays」
+ */
+export interface OneTimePassDefinition {
+  key: string;
+  name: string;
+  description: { ja: string; en: string; id: string };
+  priceJpy: number;
+  grantsPlan: PlanKey;
+  durationDays: number;
+  publiclyListed: boolean;
+}
+
+export const ONE_TIME_PASSES: Record<string, OneTimePassDefinition> = {
+  ticket: {
+    key: "ticket",
+    name: "Case Ticket (30-day pass)",
+    description: {
+      ja: "30日パス。Starter相当の全ツール（OCR・一括生成・監査ログ・年次報告）を30日間使い放題。自動更新なし。",
+      en: "30-day pass. Unlimited access to all Starter-tier tools (OCR, bulk generation, audit log, annual report) for 30 days. No auto-renew.",
+      id: "Pass 30 hari. Akses tak terbatas ke semua alat tingkat Starter (OCR, pembuatan massal, log audit, laporan tahunan) selama 30 hari. Tidak diperpanjang otomatis.",
+    },
+    priceJpy: 2_980,
+    grantsPlan: "starter",
+    durationDays: 30,
+    publiclyListed: true,
+  },
+};
+
+export function listPublicOneTimePasses(): OneTimePassDefinition[] {
+  return Object.values(ONE_TIME_PASSES).filter((p) => p.publiclyListed);
+}
+
+export function getOneTimePass(key: string | null | undefined): OneTimePassDefinition | null {
+  if (!key) return null;
+  return ONE_TIME_PASSES[key] ?? null;
 }
 
 /**

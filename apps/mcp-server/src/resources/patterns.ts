@@ -32,7 +32,7 @@ export function registerPatternResources(server: McpServer): void {
     {
       title: "全申請パターン一覧 / All application patterns",
       description:
-        "特定技能ビザの全申請パターン（変更・更新・認定・転職等）のID・正式名称・処理期間を一覧で取得。determine_application_type を呼ぶ前のオリエンテーションに使える。",
+        "特定技能ビザの全申請パターン（変更・更新・認定・転職等）のID・正式名称・処理期間を一覧で取得。suguvisa_application_type_determine を呼ぶ前のオリエンテーションに使える。",
       mimeType: "application/json",
     },
     async () => {

@@ -1,5 +1,5 @@
 /**
- * generate_reference_form — 参考様式テンプレートエンジン
+ * suguvisa_reference_form_generate — 参考様式テンプレートエンジン
  *
  * 入管提出に必要な参考様式（1-2, 1-4, 1-5, 1-6, 1-7, 1-11, 1-16, 1-17, 5-7, 農業-1, 農業-2）
  * にユーザーデータを自動マッピングし、記入済みデータを生成する。
@@ -308,7 +308,7 @@ function generateReferenceFormData(
 
 export function registerGenerateReferenceForm(server: McpServer) {
   server.tool(
-    "generate_reference_form",
+    "suguvisa_reference_form_generate",
     "【参考様式テンプレート生成】入管提出に必要な参考様式（雇用契約書1-5、雇用条件書1-6、支援計画書1-17、所属機関概要書1-11、報酬説明書1-4、誓約書1-2等）にユーザーデータを自動マッピングし、記入済みデータを生成。パターンIDを指定すれば必要な全様式を一括生成。個別の様式番号指定も可能。完成度（%）と不足フィールドを可視化。 / Generates pre-filled reference form data for ISA submission. Maps applicant and company data to official form fields with completion tracking.",
     {
       form_ids: z.array(z.string()).optional().describe(
@@ -330,7 +330,7 @@ export function registerGenerateReferenceForm(server: McpServer) {
         "支援形態（self=自社支援, delegated=登録支援機関委託）"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Generate reference form", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ form_ids, pattern_id, applicant_data, company_data, industry_field, support_type }) => {
       const today = new Date().toISOString().slice(0, 10);
 
@@ -441,7 +441,7 @@ export function registerGenerateReferenceForm(server: McpServer) {
               "## バイリンガル対応\n" +
               "- bilingual_required がある場合、「この書類は申請人の母国語との併記が必要です」と注意喚起\n\n" +
               "## 次のステップ\n" +
-              "- 完成率100%なら → generate_online_csv / generate_bulk_xlsm で申請データ生成を提案\n" +
+              "- 完成率100%なら → suguvisa_online_csv_generate / suguvisa_bulk_xlsm_generate で申請データ生成を提案\n" +
               "- 不足があれば → 不足情報のヒアリングを提案",
             _next_actions: [
               ...(allMissing.length > 0 ? [{
@@ -450,11 +450,11 @@ export function registerGenerateReferenceForm(server: McpServer) {
                 missing_count: allMissing.length,
               }] : []),
               {
-                tool: "generate_online_csv",
+                tool: "suguvisa_online_csv_generate",
                 reason: "申請CSVの生成（オンライン申請用）",
               },
               {
-                tool: "generate_paper_form",
+                tool: "suguvisa_paper_form_generate",
                 reason: "申請書本体（別記第30号の5等）のデータマッピング",
               },
             ],

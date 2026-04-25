@@ -1,5 +1,5 @@
 /**
- * get_complete_visa_guide — インテントベース統合ツール
+ * suguvisa_visa_guide_get — インテントベース統合ツール
  *
  * ユーザーの「ビザ申請について知りたい」というインテント（意図）を
  * 1回のツール呼び出しで完結させる。内部的に determine → documents → deadlines を一括実行。
@@ -17,7 +17,7 @@ import { calculateDeadlinesData } from "./calculate-deadlines.js";
 
 export function registerCompleteVisaGuide(server: McpServer) {
   server.tool(
-    "get_complete_visa_guide",
+    "suguvisa_visa_guide_get",
     "【ワンショット完全ガイド】在留資格の変更・更新に必要な情報を一括取得。" +
       "申請パターン判定 → 必要書類リスト（省略条件適用済み） → 期限計算 → 注意事項を" +
       "1回のリクエストで全て返す統合ツール。ユーザーが「ビザを変更したい」「更新したい」と言ったら、" +
@@ -49,7 +49,7 @@ export function registerCompleteVisaGuide(server: McpServer) {
         "2年以内に同一機関から申請済みか（書類省略条件）"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Get complete visa guide", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({
       from_visa, to_visa, context, expiry_date, ssw1_start_date,
       industry_field, support_type, is_same_employer_2year,
@@ -70,11 +70,11 @@ export function registerCompleteVisaGuide(server: McpServer) {
               recovery_suggestions: [
                 "from_visa と to_visa の表記を確認してください（例: '技能実習2号', '特定技能1号'）",
                 "suguvisa://patterns/list リソースで利用可能なパターンを確認できます",
-                "determine_application_type ツールで個別に判定を試みてください",
+                "suguvisa_application_type_determine ツールで個別に判定を試みてください",
               ],
               _next_actions: [
                 {
-                  tool: "determine_application_type",
+                  tool: "suguvisa_application_type_determine",
                   reason: "表記を変えて再判定",
                   params: { from_visa, to_visa },
                 },
@@ -156,21 +156,21 @@ export function registerCompleteVisaGuide(server: McpServer) {
         // AI向けナッジ: 次のアクション提案
         _next_actions: [
           ...(industry_field ? [] : [{
-            tool: "get_required_documents",
+            tool: "suguvisa_required_documents_list",
             reason: "産業分野を指定して分野固有の書類を取得",
             ask_user: "どの産業分野で就労されますか？（農業、建設、介護など）",
           }]),
           ...(!expiry_date ? [{
-            tool: "calculate_deadlines",
+            tool: "suguvisa_deadlines_calculate",
             reason: "在留期限を指定して詳細な期限計算",
             ask_user: "在留カードに記載の在留期限を教えてください",
           }] : []),
           {
-            tool: "validate_application_data",
+            tool: "suguvisa_application_data_validate",
             reason: "申請データの整合性チェック",
           },
           {
-            tool: "generate_intake_sheet",
+            tool: "suguvisa_intake_sheet_generate",
             reason: "クライアント向け入力シートの生成",
           },
         ],
@@ -196,10 +196,10 @@ export function registerCompleteVisaGuide(server: McpServer) {
           "- 試験合格状況 or 技能実習修了の有無\n" +
           "「上記を教えてください。揃い次第、書類作成に入ります。」\n\n" +
           "### Step 3: 書類作成（情報が揃ったら即実行）\n" +
-          "- generate_reason_letter(use_ai: true) → 理由書AI生成\n" +
-          "- generate_reference_form → 参考様式テンプレート生成\n" +
-          "- generate_intake_sheet → 入力シート生成\n" +
-          "- pre_submission_checklist → 提出前最終チェック\n\n" +
+          "- suguvisa_reason_letter_generate(use_ai: true) → 理由書AI生成\n" +
+          "- suguvisa_reference_form_generate → 参考様式テンプレート生成\n" +
+          "- suguvisa_intake_sheet_generate → 入力シート生成\n" +
+          "- suguvisa_submission_checklist_verify → 提出前最終チェック\n\n" +
           "## 禁止事項\n" +
           "- ❌ 長い説明文を書く（ユーザーはプロ。概要だけでいい）\n" +
           "- ❌「次のステップとして○○ツールを呼ぶことをお勧めします」（勝手に呼べ）\n" +

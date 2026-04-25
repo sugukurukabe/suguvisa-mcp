@@ -105,7 +105,7 @@ const contextBlock = formatHitsForPrompt(hits);
 
 ## MCP ツールとしての利用 / MCP Tool Usage
 
-`apps/mcp-server` は `search_golden_records` ツールを登録する。デフォルトは InMemory、本番では `setGoldenRecordsContext({ store, retriever })` で差し替える。
+`apps/mcp-server` は `suguvisa_golden_records_search` ツールを登録する。デフォルトは InMemory、本番では `setGoldenRecordsContext({ store, retriever })` で差し替える。
 
 ## ロードマップ / Roadmap / Peta Jalan
 

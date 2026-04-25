@@ -9,7 +9,7 @@ Claude Connectors Directory / ChatGPT Apps Store への掲載完了後に着手�
 ### 1. `list_application_patterns` / `get_pattern_catalog` ツールの追加
 
 **背景**: 現状、申請パターンを網羅取得するエンドポイントが無い。
-Claude / ChatGPT は `generate_reason_letter` の description に散在している ID
+Claude / ChatGPT は `suguvisa_reason_letter_generate` の description に散在している ID
 （`GRANT_01`, `CHANGE_SSW1_C`, `CHANGE_TOKKATSU_A〜D`, `GENERIC` 等）を
 拾い集めて推測する必要があり、UX 上のロスが発生している（実ケースで確認済み）。
 
@@ -65,7 +65,7 @@ get_pattern_catalog: ['read:visa_rule'],
 | 系統 | 例 | 出現場所 |
 |---|---|---|
 | v3 スキル（短縮形） | `grant`, `renewal`, `change_a`, `change_b`, `change_c`, `change_d` | `sugukuru-visa-applications` スキル、`rule-sets.json` |
-| MCP スキーマ（詳細形） | `GRANT_01`, `CHANGE_SSW1_C`, `CHANGE_TOKKATSU_A〜D`, `GENERIC` | `generate_reason_letter` 等の description |
+| MCP スキーマ（詳細形） | `GRANT_01`, `CHANGE_SSW1_C`, `CHANGE_TOKKATSU_A〜D`, `GENERIC` | `suguvisa_reason_letter_generate` 等の description |
 
 これが原因で AI クライアント（Claude / ChatGPT）が
 「同じ申請パターンなのに 2 つ ID がある」と混乱し、

@@ -13,7 +13,7 @@ interface AuditResult {
 
 export function registerAnalyzeSupportRecords(server: McpServer) {
   server.tool(
-    "analyze_support_records_docai",
+    "suguvisa_support_records_analyze",
     "【定期届出】賃金台帳や出勤簿などのPDF/画像をAI(Document AI / Gemini)で解析・監査し、特定技能の基準（同等報酬、労働時間上限など）を満たしているかチェックするツール。 / Analyze wage ledgers and attendance records to ensure compliance with SSW regulations (equal pay, working hours) using Document AI / Gemini.",
     {
       file_base64: z.string().describe("対象ファイル（賃金台帳・出勤簿）のBase64エンコードデータ"),
@@ -21,7 +21,7 @@ export function registerAnalyzeSupportRecords(server: McpServer) {
       document_type: z.enum(["wage_ledger", "attendance_record", "support_record"]).describe("検証するドキュメントの種類（賃金台帳、出勤簿、支援実施記録）"),
       expected_base_salary: z.number().optional().describe("雇用条件書に記載されている予定基本給(比較用)"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Analyze support records (OCR)", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ file_base64, mime_type, document_type, expected_base_salary }) => {
       try {
         const prompt = `あなたは出入国在留管理庁の審査官をサポートするAIオーディターです。

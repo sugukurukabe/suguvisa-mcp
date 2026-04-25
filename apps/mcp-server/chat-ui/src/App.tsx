@@ -103,16 +103,20 @@ export default function App() {
       {/* Header */}
       <header className="w-full max-w-4xl flex items-center justify-between mb-8 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-            S
-          </div>
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+          <img
+            src="/icon.png"
+            alt="SuguVisa"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-xl bg-white shadow-[0_0_20px_rgba(14,165,183,0.25)]"
+          />
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-sky-400">
             SuguVisa Agent
           </h1>
         </div>
         <div className="flex items-center gap-4 text-sm font-medium text-slate-300">
-          <span className="flex items-center gap-1.5"><Briefcase size={16} className="text-purple-400"/> 法人モード</span>
-          <span className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.15)]"><CheckCircle2 size={16} /> API Online</span>
+          <span className="flex items-center gap-1.5"><Briefcase size={16} className="text-cyan-400"/> 法人モード</span>
+          <span className="flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(14,165,183,0.2)]"><CheckCircle2 size={16} /> API Online</span>
         </div>
       </header>
 
@@ -133,7 +137,7 @@ export default function App() {
               >
                 <div className={`max-w-[85%] sm:max-w-[75%] p-4 rounded-2xl ${
                   msg.role === 'user' 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-br-sm shadow-lg shadow-blue-900/30 font-medium' 
+                    ? 'bg-gradient-to-r from-cyan-600 to-sky-700 text-white rounded-br-sm shadow-lg shadow-cyan-900/30 font-medium' 
                     : 'bg-white/5 border border-white/10 text-slate-200 rounded-bl-sm ai-glow'
                 }`}>
                   <div className="whitespace-pre-wrap leading-relaxed text-[15px]">
@@ -142,7 +146,7 @@ export default function App() {
                         return (
                           <div key={i} className="my-4 p-5 rounded-2xl download-widget glass-panel flex flex-col sm:flex-row gap-4 items-center justify-between border-white/10">
                              <div className="flex items-center gap-4">
-                               <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                               <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-300">
                                  <FileText size={24} />
                                </div>
                                <div>
@@ -154,7 +158,7 @@ export default function App() {
                                <button className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-colors border border-white/10 whitespace-nowrap hidden sm:block">
                                  プレビュー
                                </button>
-                               <button className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-500/30 whitespace-nowrap">
+                               <button className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-medium rounded-xl transition-colors shadow-lg shadow-cyan-600/30 whitespace-nowrap">
                                  ダウンロード
                                </button>
                              </div>
@@ -176,9 +180,9 @@ export default function App() {
                 <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-bl-sm flex flex-col gap-3 min-w-[280px] ai-glow">
                    <div className="flex items-center gap-3">
                      <div className="flex gap-1.5 pl-1">
-                       <span className="w-2.5 h-2.5 bg-blue-500/80 rounded-full thinking-dot [animation-delay:-0.3s]"></span>
-                       <span className="w-2.5 h-2.5 bg-indigo-500/80 rounded-full thinking-dot [animation-delay:-0.15s]"></span>
-                       <span className="w-2.5 h-2.5 bg-purple-500/80 rounded-full thinking-dot"></span>
+                       <span className="w-2.5 h-2.5 bg-cyan-400/80 rounded-full thinking-dot [animation-delay:-0.3s]"></span>
+                       <span className="w-2.5 h-2.5 bg-sky-500/80 rounded-full thinking-dot [animation-delay:-0.15s]"></span>
+                       <span className="w-2.5 h-2.5 bg-indigo-900/80 rounded-full thinking-dot"></span>
                      </div>
                      <span className="text-sm font-medium text-slate-300 tracking-wide">
                         {loadingSteps[loadingStep] || "処理中..."}
@@ -186,7 +190,7 @@ export default function App() {
                    </div>
                    <div className="w-full bg-white/10 rounded-full h-1.5 mt-1 overflow-hidden">
                      <motion.div 
-                       className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-full"
+                       className="bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-900 h-full"
                        initial={{ width: "25%" }}
                        animate={{ width: `${(loadingStep + 1) * 25}%` }}
                        transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -241,7 +245,7 @@ export default function App() {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="absolute right-2 p-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-500 hover:to-indigo-500 disabled:opacity-30 disabled:grayscale transition-all shadow-lg"
+                className="absolute right-2 p-2 bg-gradient-to-r from-cyan-600 to-sky-700 text-white rounded-xl hover:from-cyan-500 hover:to-sky-600 disabled:opacity-30 disabled:grayscale transition-all shadow-lg"
               >
                 <Send size={18} />
               </button>

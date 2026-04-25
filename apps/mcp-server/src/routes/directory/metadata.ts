@@ -111,9 +111,9 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
       id: "Otomatisasi penuh visa SSW Jepang: deteksi pola, perhitungan tenggat, pembuatan dokumen, dan laporan tahunan.",
     },
     longDescription: {
-      ja: "SuguVisa は、日本の特定技能（SSW）ビザに特化した業務用 AI コネクタです。37 ツール以上を備え、申請種別の自動判定、必要書類リスト（省略条件自動適用）、期限計算（14 日届出ルール・通算 5 年上限・更新申請 3 ヶ月前）、在留カード OCR、定期届出 CSV/Excel 生成、紙様式 PDF マッピング、法改正情報、監査ログまでを提供します。行政書士・登録支援機関・受入れ機関・外国人申請者本人が利用できます。",
-      en: "SuguVisa is a business-grade AI connector specialized in Japan's Specified Skilled Worker (SSW) visa. It exposes 37+ MCP tools including automatic application pattern detection, document checklists with exemption logic, deadline computation (14-day rule, 5-year cap, 3-month renewal window), residence card OCR, periodic notification CSV/Excel, paper form PDF mapping, law-change tracking, and audit logging. Built for immigration lawyers, registered support organizations, receiving companies, and applicants themselves.",
-      id: "SuguVisa adalah konektor AI kelas bisnis khusus visa Pekerja Berketerampilan Spesifik (SSW) Jepang. Menyediakan 37+ alat MCP untuk deteksi otomatis pola permohonan, daftar dokumen dengan logika pengecualian, perhitungan tenggat (aturan 14 hari, batas 5 tahun, 3 bulan perpanjangan), OCR kartu izin tinggal, CSV/Excel pelaporan berkala, pemetaan formulir PDF, pelacakan perubahan hukum, dan log audit.",
+      ja: "SuguVisa は、日本の特定技能（SSW）ビザに特化した業務用 AI コネクタです。42 ツールを備え、申請種別の自動判定、必要書類リスト（省略条件自動適用）、期限計算（14 日届出ルール・通算 5 年上限・更新申請 3 ヶ月前）、在留カード OCR、定期届出 CSV/Excel 生成、紙様式 PDF マッピング、法改正情報、監査ログまでを提供します。行政書士・登録支援機関・受入れ機関・外国人申請者本人が利用できます。",
+      en: "SuguVisa is a business-grade AI connector specialized in Japan's Specified Skilled Worker (SSW) visa. It exposes 42 MCP tools including automatic application pattern detection, document checklists with exemption logic, deadline computation (14-day rule, 5-year cap, 3-month renewal window), residence card OCR, periodic notification CSV/Excel, paper form PDF mapping, law-change tracking, and audit logging. Built for immigration lawyers, registered support organizations, receiving companies, and applicants themselves.",
+      id: "SuguVisa adalah konektor AI kelas bisnis khusus visa Pekerja Berketerampilan Spesifik (SSW) Jepang. Menyediakan 42 alat MCP untuk deteksi otomatis pola permohonan, daftar dokumen dengan logika pengecualian, perhitungan tenggat (aturan 14 hari, batas 5 tahun, 3 bulan perpanjangan), OCR kartu izin tinggal, CSV/Excel pelaporan berkala, pemetaan formulir PDF, pelacakan perubahan hukum, dan log audit.",
     },
     categories: ["legal", "government", "productivity", "hr", "business"],
     tags: [
@@ -131,9 +131,9 @@ export function buildDirectoryMetadata(env: NodeJS.ProcessEnv = process.env): Di
       legalName: "スグクル株式会社 / Sugukuru Inc.",
       displayName: "Sugukuru Inc.",
       website: marketingUrl,
-      supportEmail: env.SUGUVISA_SUPPORT_EMAIL ?? "support@sugu-kuru.co.jp",
+      supportEmail: env.SUGUVISA_SUPPORT_EMAIL ?? "info@sugu-kuru.co.jp",
       country: "JP",
-      address: "〒892-0816 鹿児島県鹿児島市山下町7-1",
+      address: "〒899-4332 鹿児島県霧島市国分中央3丁目42-8 翔陽A103",
     },
     urls: {
       baseUrl,

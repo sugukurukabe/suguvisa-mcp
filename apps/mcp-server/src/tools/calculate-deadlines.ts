@@ -181,15 +181,15 @@ export function calculateDeadlinesData(
     deadlines,
     _ai_summary_guidelines: ai_guidelines,
     _next_actions: [
-      { tool: "get_required_documents", reason: "必要書類リストを確認し、準備を開始" },
-      { tool: "generate_intake_sheet", reason: "クライアント向け入力シートを生成" },
+      { tool: "suguvisa_required_documents_list", reason: "必要書類リストを確認し、準備を開始" },
+      { tool: "suguvisa_intake_sheet_generate", reason: "クライアント向け入力シートを生成" },
     ],
   };
 }
 
 export function registerCalculateDeadlines(server: McpServer) {
   server.tool(
-    "calculate_deadlines",
+    "suguvisa_deadlines_calculate",
     "【期限自動計算】在留期限・届出発生日から、随時届出の14日ルール期限、更新申請の開始可能日（3ヶ月前）、定期届出期間、通算在留5年上限チェック、認定証明書(COE)の有効期限を自動算出。期限切れリスクを色分け警告。 / Calculates all critical deadlines: 14-day notification rule, 3-month renewal window, cumulative 5-year limit, and COE expiry with risk-level alerts.",
     {
       expiry_date: z.string().optional().describe("在留期限（YYYY-MM-DD） / Expiry date / Tanggal kedaluwarsa"),
@@ -197,7 +197,7 @@ export function registerCalculateDeadlines(server: McpServer) {
       ssw1_start_date: z.string().optional().describe("特定技能1号の通算開始日（YYYY-MM-DD） / SSW1 cumulative start date / Tanggal mulai kumulatif SSW1"),
       coe_issue_date: z.string().optional().describe("認定証明書交付日（YYYY-MM-DD） / COE issue date / Tanggal penerbitan COE"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Calculate visa deadlines", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
       const result = calculateDeadlinesData(params);
       return {

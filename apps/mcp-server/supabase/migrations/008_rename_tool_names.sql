@@ -1,0 +1,92 @@
+-- SuguVisa MCP ツール名を公開向け Domain-Noun-Verb 形式へ変更する。
+-- Rename SuguVisa MCP tool names to the public Domain-Noun-Verb format.
+-- Mengubah nama alat SuguVisa MCP ke format Domain-Noun-Verb untuk publik.
+
+-- 既存の利用ログは旧 tool_name を新 tool_name に移して集計の連続性を保つ。
+-- Existing usage logs keep reporting continuity by moving old tool_name values to the new names.
+-- Log penggunaan lama tetap berkesinambungan dengan memindahkan nilai tool_name lama ke nama baru.
+
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_application_type_determine'
+  WHERE tool_name = 'determine_application_type';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_required_documents_list'
+  WHERE tool_name = 'get_required_documents';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_application_data_validate'
+  WHERE tool_name = 'validate_application_data';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_csv_missing_fields_check'
+  WHERE tool_name = 'check_csv_missing_fields';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_form_ai_validate'
+  WHERE tool_name = 'ai_form_validator';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_deadlines_calculate'
+  WHERE tool_name = 'calculate_deadlines';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_intake_sheet_generate'
+  WHERE tool_name = 'generate_intake_sheet';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_residence_card_parse'
+  WHERE tool_name = 'parse_residence_card';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_passport_parse'
+  WHERE tool_name = 'parse_passport';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_corporate_number_lookup'
+  WHERE tool_name = 'lookup_corporate_number';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_bulk_xlsm_generate'
+  WHERE tool_name = 'generate_bulk_xlsm';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_paper_form_generate'
+  WHERE tool_name = 'generate_paper_form';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_online_csv_generate'
+  WHERE tool_name = 'generate_online_csv';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_annual_report_csv_generate'
+  WHERE tool_name = 'generate_annual_report_csv';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_annual_report_offline_generate'
+  WHERE tool_name = 'generate_annual_report_offline';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_reference_form_generate'
+  WHERE tool_name = 'generate_reference_form';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_reason_letter_generate'
+  WHERE tool_name = 'generate_reason_letter';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_autonomous_workflow_start'
+  WHERE tool_name = 'start_autonomous_visa_workflow';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_autonomous_workflow_resume'
+  WHERE tool_name = 'resume_autonomous_visa_workflow';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_submission_outcome_track'
+  WHERE tool_name = 'track_submission_outcome';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_audit_action_log'
+  WHERE tool_name = 'log_visa_action';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_audit_logs_list'
+  WHERE tool_name = 'get_visa_audit_logs';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_law_updates_list'
+  WHERE tool_name = 'get_law_updates';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_legal_docs_search'
+  WHERE tool_name = 'search_legal_docs';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_golden_records_search'
+  WHERE tool_name = 'search_golden_records';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_vertex_datastore_sync'
+  WHERE tool_name = 'sync_vertex_datastore';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_document_review'
+  WHERE tool_name = 'review_document';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_document_extract_advanced'
+  WHERE tool_name = 'advanced_doc_extractor';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_support_records_analyze'
+  WHERE tool_name = 'analyze_support_records_docai';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_visa_guide_get'
+  WHERE tool_name = 'get_complete_visa_guide';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_ssw2_checklist_get'
+  WHERE tool_name = 'get_ssw2_document_checklist';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_submission_checklist_verify'
+  WHERE tool_name = 'pre_submission_checklist';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_workplace_message_translate'
+  WHERE tool_name = 'translate_workplace_message';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_workplace_template_get'
+  WHERE tool_name = 'get_workplace_template';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_workplace_templates_list'
+  WHERE tool_name = 'list_workplace_templates';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_staff_visa_register'
+  WHERE tool_name = 'register_staff_visa';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_staff_visa_status_check'
+  WHERE tool_name = 'check_all_visa_status';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_staff_notification_deadline_check'
+  WHERE tool_name = 'check_notification_deadline';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_staff_compliance_dashboard_get'
+  WHERE tool_name = 'get_compliance_dashboard';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_wage_compliance_check'
+  WHERE tool_name = 'check_wage_compliance';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_periodic_notification_requirements_check'
+  WHERE tool_name = 'check_periodic_notification_requirements';
+UPDATE public.api_usage_logs SET tool_name = 'suguvisa_periodic_notification_forms_generate'
+  WHERE tool_name = 'generate_periodic_notification_forms';

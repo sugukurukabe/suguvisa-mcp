@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export function registerPeriodicNotificationChecker(server: McpServer) {
   server.tool(
-    "check_periodic_notification_requirements",
+    "suguvisa_periodic_notification_requirements_check",
     "【定期届出】受入れ機関（企業）の属性データに基づき、定期届出（受入れ・活動・支援実施状況に係る届出等）に必要な書類リストを判定して出力するツール。 / Determine required documents for the SSW Periodic Notification based on the company's attributes such as delegation status to a Registered Support Organization.",
     {
       company_name: z.string().describe("対象企業の名称"),
@@ -12,7 +12,7 @@ export function registerPeriodicNotificationChecker(server: McpServer) {
       has_middle_resignation: z.boolean().optional().describe("届出対象期間中に中途退職者が発生したか"),
       has_rest_period: z.boolean().optional().describe("届出対象期間中に休業が発生したか"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Check periodic notification requirements", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ company_name, is_delegated, has_good_standing, has_middle_resignation, has_rest_period }) => {
       
       const required_documents = [
@@ -78,7 +78,7 @@ export function registerPeriodicNotificationChecker(server: McpServer) {
               target_company: company_name,
               notification_period: "毎年4月1日〜5月31日",
               documents: required_documents,
-              _ai_instructions: "このリストをもとにして、ユーザーへ準備すべき書類の一覧を案内してください。また、収集済みの賃金台帳や出勤簿があれば、analyze_support_records_docai ツールを使ってAI監査を行うよう促してください。"
+              _ai_instructions: "このリストをもとにして、ユーザーへ準備すべき書類の一覧を案内してください。また、収集済みの賃金台帳や出勤簿があれば、suguvisa_support_records_analyze ツールを使ってAI監査を行うよう促してください。"
             }, null, 2)
           }
         ]

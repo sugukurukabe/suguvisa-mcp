@@ -1,5 +1,5 @@
 /**
- * generate_reason_letter — 申請理由書テンプレート生成
+ * suguvisa_reason_letter_generate — 申請理由書テンプレート生成
  *
  * 特定活動（つなぎビザ）や在留資格変更許可申請で必要な「申請理由書」を
  * パターンIDと申請人情報に基づいてAIが下書き生成する。
@@ -416,8 +416,8 @@ function generateReasonLetter(params: {
       ...(missingRequired.length > 0
         ? [{ action: "ask_user", reason: `必須情報${missingRequired.length}件の追加ヒアリング`, missing: missingRequired }]
         : []),
-      { tool: "get_required_documents", reason: "他の必要書類もチェック" },
-      { tool: "pre_submission_checklist", reason: "提出前の最終チェック" },
+      { tool: "suguvisa_required_documents_list", reason: "他の必要書類もチェック" },
+      { tool: "suguvisa_submission_checklist_verify", reason: "提出前の最終チェック" },
     ],
   };
 }
@@ -428,7 +428,7 @@ function generateReasonLetter(params: {
 
 export function registerGenerateReasonLetter(server: McpServer) {
   server.tool(
-    "generate_reason_letter",
+    "suguvisa_reason_letter_generate",
     "【申請理由書テンプレート生成】特定活動（つなぎビザ）や転職変更の申請で必要な「申請理由書」を自動生成。パターンIDと申請人情報を渡すと、入管の審査官向けの丁寧な日本語で申請背景・経緯・理由を論理的に説明した理由書テンプレートを出力。留学→特定活動、技能実習→特定活動、転職準備の各パターンに対応。不足情報のマーキングと注意事項の付記あり。 / Generates a formal reason letter template for visa status change applications.",
     {
       pattern_id: z.string().describe(
@@ -459,7 +459,7 @@ export function registerGenerateReasonLetter(server: McpServer) {
         "出力言語（現在は日本語のみ対応）"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Generate application reason letter", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
       const templateResult = generateReasonLetter(params);
 

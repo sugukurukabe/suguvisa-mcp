@@ -47,7 +47,7 @@ app.use(obsMiddleware());
 ```ts
 import { instrumentTool } from "@suguvisa/observability";
 
-const searchHandler = instrumentTool("search_golden_records", async (args) => {
+const searchHandler = instrumentTool("suguvisa_golden_records_search", async (args) => {
   return await retriever.search(args);
 });
 ```

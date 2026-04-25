@@ -21,7 +21,7 @@ interface IntakeSection {
 
 export function registerGenerateIntakeSheet(server: McpServer) {
   server.tool(
-    "generate_intake_sheet",
+    "suguvisa_intake_sheet_generate",
     "【入力シート自動生成】申請パターンに応じた情報ヒアリングシートを自動作成。クライアント（受入れ機関）に渡して記入してもらうことで、申請に必要な全データを漏れなく収集。分野別の追加項目にも対応。 / Auto-generates a customized intake form for clients to fill out, ensuring all required data is collected without omissions.",
     {
       pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'） / Application pattern ID / ID pola aplikasi"),
@@ -29,7 +29,7 @@ export function registerGenerateIntakeSheet(server: McpServer) {
       applicant_name: z.string().optional().describe("申請人氏名 / Applicant name / Nama pemohon"),
       industry_field: z.string().optional().describe("分野（例: '農業'） / Industry field (e.g., 'Agriculture') / Bidang industri (mis., 'Pertanian')"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Generate applicant intake sheet", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ pattern_id, company_name, applicant_name, industry_field }) => {
       const pattern = ruleSets.application_patterns[pattern_id];
       if (!pattern) {

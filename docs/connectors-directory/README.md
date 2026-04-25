@@ -47,7 +47,7 @@
 | `SUGUVISA_BASE_URL` | Cloud Run URL | すべての manifest / 法務ページのベース URL |
 | `SUGUVISA_MARKETING_URL` | sugu-kuru.co.jp/suguvisa | 企業サイト (publisher.website) |
 | `SUGUVISA_STATUS_URL` | `${baseUrl}/status` | ステータスページ |
-| `SUGUVISA_SUPPORT_EMAIL` | support@sugu-kuru.co.jp | サポート連絡先 |
+| `SUGUVISA_SUPPORT_EMAIL` | info@sugu-kuru.co.jp | サポート連絡先 |
 | `AUTH0_DOMAIN` | (unset) | OAuth 2.1 を有効化する場合に設定 |
 | `AUTH0_AUDIENCE` | `SUGUVISA_BASE_URL` | Resource indicator |
 | `APP_VERSION` | 0.9.4 | manifest の version |

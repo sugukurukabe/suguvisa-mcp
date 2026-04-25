@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.api_keys (
 CREATE TABLE IF NOT EXISTS public.api_usage_logs (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
-  tool_name text NOT NULL, -- e.g. 'parse_residence_card'
+  tool_name text NOT NULL, -- e.g. 'suguvisa_residence_card_parse'
   status text NOT NULL, -- e.g. 'success', 'error'
   duration_ms integer,
   error_message text,
@@ -54,7 +54,7 @@ CREATE POLICY "Deny public insert on api_usage_logs" ON public.api_usage_logs FO
 -- 4. 申請結果フィードバック（HITL自己改善ループ）
 -- =========================================
 -- 入管への申請結果（通過・補正・不受理）を構造化して記録する。
--- track_submission_outcome ツールから書き込まれ、
+-- suguvisa_submission_outcome_track ツールから書き込まれ、
 -- 同一パターンの補正率をベイズ推論的に算出するための教師データとなる。
 
 CREATE TABLE IF NOT EXISTS public.submission_outcomes (

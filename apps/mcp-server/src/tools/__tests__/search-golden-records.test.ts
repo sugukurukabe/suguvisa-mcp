@@ -31,7 +31,7 @@ function getTool(server: McpServer, name: string): { handler: ToolHandler } {
   return tools[name];
 }
 
-describe("search_golden_records MCP tool", () => {
+describe("suguvisa_golden_records_search MCP tool", () => {
   let store: InMemoryGoldenRecordStore;
 
   beforeEach(async () => {
@@ -73,7 +73,7 @@ describe("search_golden_records MCP tool", () => {
   it("returns structured results with citations and prompt context", async () => {
     const server = new McpServer({ name: "test", version: "0.0.0" });
     registerSearchGoldenRecords(server);
-    const tool = getTool(server, "search_golden_records");
+    const tool = getTool(server, "suguvisa_golden_records_search");
 
     const res = await tool.handler({ query: "試験免除", topK: 3 });
     const payload = JSON.parse(res.content[0]!.text);
@@ -88,7 +88,7 @@ describe("search_golden_records MCP tool", () => {
   it("respects tenant filter with include_global default true", async () => {
     const server = new McpServer({ name: "test", version: "0.0.0" });
     registerSearchGoldenRecords(server);
-    const tool = getTool(server, "search_golden_records");
+    const tool = getTool(server, "suguvisa_golden_records_search");
 
     const res = await tool.handler({ query: "農業 転職", tenant_id: "tenant-A" });
     const payload = JSON.parse(res.content[0]!.text);
@@ -99,7 +99,7 @@ describe("search_golden_records MCP tool", () => {
   it("excludes other tenants data", async () => {
     const server = new McpServer({ name: "test", version: "0.0.0" });
     registerSearchGoldenRecords(server);
-    const tool = getTool(server, "search_golden_records");
+    const tool = getTool(server, "suguvisa_golden_records_search");
 
     const res = await tool.handler({
       query: "農業 転職",
@@ -113,7 +113,7 @@ describe("search_golden_records MCP tool", () => {
   it("filters by types", async () => {
     const server = new McpServer({ name: "test", version: "0.0.0" });
     registerSearchGoldenRecords(server);
-    const tool = getTool(server, "search_golden_records");
+    const tool = getTool(server, "suguvisa_golden_records_search");
 
     const res = await tool.handler({
       query: "特定技能 農業",

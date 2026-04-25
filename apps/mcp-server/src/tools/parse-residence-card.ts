@@ -135,12 +135,12 @@ export async function parseResidenceCardHandler({
           "🎯 【エージェントモード：在留カード読み取り完了】\n" +
           "1. 読み取り結果を簡潔な表で表示（3秒で確認できる量）\n" +
           "2. ユーザーに「この情報で合っていますか？」と確認\n" +
-          "3. OKなら即座に get_complete_visa_guide を呼ぶ（聞くな、やれ）\n" +
+          "3. OKなら即座に suguvisa_visa_guide_get を呼ぶ（聞くな、やれ）\n" +
           "4. パスポート情報が未取得なら「パスポートも見せてください」と追加依頼\n\n" +
           "⚠️ 特定活動の在留カードの場合：\n" +
           "- 「特定活動」= SSW1準備のつなぎビザと即断定\n" +
           "- 46号？ワーホリ？→ 絶対に聞くな\n" +
-          "- from_visa:'特定活動', to_visa:'特定技能1号' で get_complete_visa_guide を呼ぶ\n" +
+          "- from_visa:'特定活動', to_visa:'特定技能1号' で suguvisa_visa_guide_get を呼ぶ\n" +
           "- 転職（別の会社）の場合は context:'転職' を追加",
       }, null, 2),
     }],
@@ -152,7 +152,7 @@ export async function parseResidenceCardHandler({
  */
 export function registerParseResidenceCard(server: McpServer) {
   server.tool(
-    "parse_residence_card",
+    "suguvisa_residence_card_parse",
     "【在留カードOCR】在留カードの画像またはOCRテキストから、氏名・国籍・在留資格・在留期限・カード番号等を構造化データに変換。Google Vertex AI Document AIによる高精度OCRと、正規表現フォールバックの二段構え。画像データはサーバーに一切保存しません。 / Extracts structured data from residence card images using Vertex AI Document AI with regex fallback. Images are never stored.",
     {
       image_base64: z.string().optional().describe(
@@ -165,7 +165,7 @@ export function registerParseResidenceCard(server: McpServer) {
         "Claude VisionがOCRで読み取ったテキスト（Document AIが使えない場合のフォールバック）"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Parse residence card (OCR)", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async (args) => await parseResidenceCardHandler(args as any)
   );
 }

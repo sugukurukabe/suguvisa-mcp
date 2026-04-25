@@ -14,12 +14,14 @@ vi.mock("../../lib/auth0-management.js", () => ({
     clientSecret: "secret",
   })),
   createFirstPartyClient: vi.fn(),
+  findFirstPartyClient: vi.fn(),
 }));
 
 import { oauthRegisterHandler } from "../oauth-register.js";
 import {
   isAuth0MgmtConfigured,
   createFirstPartyClient,
+  findFirstPartyClient,
 } from "../../lib/auth0-management.js";
 
 function mockResponse(): Response & {
@@ -87,6 +89,7 @@ describe("oauthRegisterHandler", () => {
 
   it("正常系は 201 で RFC 7591 形式を返し、client_secret は auth_method=none なら含めない", async () => {
     vi.mocked(isAuth0MgmtConfigured).mockReturnValue(true);
+    vi.mocked(findFirstPartyClient).mockResolvedValue(null);
     vi.mocked(createFirstPartyClient).mockResolvedValue({
       clientId: "new_client",
       clientSecret: undefined,
@@ -130,6 +133,7 @@ describe("oauthRegisterHandler", () => {
 
   it("Management API 失敗時は 502 を返す", async () => {
     vi.mocked(isAuth0MgmtConfigured).mockReturnValue(true);
+    vi.mocked(findFirstPartyClient).mockResolvedValue(null);
     vi.mocked(createFirstPartyClient).mockRejectedValue(
       new Error("Auth0 create client failed: 500"),
     );
@@ -145,5 +149,42 @@ describe("oauthRegisterHandler", () => {
     );
     expect(res._status).toBe(502);
     expect(res._json).toMatchObject({ error: "server_error" });
+  });
+
+  it("既存 client が見つかれば createFirstPartyClient を呼ばず 201 で再利用する (RFC 7591 準拠)", async () => {
+    // RFC 7591 mandates HTTP 201 Created for successful DCR responses.
+    // Even when we idempotently reuse an existing client, we must still return 201
+    // so that strict validators like oauth4webapi (used by Smithery scanner and
+    // Claude Desktop) accept the response.
+    vi.mocked(isAuth0MgmtConfigured).mockReturnValue(true);
+    vi.mocked(findFirstPartyClient).mockResolvedValue({
+      clientId: "existing_client",
+      clientSecret: undefined,
+      name: "Claude (via SuguVisa DCR Proxy)",
+      callbacks: ["https://claude.ai/api/mcp/auth_callback"],
+      grantTypes: ["authorization_code", "refresh_token"],
+      tokenEndpointAuthMethod: "none",
+      createdAt: 1700000000,
+      clientSecretExpiresAt: 0,
+    });
+
+    const res = mockResponse();
+    await oauthRegisterHandler(
+      {
+        body: {
+          client_name: "Claude",
+          redirect_uris: ["https://claude.ai/api/mcp/auth_callback"],
+          token_endpoint_auth_method: "none",
+        },
+      } as Request,
+      res,
+    );
+
+    expect(res._status).toBe(201);
+    expect(res._json).toMatchObject({
+      client_id: "existing_client",
+      redirect_uris: ["https://claude.ai/api/mcp/auth_callback"],
+    });
+    expect(createFirstPartyClient).not.toHaveBeenCalled();
   });
 });

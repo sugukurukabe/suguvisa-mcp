@@ -72,11 +72,11 @@ export function determinePattern(fromVisa: string, toVisa: string, context?: str
 
 export function registerDetermineApplication(server: McpServer) {
   server.tool(
-    "determine_application_type",
-    "【申請パターン自動判定】現在の在留資格と申請先の在留資格から、正式な申請種別（変更・更新・認定）、使用様式（別記第30号の5等）、標準処理期間、試験免除条件を瞬時に特定。技能実習→特定技能、特定技能1号→2号、転職、更新など全パターンに対応。parse_residence_card の直後に使用してください。 / Instantly determines the exact application type, required form, processing period, and exam exemptions from current and target visa status.",
+    "suguvisa_application_type_determine",
+    "【申請パターン自動判定】現在の在留資格と申請先の在留資格から、正式な申請種別（変更・更新・認定）、使用様式（別記第30号の5等）、標準処理期間、試験免除条件を瞬時に特定。技能実習→特定技能、特定技能1号→2号、転職、更新など全パターンに対応。suguvisa_residence_card_parse の直後に使用してください。 / Instantly determines the exact application type, required form, processing period, and exam exemptions from current and target visa status.",
     {
       from_visa: z.string().describe(
-        "現在の在留資格（parse_residence_card で取得した visa_type をそのまま入力してください） / Current visa status"
+        "現在の在留資格（suguvisa_residence_card_parse で取得した visa_type をそのまま入力してください） / Current visa status"
       ),
       to_visa: z.string().describe(
         "申請する在留資格（例: '特定技能1号', '特定活動'） / Target visa status"
@@ -88,7 +88,7 @@ export function registerDetermineApplication(server: McpServer) {
         "【特定技能2号用】班長等の指導・監督実務経験があるか / For SSW2: Has supervisor/leader experience?"
       )
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Determine application type", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ from_visa, to_visa, context, has_supervisor_experience }) => {
       // === 特定活動のスマート推論 ===
       // 在留カードには単に「特定活動」と記載される。ほとんどの場合は特定技能1号への
@@ -164,22 +164,22 @@ export function registerDetermineApplication(server: McpServer) {
               "🎯 【エージェントモード：書類作成がゴール】\n" +
               "パターンが確定しました。今すぐ以下を実行してください：\n\n" +
               "1. 「✅ " + pattern.short_name + "（" + pattern.form_code + "）」と1行で確定報告\n" +
-              "2. get_required_documents を即座に呼ぶ（ユーザーに聞くな）\n" +
+              "2. suguvisa_required_documents_list を即座に呼ぶ（ユーザーに聞くな）\n" +
               "3. 足りない情報（分野・会社名等）があれば1回で全部聞く\n" +
-              "4. 揃ったら generate_reason_letter / generate_reference_form を実行\n\n" +
+              "4. 揃ったら suguvisa_reason_letter_generate / suguvisa_reference_form_generate を実行\n\n" +
               "禁止：長い説明、「いかがですか？」、提案だけして止まること\n" +
               (isTokkatsuToSSW1 ?
                 "\n⚠️ 特定活動ルール：\n" +
                 "- 在留カードの「特定活動」= SSW1準備つなぎビザと即断定\n" +
                 "- 46号？ワーホリ？アルバイト？→ 聞くな\n" +
-                "- 理由書が必須 → generate_reason_letter(use_ai: true) で生成\n" +
+                "- 理由書が必須 → suguvisa_reason_letter_generate(use_ai: true) で生成\n" +
                 "- 転職の場合「なぜ別の会社か」の理由書が不可欠\n"
               : ""),
             _next_actions: [
-              { tool: "get_required_documents", reason: "必要書類リストを取得", params: { pattern_id: patternId } },
-              ...(reasonLetterRequired ? [{ tool: "generate_reason_letter", reason: "申請理由書を生成（特定活動→SSW1変更の経緯説明）" }] : []),
-              { tool: "calculate_deadlines", reason: "期限を計算（在留期限が分かれば）" },
-              { tool: "validate_application_data", reason: "申請データの整合性チェック" },
+              { tool: "suguvisa_required_documents_list", reason: "必要書類リストを取得", params: { pattern_id: patternId } },
+              ...(reasonLetterRequired ? [{ tool: "suguvisa_reason_letter_generate", reason: "申請理由書を生成（特定活動→SSW1変更の経緯説明）" }] : []),
+              { tool: "suguvisa_deadlines_calculate", reason: "期限を計算（在留期限が分かれば）" },
+              { tool: "suguvisa_application_data_validate", reason: "申請データの整合性チェック" },
             ],
           }, null, 2),
         }],

@@ -47,13 +47,14 @@ export function createDirectoryRouter(): Router {
   router.get("/logo.svg", staticFileHandler("public/logo.svg", "image/svg+xml"));
   router.get("/logo.png", staticFileHandler("public/logo.png", "image/png"));
   router.get("/icon-1024.png", staticFileHandler("public/icon-1024.png", "image/png"));
+  router.get("/icon-512.png", staticFileHandler("public/icon-512.png", "image/png"));
   router.get("/icon-256.png", staticFileHandler("public/icon-256.png", "image/png"));
   router.get("/apple-touch-icon.png", staticFileHandler("public/apple-touch-icon.png", "image/png"));
   router.get("/favicon.svg", staticFileHandler("public/favicon.svg", "image/svg+xml"));
   router.get("/favicon.ico", staticFileHandler("public/favicon.svg", "image/svg+xml"));
   router.get("/favicon-32.png", staticFileHandler("public/favicon-32.png", "image/png"));
-  router.get("/og-image.svg", staticFileHandler("public/og-image.svg", "image/svg+xml"));
-  router.get("/og-image.png", staticFileHandler("public/og-image.svg", "image/svg+xml")); // fallback
+  router.get("/og-image.png", staticFileHandler("public/og-image.png", "image/png"));
+  router.get("/og-image.svg", staticFileHandler("public/og-image.png", "image/png")); // legacy path, serves PNG
 
   // Screenshot / marketing assets (served from public/assets/ if present)
   router.get("/assets/:filename", (req: Request, res: Response) => {
@@ -78,6 +79,28 @@ export function createDirectoryRouter(): Router {
   router.get("/security", securityHandler);
   router.get("/support", supportHandler);
   router.get("/docs", (_req, res) => res.redirect(302, "/openapi.yaml"));
+
+  // Google Search Console の HTML ファイル検証 /
+  // Google Search Console HTML file verification /
+  // Verifikasi file HTML Google Search Console
+  //
+  // 検証方法を選択した際に Google がダウンロードを要求する `google<token>.html` を
+  // 動的に返す。トークンは `GOOGLE_VERIFICATION_HTML_TOKEN` 環境変数で設定する。
+  // 例: GOOGLE_VERIFICATION_HTML_TOKEN="abc123" → GET /googleabc123.html
+  router.get(/^\/google([a-z0-9]+)\.html$/i, (req: Request, res: Response) => {
+    const token = (process.env.GOOGLE_VERIFICATION_HTML_TOKEN ?? "").trim();
+    if (!token) {
+      res.status(404).json({ error: "verification token not configured" });
+      return;
+    }
+    const raw = req.params[0];
+    const requested = Array.isArray(raw) ? raw[0] : raw;
+    if (requested !== token) {
+      res.status(404).json({ error: "verification token mismatch" });
+      return;
+    }
+    res.type("text/html").send(`google-site-verification: google${token}.html\n`);
+  });
 
   // security.txt (RFC 9116)
   router.get("/.well-known/security.txt", (_req: Request, res: Response) => {
@@ -107,11 +130,25 @@ export function createDirectoryRouter(): Router {
 
   router.get("/sitemap.xml", (_req: Request, res: Response) => {
     const m = buildDirectoryMetadata();
-    const paths = ["/", "/privacy", "/terms", "/security", "/support"];
+    const lastmod = new Date().toISOString().slice(0, 10);
+    const entries: { loc: string; priority: string; changefreq: string }[] = [
+      { loc: "/", priority: "1.0", changefreq: "weekly" },
+      { loc: "/privacy", priority: "0.5", changefreq: "monthly" },
+      { loc: "/terms", priority: "0.5", changefreq: "monthly" },
+      { loc: "/security", priority: "0.5", changefreq: "monthly" },
+      { loc: "/support", priority: "0.7", changefreq: "monthly" },
+      { loc: "/.well-known/mcp/server-card.json", priority: "0.6", changefreq: "weekly" },
+      { loc: "/.well-known/ai-plugin.json", priority: "0.6", changefreq: "weekly" },
+    ];
     res.type("application/xml").send(
       `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${paths.map((p) => `  <url><loc>${m.urls.baseUrl}${p}</loc></url>`).join("\n")}
+${entries
+  .map(
+    (e) =>
+      `  <url><loc>${m.urls.baseUrl}${e.loc}</loc><lastmod>${lastmod}</lastmod><changefreq>${e.changefreq}</changefreq><priority>${e.priority}</priority></url>`,
+  )
+  .join("\n")}
 </urlset>`,
     );
   });
@@ -126,6 +163,12 @@ function staticFileHandler(relPath: string, contentType: string) {
       res.status(404).json({ error: `${relPath} not found` });
       return;
     }
-    res.type(contentType).setHeader("Cache-Control", "public, max-age=86400").sendFile(abs);
+    // 短めの TTL (5 分) にしてブランド差し替え時の伝播を速くする。
+    // Short TTL so brand refreshes propagate quickly through any CDN.
+    // TTL pendek supaya pembaruan merek cepat tersebar lewat CDN.
+    res
+      .type(contentType)
+      .setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=600")
+      .sendFile(abs);
   };
 }

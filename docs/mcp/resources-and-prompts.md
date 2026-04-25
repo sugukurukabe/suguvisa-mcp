@@ -75,18 +75,18 @@ store 未接続時 (CI / 開発環境) は template resource を **登録しな�
 ### 既存 Prompts (register-tools.ts)
 
 既に以下 8 件が登録済み:
-`titp_to_ssw1_workflow` / `job_change_checklist` / `renewal_preparation` / `verify_residence_card` / `visual_deadline_calculator` / `autonomous_visa_wizard` / `submission_feedback` / `ssw2_application_preparation`
+`suguvisa_titp_to_ssw1_workflow` / `suguvisa_job_change_checklist` / `suguvisa_renewal_preparation` / `suguvisa_residence_card_verify` / `suguvisa_deadline_timeline_visualize` / `suguvisa_autonomous_visa_wizard` / `suguvisa_submission_feedback_record` / `suguvisa_ssw2_application_prepare`
 
 ### 新規追加 Prompts (resources/prompts.ts)
 
 | 名称 | 目的 |
 | --- | --- |
-| `citation_based_answer` | Golden Records を参照し、**出典付き** で質問に回答する |
-| `ssw2_field_eligibility` | 特定技能2号の分野適合性を判定 |
-| `weekly_visa_status_review` | 週次の在留状況レビュー (ダッシュボード生成) |
-| `pre_submission_final_check` | 提出前の最終チェック (paper / online 切替) |
-| `incident_triage` | 障害時の一次トリアージ |
-| `onboarding_new_tenant` | 新規テナント (行政書士事務所 / 受入れ機関) のオンボーディング |
+| `suguvisa_citation_answer_generate` | Golden Records を参照し、**出典付き** で質問に回答する |
+| `suguvisa_ssw2_field_eligibility_check` | 特定技能2号の分野適合性を判定 |
+| `suguvisa_weekly_visa_status_review` | 週次の在留状況レビュー (ダッシュボード生成) |
+| `suguvisa_pre_submission_final_check` | 提出前の最終チェック (paper / online 切替) |
+| `suguvisa_incident_triage` | 障害時の一次トリアージ |
+| `suguvisa_tenant_onboarding` | 新規テナント (行政書士事務所 / 受入れ機関) のオンボーディング |
 
 ### 設計原則
 

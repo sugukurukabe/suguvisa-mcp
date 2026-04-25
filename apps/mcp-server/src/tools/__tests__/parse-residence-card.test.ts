@@ -8,7 +8,7 @@ vi.mock("../../lib/document-ai.js");
 
 const mockedProcessDocument = documentAI.processDocument as any;
 
-describe("parse_residence_card", () => {
+describe("suguvisa_residence_card_parse", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

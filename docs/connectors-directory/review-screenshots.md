@@ -82,7 +82,7 @@ end tell'
 
 **撮影ポイント**:
 
-- Claude が `determine_application_type` → `get_required_documents` → `calculate_deadlines` を連続で呼び出す
+- Claude が `suguvisa_application_type_determine` → `suguvisa_required_documents_list` → `suguvisa_deadlines_calculate` を連続で呼び出す
 - ツール呼び出しボックスが 3 つ並ぶところ が見える状態で撮影
 - 最終回答の書類チェックリスト冒頭まで収まるサイズ
 
@@ -109,7 +109,7 @@ end tell'
 
 **撮影ポイント**:
 
-- `calculate_deadlines` のツール呼び出し表示
+- `suguvisa_deadlines_calculate` のツール呼び出し表示
 - 期限が ⚠️ / ⚡ 等のアイコン付きで色分け表示されるとベスト
 - 通算 5 年の残日数が計算されている部分を強調
 
@@ -134,7 +134,7 @@ CSV の先頭20行をプレビューしてください。
 
 **撮影ポイント**:
 
-- `generate_annual_report_csv` のツール呼び出し
+- `suguvisa_annual_report_csv_generate` のツール呼び出し
 - 生成された CSV がマークダウンの code block で表示される状態
 - 列ヘッダーに「受入状況」「支援実施状況」等の正規フィールド名が見える
 
@@ -154,7 +154,7 @@ CSV の先頭20行をプレビューしてください。
 
 **撮影ポイント**:
 
-- `search_golden_records` のツール呼び出し
+- `suguvisa_golden_records_search` のツール呼び出し
 - 回答内に **出典 ID**（例: `immigration-notice-2024-xxx`）と **信頼スコア**（例: `0.92`）が表示される
 - 「推測ではなく公式情報に基づく回答」であることが一目で分かる画
 
@@ -177,7 +177,7 @@ CSV の先頭20行をプレビューしてください。
 
 **撮影ポイント**:
 
-- `start_autonomous_visa_workflow` の呼び出し
+- `suguvisa_autonomous_workflow_start` の呼び出し
 - Claude が「以下の情報が不足しています: [ 過去の就労歴、試験合格証... ]」と構造化質問を返す
 - これは SuguVisa の差別化ポイント（ただの Q&A でなく、足りない情報を能動的に聞く）
 

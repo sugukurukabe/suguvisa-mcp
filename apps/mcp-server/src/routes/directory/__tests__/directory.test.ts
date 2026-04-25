@@ -86,7 +86,7 @@ describe("/.well-known/ai-plugin.json", () => {
       contact_email: expect.stringContaining("@"),
       legal_info_url: expect.stringContaining("/terms"),
     });
-    expect(res.body.description_for_model).toContain("determine_application_type");
+    expect(res.body.description_for_model).toContain("suguvisa_application_type_determine");
   });
 });
 

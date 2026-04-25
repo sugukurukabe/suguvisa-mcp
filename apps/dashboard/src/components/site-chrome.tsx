@@ -56,7 +56,7 @@ export function SiteFooter() {
           <Link href="/terms" className="hover:text-brand-600">Terms</Link>
           <Link href="/security" className="hover:text-brand-600">Security</Link>
           <Link href="/support" className="hover:text-brand-600">Support</Link>
-          <a href="mailto:support@sugu-kuru.co.jp" className="hover:text-brand-600">support@sugu-kuru.co.jp</a>
+          <a href="mailto:info@sugu-kuru.co.jp" className="hover:text-brand-600">info@sugu-kuru.co.jp</a>
         </nav>
       </div>
     </footer>

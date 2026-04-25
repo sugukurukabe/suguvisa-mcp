@@ -149,7 +149,7 @@ import { processDocument, type DocumentAIResult } from "../lib/document-ai.js";
  */
 export function registerParseResidenceCard(server: McpServer) {
   server.tool(
-    "parse_residence_card",
+    "suguvisa_residence_card_parse",
     "在留カードの画像またはOCRテキストを構造化データに変換・検証する。Vertex AI Document AIで高精度OCRを実行。画像はサーバーに保存しない。Mengonversi gambar atau teks OCR kartu izin tinggal menjadi data terstruktur.",
     {
       // 2つの入力方式をサポート

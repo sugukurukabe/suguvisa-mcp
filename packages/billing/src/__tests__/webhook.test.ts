@@ -185,6 +185,73 @@ describe("processStripeEvent", () => {
     });
     expect(intent.kind).toBe("noop");
   });
+
+  // チケット (ワンタイム 30日パス) 購入の webhook
+  // Ticket (one-time 30-day pass) purchase via checkout.session.completed mode=payment
+  it("maps checkout.session.completed (mode=payment, metadata.plan=ticket) to tenant_ticket_granted", () => {
+    const event = makeEvent("checkout.session.completed", {
+      id: "cs_ticket_1",
+      mode: "payment",
+      client_reference_id: "tenant-abc",
+      customer: "cus_1",
+      payment_intent: "pi_123",
+      amount_total: 2980,
+      metadata: { tenant_id: "tenant-abc", plan: "ticket" },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("tenant_ticket_granted");
+    if (intent.kind !== "tenant_ticket_granted") throw new Error("wrong kind");
+    expect(intent.tenantId).toBe("tenant-abc");
+    expect(intent.passKey).toBe("ticket");
+    expect(intent.grantsPlan).toBe("starter");
+    expect(intent.durationDays).toBe(30);
+    expect(intent.amountJpy).toBe(2980);
+    expect(intent.stripeCheckoutSessionId).toBe("cs_ticket_1");
+    expect(intent.stripePaymentIntentId).toBe("pi_123");
+  });
+
+  it("returns noop for mode=payment with unknown pass key", () => {
+    const event = makeEvent("checkout.session.completed", {
+      id: "cs_x",
+      mode: "payment",
+      client_reference_id: "tenant-abc",
+      customer: "cus_1",
+      payment_intent: "pi_x",
+      amount_total: 9999,
+      metadata: { plan: "mystery_pass_not_real" },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("noop");
+  });
+
+  it("returns noop for mode=payment missing client_reference_id (tenant_id)", () => {
+    const event = makeEvent("checkout.session.completed", {
+      id: "cs_x",
+      mode: "payment",
+      customer: "cus_1",
+      payment_intent: "pi_x",
+      amount_total: 2980,
+      metadata: { plan: "ticket" },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("noop");
+  });
+
+  it("falls back to pass.priceJpy when amount_total is missing", () => {
+    const event = makeEvent("checkout.session.completed", {
+      id: "cs_no_amount",
+      mode: "payment",
+      client_reference_id: "tenant-abc",
+      customer: "cus_1",
+      payment_intent: "pi_x",
+      // amount_total intentionally absent
+      metadata: { plan: "ticket" },
+    });
+    const intent = processStripeEvent(event, { priceMappings: MAPPING });
+    expect(intent.kind).toBe("tenant_ticket_granted");
+    if (intent.kind !== "tenant_ticket_granted") throw new Error();
+    expect(intent.amountJpy).toBe(2980);
+  });
 });
 
 describe("handleWebhook end-to-end with fake client + repository", () => {

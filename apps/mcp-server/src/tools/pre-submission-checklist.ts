@@ -1,5 +1,5 @@
 /**
- * pre_submission_checklist — 提出前最終チェックリスト
+ * suguvisa_submission_checklist_verify — 提出前最終チェックリスト
  *
  * オンライン申請またはに紙申請の直前に、全書類の整合性・不足を最終確認する。
  * validate_data のフィールド検証とは異なり、ここでは「書類セットとしてんmのt完全性」を確認。
@@ -127,7 +127,7 @@ async function runPreSubmissionChecklist(params: {
   if (!pattern) {
     return {
       status: "error",
-      message: `パターンID '${pattern_id}' が見つかりません。determine_application_type ツールで正しいパターンIDを取得してください。`,
+      message: `パターンID '${pattern_id}' が見つかりません。suguvisa_application_type_determine ツールで正しいパターンIDを取得してください。`,
     };
   }
 
@@ -370,7 +370,7 @@ async function runPreSubmissionChecklist(params: {
       category: "オンライン申請",
       check: "CSVデータの準備",
       status: prepared_documents.includes("csv_data") ? "pass" : "warning",
-      detail: "一括申請用CSVデータ（generate_online_csv / generate_bulk_xlsm で生成可能）",
+      detail: "一括申請用CSVデータ（suguvisa_online_csv_generate / suguvisa_bulk_xlsm_generate で生成可能）",
       action_needed: prepared_documents.includes("csv_data") ? undefined : "一括申請用CSVの準備を推奨します",
     });
   }
@@ -459,9 +459,9 @@ async function runPreSubmissionChecklist(params: {
         ? [{ action: "resolve_issues", reason: `${failCount}件の不合格項目を解消` }]
         : []),
       ...(submission_method === "online" || submission_method === "both"
-        ? [{ tool: "generate_online_csv", reason: "オンライン申請用CSVデータ生成" }]
+        ? [{ tool: "suguvisa_online_csv_generate", reason: "オンライン申請用CSVデータ生成" }]
         : []),
-      { tool: "calculate_deadlines", reason: "申請期限の確認" },
+      { tool: "suguvisa_deadlines_calculate", reason: "申請期限の確認" },
     ],
   };
 }
@@ -472,11 +472,11 @@ async function runPreSubmissionChecklist(params: {
 
 export function registerPreSubmissionChecklist(server: McpServer) {
   server.tool(
-    "pre_submission_checklist",
+    "suguvisa_submission_checklist_verify",
     "【提出前最終チェックリスト】オンライン/紙申請の直前に、全書類の整合性・不足を最終確認。(1)必要書類の存在チェック (2)氏名・日付・報酬の整合性チェック（都道府県別最低賃金対応）(3)署名・押印の確認 (4)添付ファイル形式チェック（オンライン申請用）(5)管轄入管局の特定（全国8局+支局対応）。readiness判定: ready/mostly_ready/not_ready で提出可否を明示。 / Pre-submission checklist that validates all documents, data consistency, minimum wage, signatures, and identifies the jurisdictional immigration office.",
     {
       pattern_id: z.string().describe(
-        "申請パターンID（例: 'CHANGE_SSW1_C', 'GRANT_01'）。determine_application_type で取得したIDを使用。"
+        "申請パターンID（例: 'CHANGE_SSW1_C', 'GRANT_01'）。suguvisa_application_type_determine で取得したIDを使用。"
       ),
       submission_method: z.enum(["online", "paper", "both"]).default("online").describe(
         "提出方法。online=オンライン申請、paper=紙申請（窓口提出）、both=両方準備"
@@ -501,7 +501,7 @@ export function registerPreSubmissionChecklist(server: McpServer) {
       residence_card_image_mime_type: z.enum(["image/jpeg", "image/png", "image/webp"]).optional().describe("画像のMIMEタイプ"),
       ocr_text: z.string().optional().describe("事前に読み取ったOCRテキスト（フォールバック用）"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Pre-submission checklist", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
       const result = await runPreSubmissionChecklist(params as any);
       return {

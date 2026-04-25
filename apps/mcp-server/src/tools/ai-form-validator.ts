@@ -11,7 +11,7 @@ const ai = new GoogleGenAI({});
  */
 export function registerAiFormValidator(server: McpServer) {
   server.tool(
-    "ai_form_validator",
+    "suguvisa_form_ai_validate",
     "入管書類や理由書を「Gemini Flash / Pro」のハイブリッドルーターを用いて視覚的・文脈的に完璧に審査する / Evaluate document quality using Gemini Flash/Pro dynamically / Validasi kualitas dokumen menggunakan AI",
     {
       documentType: z.enum(["application_form", "reason_letter", "residence_card_visual", "other"])
@@ -23,7 +23,7 @@ export function registerAiFormValidator(server: McpServer) {
       complexity: z.enum(["high", "low"]).default("low")
         .describe("審査の難易度。『high』の場合は推論能力の高いGemini Proへルーティングされます。"),
     },
-    { readOnlyHint: true },
+    { title: "Validate application form with AI", readOnlyHint: true, destructiveHint: false },
     async ({ documentType, base64Image, textContent, complexity }) => {
       try {
         // 難易度と用途によるモデル自動ルーティング (Flash / Pro)

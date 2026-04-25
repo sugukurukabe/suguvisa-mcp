@@ -41,7 +41,7 @@ describe("Audit Logs Infrastructure", () => {
     process.env = { ...originalEnv };
   });
 
-  describe("log_visa_action tool", () => {
+  describe("suguvisa_audit_action_log tool", () => {
     it("should return mock success when SUPABASE credentials are missing", async () => {
       delete process.env.SUPABASE_URL;
       delete process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -74,7 +74,7 @@ describe("Audit Logs Infrastructure", () => {
     });
   });
 
-  describe("get_visa_audit_logs tool", () => {
+  describe("suguvisa_audit_logs_list tool", () => {
     it("should return mock logs when SUPABASE credentials are missing", async () => {
       delete process.env.SUPABASE_URL;
       delete process.env.SUPABASE_SERVICE_ROLE_KEY;

@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 /**
- * search_legal_docs ツールのユニットテスト（モックモード）
- * Unit tests for search_legal_docs tool (mock mode)
- * Unit test untuk alat search_legal_docs (mode mock)
+ * suguvisa_legal_docs_search ツールのユニットテスト（モックモード）
+ * Unit tests for suguvisa_legal_docs_search tool (mock mode)
+ * Unit test untuk alat suguvisa_legal_docs_search (mode mock)
  *
  * GCP認証情報なしでモックフォールバック動作をテスト
  */
@@ -28,7 +28,7 @@ beforeEach(async () => {
   mod.registerSearchLegalDocs(mockServer);
 });
 
-describe("search_legal_docs (mock mode)", () => {
+describe("suguvisa_legal_docs_search (mock mode)", () => {
   it("should register the tool", () => {
     expect(toolHandler).toBeDefined();
   });

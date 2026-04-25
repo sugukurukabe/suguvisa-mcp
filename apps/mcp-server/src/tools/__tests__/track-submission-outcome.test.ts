@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 /**
- * track_submission_outcome ツールのユニットテスト
- * Unit tests for track_submission_outcome tool
- * Unit test untuk alat track_submission_outcome
+ * suguvisa_submission_outcome_track ツールのユニットテスト
+ * Unit tests for suguvisa_submission_outcome_track tool
+ * Unit test untuk alat suguvisa_submission_outcome_track
  *
  * Supabase未設定の場合のローカルモードとバリデーションをテスト
  */
@@ -31,7 +31,7 @@ beforeEach(async () => {
   mod.registerTrackSubmissionOutcome(mockServer);
 });
 
-describe("track_submission_outcome", () => {
+describe("suguvisa_submission_outcome_track", () => {
   it("should register the tool with the server", () => {
     expect(toolHandler).toBeDefined();
   });
@@ -48,7 +48,7 @@ describe("track_submission_outcome", () => {
     );
     expect(parsed.status).toBe("error");
     expect(parsed.message).toContain("無効な pattern_id");
-    expect(parsed._ai_instructions).toContain("determine_application_type");
+    expect(parsed._ai_instructions).toContain("suguvisa_application_type_determine");
   });
 
   it("should accept valid CHANGE_SSW1_C pattern with ACCEPTED result (local mode)", async () => {

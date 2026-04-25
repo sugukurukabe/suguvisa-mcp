@@ -12,6 +12,7 @@ import type {
   CheckoutSession,
   CreateCheckoutArgs,
   CreatePortalArgs,
+  CreateTicketCheckoutArgs,
   PortalSession,
   SubscriptionSnapshot,
 } from "./stripe-client.js";
@@ -24,6 +25,7 @@ export interface FakeBillingClientOptions {
 
 export class FakeBillingClient implements BillingClient {
   readonly sessions: Array<{ id: string; args: CreateCheckoutArgs }> = [];
+  readonly ticketSessions: Array<{ id: string; args: CreateTicketCheckoutArgs }> = [];
   readonly portals: Array<{ id: string; args: CreatePortalArgs }> = [];
   readonly subscriptions = new Map<string, SubscriptionSnapshot>();
   /** テスト用: retrieveCheckoutSession の返却値をあらかじめ登録する */
@@ -45,6 +47,18 @@ export class FakeBillingClient implements BillingClient {
     return {
       id,
       url: `${this.baseUrl}/checkout/${id}`,
+      customerId,
+    };
+  }
+
+  async createTicketCheckoutSession(args: CreateTicketCheckoutArgs): Promise<CheckoutSession> {
+    this.counter += 1;
+    const id = `cs_test_ticket_${this.counter}`;
+    this.ticketSessions.push({ id, args });
+    const customerId = args.customerId ?? `cus_fake_${this.counter}`;
+    return {
+      id,
+      url: `${this.baseUrl}/checkout/${id}?mode=payment`,
       customerId,
     };
   }

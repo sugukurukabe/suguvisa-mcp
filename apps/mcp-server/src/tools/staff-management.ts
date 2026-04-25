@@ -53,8 +53,8 @@ export function registerStaffManagement(server: McpServer) {
 
   // === ツール1: 在留カード情報の登録/更新 ===
   server.tool(
-    "register_staff_visa",
-    "【スタッフ在留情報登録】在留カード情報をデータベースに登録・更新。parse_residence_card の結果をそのまま保存できる。全スタッフの在留期限を一元管理し、期限切れによる不法就労を防止。 / Registers or updates staff visa information in the database for centralized expiry tracking.",
+    "suguvisa_staff_visa_register",
+    "【スタッフ在留情報登録】在留カード情報をデータベースに登録・更新。suguvisa_residence_card_parse の結果をそのまま保存できる。全スタッフの在留期限を一元管理し、期限切れによる不法就労を防止。 / Registers or updates staff visa information in the database for centralized expiry tracking.",
     {
       staff_name: z.string().describe("スタッフ氏名（ローマ字） / Staff name in romaji"),
       nationality: z.string().optional().describe("国籍 / Nationality"),
@@ -63,7 +63,7 @@ export function registerStaffManagement(server: McpServer) {
       card_number: z.string().optional().describe("在留カード番号 / Residence card number"),
       company_name: z.string().optional().describe("所属企業名 / Company name"),
     },
-    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Register staff visa", readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ staff_name, nationality, visa_type, visa_expiry, card_number, company_name }) => {
       try {
         // Upsert by staff_name
@@ -99,7 +99,7 @@ export function registerStaffManagement(server: McpServer) {
                 ? `⚠️ ${staff_name}さんの在留期限まで残り${days}日です。更新申請の準備を始めてください。`
                 : `✅ ${staff_name}さんの在留情報を登録しました。期限まで残り${days}日です。`,
               _ai_instructions: days <= THRESHOLDS.URGENT
-                ? `🚨 至急! ${staff_name}さんの在留期限まで${days}日しかありません。determine_application_type を使って更新申請の準備を今すぐ開始してください。`
+                ? `🚨 至急! ${staff_name}さんの在留期限まで${days}日しかありません。suguvisa_application_type_determine を使って更新申請の準備を今すぐ開始してください。`
                 : "登録完了を報告してください。",
             }, null, 2),
           }],
@@ -127,13 +127,13 @@ export function registerStaffManagement(server: McpServer) {
 
   // === ツール2: 全スタッフの在留期限チェック ===
   server.tool(
-    "check_all_visa_status",
+    "suguvisa_staff_visa_status_check",
     "【在留期限一括チェック】登録済みの全スタッフの在留期限を一覧表示し、期限切れリスクを色分けで可視化。🔴30日以内 🟡60日以内 🟠90日以内 🟢安全。不法就労助長罪（3年以下の懲役）の予防に必須。 / Checks visa expiry dates for all registered staff with color-coded risk levels.",
     {
       company_name: z.string().optional().describe("企業名でフィルタ（省略時は全員） / Filter by company"),
       days_threshold: z.number().optional().describe("この日数以内に期限が来る人のみ表示（省略時は全員） / Show only staff expiring within N days"),
     },
-    { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Check all visa status", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ company_name, days_threshold }) => {
       try {
         let query = supabase.from("staff_visa_status").select("*").order("visa_expiry", { ascending: true });
@@ -188,7 +188,7 @@ export function registerStaffManagement(server: McpServer) {
 のフォーマットで。
 
 ${expired.length > 0 ? "🚨 期限切れのスタッフがいます！これは不法就労助長罪（3年以下の懲役・300万以下の罰金）に該当する可能性があります。至急対応を促してください。" : ""}
-${urgent.length > 0 ? `⚠️ ${urgent.length}名のスタッフの期限が30日以内です。determine_application_type で更新申請の準備を提案してください。` : "全員安全です。"}`,
+${urgent.length > 0 ? `⚠️ ${urgent.length}名のスタッフの期限が30日以内です。suguvisa_application_type_determine で更新申請の準備を提案してください。` : "全員安全です。"}`,
             }, null, 2),
           }],
         };
@@ -199,8 +199,8 @@ ${urgent.length > 0 ? `⚠️ ${urgent.length}名のスタッフの期限が30�
             text: JSON.stringify({
               error: "スタッフデータの取得に失敗しました",
               detail: err.message,
-              suggestion: "先に register_staff_visa でスタッフ情報を登録してください",
-              _ai_instructions: "Supabase テーブル `staff_visa_status` が未作成の可能性があります。手動で parse_residence_card → register_staff_visa のフローでデータを登録するよう案内してください。",
+              suggestion: "先に suguvisa_staff_visa_register でスタッフ情報を登録してください",
+              _ai_instructions: "Supabase テーブル `staff_visa_status` が未作成の可能性があります。手動で suguvisa_residence_card_parse → suguvisa_staff_visa_register のフローでデータを登録するよう案内してください。",
             }, null, 2),
           }],
         };
@@ -210,7 +210,7 @@ ${urgent.length > 0 ? `⚠️ ${urgent.length}名のスタッフの期限が30�
 
   // === ツール3: 届出リマインダー ===
   server.tool(
-    "check_notification_deadline",
+    "suguvisa_staff_notification_deadline_check",
     "【届出期限チェック】住所変更・入退社・契約変更等のイベント発生時、14日以内の届出期限を計算し、必要な届出書類を案内。届出忘れは入管法違反（20万以下の罰金）。 / Calculates 14-day notification deadlines for address changes, employment changes etc.",
     {
       event_type: z.enum([
@@ -220,7 +220,7 @@ ${urgent.length > 0 ? `⚠️ ${urgent.length}名のスタッフの期限が30�
       event_date: z.string().describe("イベント発生日（YYYY-MM-DD） / Event date"),
       staff_name: z.string().optional().describe("対象スタッフ氏名 / Staff name"),
     },
-    { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Check notification deadline", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ event_type, event_date, staff_name }) => {
       const event = NOTIFICATION_EVENTS[event_type];
       const eventDate = new Date(event_date);
@@ -262,12 +262,12 @@ ${staff_name ? `${staff_name}さん` : "対象者"}の情報を使って generat
 
   // === ツール4: コンプライアンスダッシュボード ===
   server.tool(
-    "get_compliance_dashboard",
+    "suguvisa_staff_compliance_dashboard_get",
     "【コンプラダッシュボード】在留期限・届出義務・定期面談の実施状況を一画面で可視化。100点満点でスコアリングし、対応が必要な項目をアラート表示。監査対応や本社報告に活用。 / Compliance dashboard showing visa expiry, notification status, and interview records with a 100-point score.",
     {
       company_name: z.string().optional().describe("企業名（省略時は全体） / Company name"),
     },
-    { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Get compliance dashboard", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ company_name }) => {
       // Supabase からデータ取得を試みる
       let staffData: any[] = [];
@@ -303,12 +303,12 @@ ${staff_name ? `${staff_name}さん` : "対象者"}の情報を使って generat
       if (expiringSoon.length > 0) {
         score -= expiringSoon.length * 5;
         issues.push(`🟡 90日以内に期限到来: ${expiringSoon.length}名`);
-        actions.push("更新申請の準備を開始（determine_application_type を実行）");
+        actions.push("更新申請の準備を開始（suguvisa_application_type_determine を実行）");
       }
       if (totalStaff === 0) {
         score = 0;
         issues.push("📋 スタッフ情報が未登録です");
-        actions.push("parse_residence_card と register_staff_visa でスタッフを登録してください");
+        actions.push("suguvisa_residence_card_parse と suguvisa_staff_visa_register でスタッフを登録してください");
       }
 
       score = Math.max(0, score);

@@ -13,7 +13,7 @@ const ruleSets = require("../data/rule-sets.json");
  */
 const submissionOutcomeSchema = z.object({
   pattern_id: z.string().describe(
-    "申請パターンID（determine_application_type の結果を使用。例: 'CHANGE_SSW1_C'） / Application pattern ID from determine_application_type"
+    "申請パターンID（suguvisa_application_type_determine の結果を使用。例: 'CHANGE_SSW1_C'） / Application pattern ID from suguvisa_application_type_determine"
   ),
   lookup_key: z.string().describe(
     "ルックアップキー（例: '技能実習2号_特定技能1号'） / Lookup key e.g. '技能実習2号_特定技能1号'"
@@ -111,12 +111,12 @@ export async function calculatePatternStats(
 
 export function registerTrackSubmissionOutcome(server: McpServer) {
   server.tool(
-    "track_submission_outcome",
+    "suguvisa_submission_outcome_track",
     "入管への申請結果（許可・補正・不許可）をフィードバックとして記録します。このデータにより、申請パターンごとの補正率を統計的に算出し、システムの自己改善に活用します。" +
     " / Record immigration submission outcomes for HITL feedback loop." +
     " / Mencatat hasil pengajuan imigrasi untuk loop umpan balik HITL.",
     submissionOutcomeSchema.shape,
-    { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Track submission outcome", readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async (params) => {
       // パターンIDの存在確認
       // Validate pattern_id exists in rule-sets
@@ -131,7 +131,7 @@ export function registerTrackSubmissionOutcome(server: McpServer) {
               message: `無効な pattern_id です: ${params.pattern_id}`,
               message_en: `Invalid pattern_id: ${params.pattern_id}`,
               hint: `有効な値: ${validPatterns.join(", ")}`,
-              _ai_instructions: "ユーザーに正しい pattern_id を選択するよう促してください。determine_application_type の結果から取得した pattern_id を使ってください。",
+              _ai_instructions: "ユーザーに正しい pattern_id を選択するよう促してください。suguvisa_application_type_determine の結果から取得した pattern_id を使ってください。",
             }, null, 2),
           }],
         };
@@ -258,7 +258,7 @@ export function registerTrackSubmissionOutcome(server: McpServer) {
                 : "❌ 不許可の結果です。以下を案内してください：\n" +
                   "1. 不服申立て（再審情報提供）の可能性と期限\n" +
                   "2. 特定行政書士への相談を強く推奨\n" +
-                  "3. track_submission_outcome で蓄積されたデータが不服申立てのエビデンスになることを伝える",
+                  "3. suguvisa_submission_outcome_track で蓄積されたデータが不服申立てのエビデンスになることを伝える",
           }, null, 2),
         }],
       };

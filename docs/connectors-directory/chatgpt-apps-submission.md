@@ -49,11 +49,11 @@ OpenAI の申請コンソールで以下を入力:
 7. **Manifest URL**: `https://<domain>/.well-known/openai-app.json`
 8. **MCP Server URL**: `https://<domain>/mcp`
 9. **OpenAPI URL**: `https://<domain>/openapi.yaml`
-10. **Icon**: `https://<domain>/logo.svg` → ストア表示用に 1024x1024 PNG も用意
+10. **Icon**: `https://<domain>/icon-512.png` (ストア表示) + `/icon-1024.png` (高解像度) + `/logo.png` (ワードマーク 1024×576)
 11. **Screenshots**: 3–5 枚
 12. **Privacy**: `https://<domain>/privacy`
 13. **Terms**: `https://<domain>/terms`
-14. **Support email**: `support@sugu-kuru.co.jp`
+14. **Support email**: `info@sugu-kuru.co.jp`
 15. **Pricing**: freemium (Free / ¥19,800 / ¥49,800)
 16. **OAuth client**: OpenAI から redirect_uri を受領後、Auth0 で ChatGPT 用クライアント作成
 

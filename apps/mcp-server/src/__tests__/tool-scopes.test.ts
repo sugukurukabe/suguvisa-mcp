@@ -6,23 +6,23 @@ describe('TOOL_SCOPE_MAP', () => {
     expect(Object.keys(TOOL_SCOPE_MAP).length).toBeGreaterThan(30);
   });
 
-  it('should return scopes for determine_application_type', () => {
-    const scopes = getToolScopes('determine_application_type');
+  it('should return scopes for suguvisa_application_type_determine', () => {
+    const scopes = getToolScopes('suguvisa_application_type_determine');
     expect(scopes).toContain('read:visa_case');
   });
 
-  it('should return scopes for generate_reason_letter', () => {
-    const scopes = getToolScopes('generate_reason_letter');
+  it('should return scopes for suguvisa_reason_letter_generate', () => {
+    const scopes = getToolScopes('suguvisa_reason_letter_generate');
     expect(scopes).toContain('generate:reason_letter');
   });
 
-  it('should return scopes for track_submission_outcome', () => {
-    const scopes = getToolScopes('track_submission_outcome');
+  it('should return scopes for suguvisa_submission_outcome_track', () => {
+    const scopes = getToolScopes('suguvisa_submission_outcome_track');
     expect(scopes).toContain('write:submission_outcome');
   });
 
-  it('should return scopes for sync_vertex_datastore', () => {
-    const scopes = getToolScopes('sync_vertex_datastore');
+  it('should return scopes for suguvisa_vertex_datastore_sync', () => {
+    const scopes = getToolScopes('suguvisa_vertex_datastore_sync');
     expect(scopes).toContain('admin:tenant');
   });
 
@@ -31,8 +31,8 @@ describe('TOOL_SCOPE_MAP', () => {
     expect(scopes).toEqual([]);
   });
 
-  it('should return read:golden_records for search_golden_records', () => {
-    const scopes = getToolScopes('search_golden_records');
+  it('should return read:golden_records for suguvisa_golden_records_search', () => {
+    const scopes = getToolScopes('suguvisa_golden_records_search');
     expect(scopes).toContain('read:golden_records');
   });
 });

@@ -30,7 +30,7 @@ servers:
 paths:
   /determine:
     post:
-      operationId: determineApplicationType
+      operationId: suguvisa_application_type_determine
       summary: 申請パターンを自動判定する（最初に呼ぶ）
       description: |
         現在の在留資格と申請先の在留資格から、正式な申請種別（変更・更新・認定）、使用様式、標準処理期間、試験免除条件を瞬時に特定します。
@@ -79,7 +79,7 @@ paths:
 
   /required-documents:
     post:
-      operationId: getRequiredDocuments
+      operationId: suguvisa_required_documents_list
       summary: 必要書類リストを取得する（省略条件自動適用）
       description: |
         申請パターンIDに基づき、入管提出に必要な全書類をカテゴリ別に返します。
@@ -143,7 +143,7 @@ paths:
 
   /deadlines:
     post:
-      operationId: calculateDeadlines
+      operationId: suguvisa_deadlines_calculate
       summary: 全期限を自動計算する（14日ルール・更新時期・5年上限）
       description: |
         在留期限・届出発生日等から、すべての重要な期限を算出します。
@@ -194,7 +194,7 @@ paths:
 
   /validate:
     post:
-      operationId: validateApplicationData
+      operationId: suguvisa_application_data_validate
       summary: 申請データをリアルタイム検証する
       description: |
         在留カード番号（12桁英数字）、法人番号（13桁）、日付形式、電話番号等の入力値を検証します。
@@ -229,7 +229,7 @@ paths:
 
   /annual-report-csv:
     post:
-      operationId: generateAnnualReportCsv
+      operationId: suguvisa_annual_report_csv_generate
       summary: 定期届出CSVを生成する（オンライン提出用）
       description: |
         年1回の特定技能定期届出（受入れ状況・活動状況・支援実施状況）を、
@@ -254,7 +254,7 @@ paths:
 
   /annual-report-excel:
     post:
-      operationId: generateAnnualReportExcel
+      operationId: suguvisa_annual_report_offline_generate
       summary: 定期届出Excelを生成する（紙提出用）
       description: |
         オンライン届出を利用しない所属機関向けに、紙提出用の定期報告書をExcel形式で自動出力。
@@ -284,7 +284,7 @@ paths:
 
   /law-updates:
     get:
-      operationId: getLawUpdates
+      operationId: suguvisa_law_updates_list
       summary: 法改正・制度変更情報を取得する
       description: |
         特定技能制度に関する最新の法改正・制度変更・運用要領の改定情報を取得します。

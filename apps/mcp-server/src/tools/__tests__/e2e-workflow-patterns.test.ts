@@ -81,7 +81,7 @@ describe("E2E Workflow over all 13 patterns", () => {
       // 1. Determine Application Type (If applicable for this pattern test)
       const determineCase = DETERMINE_CASES[patternId];
       if (determineCase) {
-        const detResult = await handlers["determine_application_type"]({
+        const detResult = await handlers["suguvisa_application_type_determine"]({
           from_visa: determineCase.from,
           to_visa: determineCase.to,
           context: determineCase.context,
@@ -89,11 +89,11 @@ describe("E2E Workflow over all 13 patterns", () => {
         const detParsed = JSON.parse(detResult.content[0].text);
         expect(detParsed.status).toBe("found");
         expect(detParsed.pattern_id).toBe(patternId);
-        expect(detParsed._ai_instructions).toContain("get_required_documents"); // AI instruction check
+        expect(detParsed._ai_instructions).toContain("suguvisa_required_documents_list"); // AI instruction check
       }
 
       // 2. Get Required Documents
-      const reqDocsResult = await handlers["get_required_documents"]({
+      const reqDocsResult = await handlers["suguvisa_required_documents_list"]({
         pattern_id: patternId,
         employment_type: "direct_employment", // Default test value
         industry_field: "agriculture",        // Default test value
@@ -104,7 +104,7 @@ describe("E2E Workflow over all 13 patterns", () => {
       expect(reqParsed._ai_instructions).toContain("表で表示"); // AI instruction check
 
       // 3. Track Submission Outcome (Test HITL reporting)
-      const trackResult = await handlers["track_submission_outcome"]({
+      const trackResult = await handlers["suguvisa_submission_outcome_track"]({
         pattern_id: patternId,
         lookup_key: determineCase ? `${determineCase.from}_${determineCase.to}` : "manual",
         result: "ACCEPTED",

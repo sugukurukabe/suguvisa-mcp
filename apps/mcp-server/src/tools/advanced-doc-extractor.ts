@@ -9,7 +9,7 @@ const client = new DocumentProcessorServiceClient();
  */
 export function registerAdvancedDocExtractor(server: McpServer) {
   server.tool(
-    "advanced_doc_extractor",
+    "suguvisa_document_extract_advanced",
     "入管用の特殊で複雑な表やチェックボックスを含む書類をDocument AIで完璧に抽出します / Perfect extraction of complex ISA forms using Google Document AI / Ekstraksi dokumen khusus",
     {
       base64Image: z.string().describe("書類画像データ(Base64)"),
@@ -17,7 +17,7 @@ export function registerAdvancedDocExtractor(server: McpServer) {
       extractorType: z.enum(["standard_visa_form", "tax_certificate", "contract"]).default("standard_visa_form")
         .describe("呼び出すCustom Extractorのタイプ"),
     },
-    { readOnlyHint: true },
+    { title: "Extract data from document (advanced)", readOnlyHint: true, destructiveHint: false },
     async ({ base64Image, mimeType, extractorType }) => {
       try {
         const projectId = process.env.GCP_PROJECT_ID || "mcp-service-492010";

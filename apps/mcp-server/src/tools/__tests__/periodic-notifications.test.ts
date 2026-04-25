@@ -44,9 +44,9 @@ describe("Periodic Notification Tools", () => {
     registerGeneratePeriodicNotification(mockServer);
   });
 
-  describe("check_periodic_notification_requirements", () => {
+  describe("suguvisa_periodic_notification_requirements_check", () => {
     it("should return extra documents when support is self-managed and not good standing", async () => {
-      const result = await handlers["check_periodic_notification_requirements"]({
+      const result = await handlers["suguvisa_periodic_notification_requirements_check"]({
         company_name: "テスト農園",
         is_delegated: false,
         has_good_standing: false,
@@ -63,7 +63,7 @@ describe("Periodic Notification Tools", () => {
     });
 
     it("should return base document only if delegated and has good standing", async () => {
-      const result = await handlers["check_periodic_notification_requirements"]({
+      const result = await handlers["suguvisa_periodic_notification_requirements_check"]({
         company_name: "優良企業株式会社",
         is_delegated: true,
         has_good_standing: true,
@@ -76,9 +76,9 @@ describe("Periodic Notification Tools", () => {
     });
   });
 
-  describe("analyze_support_records_docai", () => {
+  describe("suguvisa_support_records_analyze", () => {
     it("should call mock vertex AI and return compliance audit", async () => {
-      const result = await handlers["analyze_support_records_docai"]({
+      const result = await handlers["suguvisa_support_records_analyze"]({
         file_base64: "dGVzdC1iYXNlNjQ=",
         mime_type: "application/pdf",
         document_type: "wage_ledger",
@@ -93,7 +93,7 @@ describe("Periodic Notification Tools", () => {
     });
 
     it("should handle error thrown by Vertex AI gracefully", async () => {
-      const result = await handlers["analyze_support_records_docai"]({
+      const result = await handlers["suguvisa_support_records_analyze"]({
         file_base64: "BAD_BASE64",
         mime_type: "image/jpeg",
         document_type: "attendance_record"
@@ -106,13 +106,13 @@ describe("Periodic Notification Tools", () => {
     });
   });
 
-  describe("generate_periodic_notification_forms", () => {
+  describe("suguvisa_periodic_notification_forms_generate", () => {
     it("should output download URLs and simulated success", async () => {
       const records = [
         { name: "TANAKA", residence_card_number: "AA123", total_working_hours: 100, total_payment: 1000, status: "active" as const }
       ];
 
-      const result = await handlers["generate_periodic_notification_forms"]({
+      const result = await handlers["suguvisa_periodic_notification_forms_generate"]({
         company_name: "自動生成テスト",
         reporting_year: 2025,
         output_format: "excel",

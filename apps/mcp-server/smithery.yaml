@@ -1,54 +1,89 @@
 # Smithery.ai configuration for SuguVisa MCP Server
-# 日本の特定技能ビザ申請を完全自動化するAI MCPサーバー（24ツール搭載）
-# https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
+# 日本の特定技能ビザ申請を完全自動化するAI MCPサーバー（42ツール搭載・OAuth 2.1対応）
+# The only AI MCP server that fully automates Japan's SSW visa applications.
+# Satu-satunya server MCP AI yang sepenuhnya mengotomatisasi permohonan visa SSW Jepang.
+#
+# Registry: https://smithery.ai/server/@a-kabe-1qio/suguvisa-mcp
 
-# ─── リモートサーバー設定 (Cloud Run) ───
-# Smithery はこの URL にプロキシして MCP プロトコルを提供する
+# ─── Transport: URL-published remote server ───
+# SuguVisa MCP は Cloud Run (asia-northeast1) で自前ホスティングし、Smithery Gateway は
+# upstream として https://mcp.suguvisa.com/mcp にプロキシする URL-published 方式。
+# 詳細メタデータは /.well-known/mcp/server-card.json で配信している（Static Server Card）。
+# 再 publish する場合:
+#   smithery mcp publish "https://mcp.suguvisa.com/mcp" \
+#     -n @a-kabe-1qio/suguvisa-mcp \
+#     --config-schema ./smithery-config-schema.json
+#
+# SuguVisa MCP is self-hosted on Cloud Run (asia-northeast1). Smithery Gateway proxies
+# to https://mcp.suguvisa.com/mcp as an URL-published remote server. Full metadata is
+# served from /.well-known/mcp/server-card.json (Static Server Card).
+#
+# SuguVisa MCP di-hosting sendiri di Cloud Run (asia-northeast1). Smithery Gateway
+# mem-proxy ke https://mcp.suguvisa.com/mcp sebagai server remote URL-published.
+# Metadata lengkap disajikan dari /.well-known/mcp/server-card.json (Static Server Card).
+
+runtime: "typescript"
+
+# ─── Session Configuration (ユーザーが Smithery 経由で接続する際の UI) ───
+# 正準な configSchema は smithery-config-schema.json に定義。
+# Smithery Gateway はこのスキーマから OAuth UI フォームを自動生成する。
+# The canonical configSchema is defined in smithery-config-schema.json.
+# Skema konfigurasi kanonik didefinisikan di smithery-config-schema.json.
+
 startCommand:
-  type: stdio
+  type: "http"
   configSchema:
     type: object
     required: []
     properties:
       plan:
         type: string
-        title: "利用プラン / Subscription Plan"
+        title: "Subscription Plan"
         default: "free"
         enum:
           - "free"
-          - "pro"
-          - "enterprise"
+          - "starter"
+          - "professional"
         description: >
-          利用プラン。free=基本ツール5種（申請判定・書類リスト・期限計算・データ検証・法改正追跡）、
-          pro=全24ツール（AI理由書生成・参考様式テンプレート・オンラインCSV/Excel・SSW2チェックリスト・提出前チェック・在留カードOCR等）、
-          enterprise=監査ログ・テナント管理・API認証・優先サポート付き。
-          / Subscription plan. free=5 basic tools, pro=all 24 tools, enterprise=audit logs & tenant management.
+          利用プラン。free=全42ツールを試用可（OCR/一括生成/自律ワークフローはゲート）、
+          starter=実務プラン（OCR・一括生成・監査ログ・年次報告、19,800円/月）、
+          professional=フル機能（法令検索・自律ワークフロー、49,800円/月）。
+          / Subscription tier. free = try all 42 tools (OCR/bulk/autonomous gated),
+          starter = production use with OCR + bulk + audit + annual report (19,800 JPY/mo),
+          professional = full feature set with legal search + autonomous workflow (49,800 JPY/mo).
+          / Paket. free = coba semua 42 alat (OCR/bulk/autonomous dibatasi),
+          starter = pemakaian produksi dengan OCR + bulk + audit + laporan tahunan (19.800 JPY/bulan),
+          professional = fitur lengkap dengan pencarian hukum + alur kerja otonom (49.800 JPY/bulan).
       apiKey:
         type: string
-        title: "API Key（Enterprise専用 / Enterprise Only）"
+        title: "API Key"
         default: ""
         description: >
-          Enterprise プラン用のAPI認証キー。free/proプランでは不要です。
-          SuguVisa管理画面 → Settings → API Keys で発行できます。
-          / API key for Enterprise plan. Not required for free/pro plans.
+          SuguVisa ダッシュボード発行の API キー。starter / professional プランでは必須、
+          free プランでは任意（未認証アクセスはレート制限が厳しくなります）。
+          発行先: https://suguvisa.com/dashboard/api-keys
+          / SuguVisa API key. Required for starter / professional plans, optional for free tier
+          (unauthenticated access uses stricter rate limits).
+          Issued at https://suguvisa.com/dashboard/api-keys
+          / Kunci API SuguVisa. Wajib untuk paket starter / professional, opsional untuk paket free
+          (akses tanpa autentikasi memiliki batas laju yang lebih ketat).
+          Terbitkan di https://suguvisa.com/dashboard/api-keys
         x-from:
           header: x-suguvisa-api-key
       gcpProjectId:
         type: string
-        title: "GCP Project ID（任意 / Optional）"
+        title: "GCP Project ID (Optional)"
         default: ""
         description: >
-          在留カードOCR（Document AI）と法務文書検索（Vertex AI Search）を有効にするために必要。
-          これらの機能を使わない場合は空欄のままでOKです。
-          例: my-project-123456
-          / Required only for residence card OCR and legal document search. Leave empty if not needed.
-  commandFunction: |-
-    (config) => ({
-      command: "node",
-      args: ["dist/index.js"],
-      env: {
-        SUGUVISA_PLAN: config.plan || "free",
-        SUGUVISA_API_KEY: config.apiKey || "",
-        GCP_PROJECT_ID: config.gcpProjectId || ""
-      }
-    })
+          独自の GCP Project ID。在留カード OCR (Document AI) と法令検索 (Vertex AI Search) を
+          自分の GCP クォータで動かしたい場合のみ指定。空欄で SuguVisa マネージドクォータを使用。
+          / Your own GCP Project ID. Specify only if you want residence card OCR (Document AI)
+          and legal document search (Vertex AI Search) to run on your own GCP quota.
+          Leave empty to use SuguVisa's managed quota.
+          / ID Proyek GCP Anda. Isi hanya jika ingin OCR kartu izin tinggal (Document AI)
+          dan pencarian dokumen hukum (Vertex AI Search) berjalan pada kuota GCP Anda sendiri.
+          Kosongkan untuk menggunakan kuota terkelola SuguVisa.
+  exampleConfig:
+    plan: "free"
+    apiKey: ""
+    gcpProjectId: ""

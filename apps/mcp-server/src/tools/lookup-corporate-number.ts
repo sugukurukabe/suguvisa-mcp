@@ -1,5 +1,5 @@
 /**
- * lookup_corporate_number — 国税庁 法人番号公表API連携
+ * suguvisa_corporate_number_lookup — 国税庁 法人番号公表API連携
  *
  * 会社名から法人番号・本店所在地・代表者を自動取得。
  * ユーザーは会社名を入力するだけで、申請に必要な企業情報が揃う。
@@ -100,14 +100,14 @@ const kindLabels: Record<string, string> = {
 
 export function registerLookupCorporateNumber(server: McpServer) {
   server.tool(
-    "lookup_corporate_number",
+    "suguvisa_corporate_number_lookup",
     "【法人番号検索】会社名から国税庁の法人番号公表APIで法人番号・本店所在地を自動取得。会社名を入力するだけで申請に必要な企業情報が揃います。法人番号を直接指定した場合はチェックデジット検証も実行。 / Looks up corporate number, headquarters address via National Tax Agency API. Enter company name to auto-fill corporate info for visa applications.",
     {
       query: z.string().describe(
         "検索する会社名（例: 'スグクル'）または法人番号（13桁数字）"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Lookup corporate number", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ query }) => {
       const trimmed = query.trim();
 
@@ -185,7 +185,7 @@ export function registerLookupCorporateNumber(server: McpServer) {
               results: formatted,
               _ai_instructions:
                 "見つかった法人を一覧で表示し、ユーザーに該当企業を選択してもらってください。\n" +
-                "選択後は corporate_number と address を他のツール（generate_reference_form, generate_online_csv 等）に渡せます。",
+                "選択後は corporate_number と address を他のツール（suguvisa_reference_form_generate, suguvisa_online_csv_generate 等）に渡せます。",
             }, null, 2),
           }],
         };

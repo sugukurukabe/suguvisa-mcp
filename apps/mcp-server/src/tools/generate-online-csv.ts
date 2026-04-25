@@ -47,14 +47,14 @@ function preprocessApplicant(raw: Record<string, any>): Record<string, any> {
 
 export function registerGenerateOnlineCsv(server: McpServer) {
   server.tool(
-    "generate_online_csv",
+    "suguvisa_online_csv_generate",
     "【オンライン申請CSV生成】入管オンライン申請システムに直接アップロード可能なCSVデータを生成。国名・分野名・フルネームからの自動変換対応。日付(YYYYMMDD)・コード値の自動変換、必須フィールドの厳格チェック、複数申請人の一括処理に対応。 / Generates ISA-compatible CSV for online batch submission with strict field validation, auto-formatting, and smart field conversion.",
     {
       applicants: z.array(z.record(z.any())).describe(
         "申請人データの配列。各オブジェクトのキー: " + CSV_COLUMNS.join(", ") + "\n※name_romaji からの氏名自動分割、nationality からの国籍コード自動変換、industry_field からの分野コード自動変換に対応。\n※日付は「2000年7月7日」といった自然言語でもパースを試みます。"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Generate online application CSV", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ applicants }) => {
       if (!Array.isArray(applicants) || applicants.length === 0) {
         return {

@@ -104,7 +104,7 @@ export function registerOperationResources(server: McpServer): void {
               "Resource Templates (URI テンプレート) 対応",
               "Golden Records ハイブリッド検索 (BM25 + Vector)",
               "OpenTelemetry + Langfuse observability",
-              "MCP Prompts を 11 種類に拡張",
+              "MCP Prompts を 14 種類に拡張",
             ],
           },
           {

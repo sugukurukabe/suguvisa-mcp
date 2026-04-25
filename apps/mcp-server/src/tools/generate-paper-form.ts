@@ -62,7 +62,7 @@ interface ExamInfo {
 
 export function registerGeneratePaperForm(server: McpServer) {
   server.tool(
-    "generate_paper_form",
+    "suguvisa_paper_form_generate",
     "【紙申請PDFマッピング】申請パターンに対応する紙申請書（別記第30号の5等）の全フィールドにデータを自動マッピング。記入済み/未記入/必須の状態を可視化し、完成度をパーセントで表示。 / Maps applicant data to official paper form PDF fields with completion tracking and required-field highlighting.",
     {
       pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'） / Application pattern ID / ID pola aplikasi"),
@@ -74,7 +74,7 @@ export function registerGeneratePaperForm(server: McpServer) {
       ),
       industry_field: z.string().optional().describe("分野（例: '農業'） / Industry field (e.g., 'Agriculture') / Bidang industri (mis., 'Pertanian')"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Generate paper form PDF", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async ({ pattern_id, applicant_data, company_data, industry_field }) => {
       const pattern = ruleSets.application_patterns[pattern_id];
       if (!pattern) {

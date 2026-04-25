@@ -62,7 +62,7 @@ export function landingHandler(_req: Request, res: Response): void {
 
   <section>
     <h2>提供ツール / Tools</h2>
-    <p>申請パターン判定、必要書類リスト、期限計算、在留カード OCR、定期届出 CSV/Excel、法改正トラッキング、Golden Records 検索など 37+ の MCP ツールを提供します。</p>
+    <p>申請パターン判定、必要書類リスト、期限計算、在留カード OCR、定期届出 CSV/Excel、法改正トラッキング、Golden Records 検索など 42 の MCP ツールを提供します。</p>
     <p><a href="${m.urls.openapi}">OpenAPI 仕様</a> · <a href="${m.urls.mcpEndpoint}">MCP エンドポイント</a></p>
   </section>
 
@@ -263,6 +263,84 @@ export function supportHandler(_req: Request, res: Response): void {
     </tbody>
   </table>
 
+  <h2>セットアップ / Setup / Pengaturan</h2>
+  <p>本番エンドポイント / Production endpoint: <code>${m.urls.mcpEndpoint}</code></p>
+  <p>認証 / Authentication: OAuth 2.1 + PKCE (Dynamic Client Registration 対応) または Bearer API キー / API keys (<code>svmcp_...</code>) — Bearer auth should send the key exactly as <code>Authorization: Bearer &lt;key&gt;</code>.</p>
+
+  <h3>Claude.ai (Web) — OAuth で接続</h3>
+  <ol>
+    <li>Claude.ai → 左下のプロフィール → <strong>Settings → Connectors</strong> → <strong>Add custom connector</strong></li>
+    <li><em>Name</em>: <code>SuguVisa</code>、<em>URL</em>: <code>${m.urls.mcpEndpoint}</code> を入力</li>
+    <li><em>Add</em> をクリック → Auth0 の consent 画面に遷移 → 許可すると Claude に戻り自動接続されます。</li>
+    <li>チャット欄下部の <strong>Search &amp; tools</strong> で <code>SuguVisa</code> を有効化して呼び出し可能な状態にします。</li>
+  </ol>
+
+  <h3>Claude Desktop — <code>claude_desktop_config.json</code> でローカル接続</h3>
+  <p><code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS) に以下を追加して再起動:</p>
+  <pre><code>{
+  "mcpServers": {
+    "suguvisa": {
+      "url": "${m.urls.mcpEndpoint}"
+    }
+  }
+}</code></pre>
+  <p>初回起動時に OAuth 同意画面が表示されます。</p>
+
+  <h3>MCP Inspector — 開発者向けツールテスト</h3>
+  <pre><code>npx @modelcontextprotocol/inspector@latest ${m.urls.mcpEndpoint}</code></pre>
+  <p>ブラウザで Inspector が起動し、OAuth フローと tools/list が確認できます。</p>
+
+  <h3>curl — Bearer API キーで直接呼び出し</h3>
+  <pre><code>curl -X POST ${m.urls.mcpEndpoint} \
+  -H "Authorization: Bearer svmcp_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</code></pre>
+
+  <h2>ツール仕様 / Tool specifications</h2>
+  <p>全 42 ツールの name・title・入出力スキーマ・annotation (readOnlyHint / destructiveHint) は Server Card で公開されています:</p>
+  <ul>
+    <li><a href="/.well-known/mcp/server-card.json">MCP Server Card</a> — 機械可読な全ツール一覧</li>
+    <li>接続後に <code>tools/list</code> (JSON-RPC) を呼ぶと同じ情報がライブで取得できます。</li>
+  </ul>
+
+  <h2>トラブルシューティング / Troubleshooting / Pemecahan masalah</h2>
+  <table>
+    <thead><tr><th>症状 / Symptom</th><th>原因 / Cause</th><th>対処 / Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>HTTP 401 Unauthorized</code> — <em>invalid_token</em></td>
+        <td>OAuth トークンの期限切れ、または API キーが無効化されている</td>
+        <td>Claude.ai の Connectors 画面で一度切断→再接続。API キーの場合はダッシュボードで新しいキーを発行してください。</td>
+      </tr>
+      <tr>
+        <td><code>HTTP 403 Forbidden</code> — <em>insufficient_scope</em></td>
+        <td>プランに含まれない scope を持つツールを呼んだ</td>
+        <td>エラーメッセージ内の <code>required_scope</code> を確認。プランのアップグレードで解消します。<a href="mailto:${m.publisher.supportEmail}">サポート</a>までご連絡ください。</td>
+      </tr>
+      <tr>
+        <td><code>HTTP 429 Too Many Requests</code></td>
+        <td>プランごとのレート制限に到達</td>
+        <td>レスポンスヘッダー <code>Retry-After</code> 秒後に再試行。継続的に 429 が出る場合は上位プランへ。</td>
+      </tr>
+      <tr>
+        <td>Claude 上で "Connection failed"</td>
+        <td>OAuth 同意画面を閉じた、redirect_uri 不一致、または Cloudflare 経由のキャッシュ</td>
+        <td>ブラウザのシークレットウィンドウで再接続。解消しない場合はサポートまで <code>X-Request-Id</code> を添えて連絡。</td>
+      </tr>
+      <tr>
+        <td>OCR の文字化け / 精度が低い</td>
+        <td>画像解像度不足、反射・影、斜め撮影</td>
+        <td>在留カード/パスポートは正面・明るい場所で再撮影。PDF 化したスキャン (300dpi 以上) も推奨。</td>
+      </tr>
+      <tr>
+        <td>ふりがなが弾かれる (<em>カタカナ不可</em>)</td>
+        <td>入管の様式要件</td>
+        <td>必ずひらがなで入力してください。カタカナ・ローマ字は 入管 審査で不受理になります。</td>
+      </tr>
+    </tbody>
+  </table>
+
   <h2>よくある質問 / FAQ</h2>
   <ul>
     <li>API キーの取得: <code>/api/v1/tenant/me</code> エンドポイントまたはダッシュボードから発行できます。</li>
@@ -278,6 +356,8 @@ export function supportHandler(_req: Request, res: Response): void {
     <li><a href="/.well-known/mcp/server-card.json">MCP Server Card</a></li>
     <li><a href="/.well-known/ai-plugin.json">GPT Plugin Manifest</a></li>
     <li><a href="/.well-known/openai-app.json">OpenAI Apps SDK Manifest</a></li>
+    <li><a href="/.well-known/oauth-protected-resource">OAuth Protected Resource Metadata (RFC 9728)</a></li>
+    <li><a href="/.well-known/oauth-authorization-server">OAuth Authorization Server Metadata (RFC 8414)</a></li>
   </ul>
   `;
   res.type("text/html").send(layout({ title: "サポート", description: "SuguVisa Support", body, canonicalPath: "/support" }));

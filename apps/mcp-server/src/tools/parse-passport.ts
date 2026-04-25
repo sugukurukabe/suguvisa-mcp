@@ -24,7 +24,7 @@ interface ParsedPassport {
  */
 export function registerParsePassport(server: McpServer) {
   server.tool(
-    "parse_passport",
+    "suguvisa_passport_parse",
     "【パスポートOCR】パスポート画像からAIで自動読み取り。氏名（姓名分割）・生年月日・性別・国籍・旅券番号・有効期限・MRZを抽出。Document AI → Gemini Vision → 正規表現の3段フォールバック。画像はサーバーに保存しません。 / Extract passport data (name, DOB, gender, nationality, passport number, expiry, MRZ) from images using Document AI + Gemini Vision hybrid OCR.",
     {
       image_base64: z.string().optional().describe(
@@ -37,7 +37,7 @@ export function registerParsePassport(server: McpServer) {
         "AIが読み取ったOCRテキスト（画像がない場合のフォールバック） / OCR text fallback"
       ),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+    { title: "Parse passport (OCR)", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ image_base64, image_mime_type, ocr_text }) => {
       let parsed: ParsedPassport;
 

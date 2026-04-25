@@ -26,7 +26,7 @@ const OVERTIME_LIMITS = {
 
 export function registerWageCompliance(server: McpServer) {
   server.tool(
-    "check_wage_compliance",
+    "suguvisa_wage_compliance_check",
     "【給与コンプライアンスチェック】外国人スタッフの給与が①最低賃金以上か、②日本人と同等以上か、③36協定の残業上限を超えていないかを自動チェック。特定技能の在留資格要件「日本人と同等以上の報酬」の証明にも活用。 / Checks if foreign staff wages comply with minimum wage, equal pay requirements, and overtime limits.",
     {
       staff_name: z.string().optional().describe("スタッフ氏名 / Staff name"),
@@ -38,7 +38,7 @@ export function registerWageCompliance(server: McpServer) {
       overtime_hours_yearly: z.number().optional().describe("年間残業時間（累計） / Yearly overtime hours"),
       japanese_avg_wage: z.number().optional().describe("同職種の日本人平均時給（比較用） / Average Japanese worker hourly wage for same job"),
     },
-    { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    { title: "Check wage compliance", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async ({ staff_name, prefecture, hourly_wage, monthly_salary, monthly_hours, overtime_hours_monthly, overtime_hours_yearly, japanese_avg_wage }) => {
       const minWage = MINIMUM_WAGES[prefecture];
       if (!minWage) {

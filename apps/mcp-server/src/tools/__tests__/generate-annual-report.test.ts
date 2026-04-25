@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { generateAnnualReportCsvHandler } from "../generate-annual-report-csv.js";
 
-describe("generate_annual_report_csv tool", () => {
+describe("suguvisa_annual_report_csv_generate tool", () => {
   it("should successfully generate both CSV and paper formats for valid data", async () => {
     const response = await generateAnnualReportCsvHandler([
       {

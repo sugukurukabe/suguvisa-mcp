@@ -21,6 +21,40 @@ export function layout(opts: LayoutOptions): string {
   const lang = opts.lang ?? "ja";
   const canonical = opts.canonicalPath ? `${meta.urls.baseUrl}${opts.canonicalPath}` : meta.urls.baseUrl;
 
+  // Search Console 認証メタタグ / Google Search Console verification meta tag /
+  // Tag meta verifikasi Google Search Console
+  // GSC の HTML タグ方式で取得したトークンを環境変数で注入すると <head> に埋め込まれる。
+  // 例: GOOGLE_SITE_VERIFICATION="abc123..."
+  const gscToken = (process.env.GOOGLE_SITE_VERIFICATION ?? "").trim();
+  const gscMeta = gscToken
+    ? `\n  <meta name="google-site-verification" content="${escapeAttr(gscToken)}" />`
+    : "";
+
+  // 構造化データ (JSON-LD) でサイト/組織情報を Google に明示
+  // Structured data so Google understands the brand / favicon quickly
+  // Data terstruktur supaya Google memahami merek & favicon dengan cepat
+  const jsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${meta.urls.baseUrl}/#organization`,
+        name: meta.publisher.legalName,
+        url: meta.urls.baseUrl,
+        logo: meta.urls.logo,
+        sameAs: [meta.urls.baseUrl],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${meta.urls.baseUrl}/#website`,
+        name: "SuguVisa",
+        url: meta.urls.baseUrl,
+        publisher: { "@id": `${meta.urls.baseUrl}/#organization` },
+        inLanguage: ["ja", "en", "id"],
+      },
+    ],
+  });
+
   const header = opts.chromeless
     ? ""
     : `
@@ -60,10 +94,11 @@ export function layout(opts: LayoutOptions): string {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(opts.title)} — SuguVisa</title>
-  <meta name="description" content="${escapeHtml(opts.description)}" />
+  <meta name="description" content="${escapeHtml(opts.description)}" />${gscMeta}
   <link rel="canonical" href="${canonical}" />
   <link rel="icon" href="${meta.urls.favicon}" type="image/svg+xml" />
   <link rel="icon" href="${meta.urls.baseUrl}/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="shortcut icon" href="${meta.urls.baseUrl}/favicon.ico" />
   <link rel="apple-touch-icon" href="${meta.urls.baseUrl}/apple-touch-icon.png" />
   <meta property="og:title" content="${escapeHtml(opts.title)} — SuguVisa" />
   <meta property="og:description" content="${escapeHtml(opts.description)}" />
@@ -71,10 +106,11 @@ export function layout(opts: LayoutOptions): string {
   <meta property="og:url" content="${canonical}" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">${jsonLd}</script>
   <style>
-    :root { --fg:#0f172a; --muted:#475569; --bg:#ffffff; --card:#f8fafc; --accent:#2563eb; --border:#e2e8f0; }
+    :root { --fg:#0b1c4d; --muted:#475569; --bg:#ffffff; --card:#f4fafb; --accent:#0ea5b7; --accent-dark:#0b1c4d; --border:#d7e3e8; }
     @media (prefers-color-scheme: dark) {
-      :root { --fg:#f1f5f9; --muted:#94a3b8; --bg:#020617; --card:#0f172a; --accent:#60a5fa; --border:#1e293b; }
+      :root { --fg:#e6f1f5; --muted:#94a3b8; --bg:#05122e; --card:#0b1c4d; --accent:#22d3ee; --accent-dark:#0ea5b7; --border:#1e2e5a; }
     }
     *,*::before,*::after { box-sizing: border-box; }
     body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
@@ -121,4 +157,9 @@ function escapeHtml(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+// HTML 属性値用のエスケープ / HTML attribute escape / Pelolosan nilai atribut HTML
+function escapeAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

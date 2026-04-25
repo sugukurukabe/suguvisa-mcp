@@ -50,11 +50,35 @@ export interface CreatePortalArgs {
 }
 
 /**
+ * ワンタイム購入 (チケット / 30日パス等) 用の checkout session 作成パラメータ
+ * One-time purchase checkout session args (e.g. 30-day ticket)
+ * Parameter sesi checkout sekali beli (mis. tiket 30 hari)
+ */
+export interface CreateTicketCheckoutArgs {
+  tenantId: string;
+  priceId: string;
+  /** 識別子 (Stripe metadata に保存される。例: "ticket") */
+  passKey: string;
+  customerId?: string;
+  customerEmail?: string;
+  successUrl: string;
+  cancelUrl: string;
+  metadata?: Record<string, string>;
+}
+
+/**
  * 課金クライアント抽象
  * Billing client abstraction
  */
 export interface BillingClient {
   createCheckoutSession(args: CreateCheckoutArgs): Promise<CheckoutSession>;
+  /**
+   * ワンタイム購入 (Stripe mode=payment) 用の Checkout Session を作成する。
+   * サブスクとは別扱いで、metadata.plan=<passKey> を埋め込む。
+   * Create a one-time payment checkout session with metadata.plan=<passKey>.
+   * Buat sesi checkout pembayaran sekali (mode=payment) dengan metadata.plan=<passKey>.
+   */
+  createTicketCheckoutSession(args: CreateTicketCheckoutArgs): Promise<CheckoutSession>;
   createPortalSession(args: CreatePortalArgs): Promise<PortalSession>;
   getSubscription(subscriptionId: string): Promise<SubscriptionSnapshot>;
   /**
@@ -96,6 +120,44 @@ export class StripeBillingClient implements BillingClient {
       subscription_data: {
         metadata: { tenant_id: args.tenantId, ...(args.metadata ?? {}) },
         ...(args.trialPeriodDays ? { trial_period_days: args.trialPeriodDays } : {}),
+      },
+      allow_promotion_codes: true,
+      billing_address_collection: "required",
+      tax_id_collection: { enabled: true },
+    };
+    if (args.customerId) {
+      params.customer = args.customerId;
+      params.customer_update = { name: "auto", address: "auto" };
+    } else if (args.customerEmail) {
+      params.customer_email = args.customerEmail;
+    }
+
+    const session = await this.stripe.checkout.sessions.create(params);
+    const customer = session.customer;
+    return {
+      id: session.id,
+      url: session.url ?? null,
+      customerId: typeof customer === "string" ? customer : (customer?.id ?? null),
+    };
+  }
+
+  async createTicketCheckoutSession(args: CreateTicketCheckoutArgs): Promise<CheckoutSession> {
+    const baseMetadata: Record<string, string> = {
+      tenant_id: args.tenantId,
+      plan: args.passKey,
+      ...(args.metadata ?? {}),
+    };
+    const params: Stripe.Checkout.SessionCreateParams = {
+      mode: "payment",
+      line_items: [{ price: args.priceId, quantity: 1 }],
+      success_url: args.successUrl,
+      cancel_url: args.cancelUrl,
+      client_reference_id: args.tenantId,
+      // Session レベルと PaymentIntent レベル両方に metadata を入れて webhook 側で参照しやすくする。
+      // Attach metadata at both session and payment_intent levels for easier webhook introspection.
+      metadata: baseMetadata,
+      payment_intent_data: {
+        metadata: baseMetadata,
       },
       allow_promotion_codes: true,
       billing_address_collection: "required",

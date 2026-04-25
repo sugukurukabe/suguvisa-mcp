@@ -219,9 +219,9 @@ export async function getRequiredDocumentsData(params: {
         "1. 「📄 必要書類 " + documents.length + "件（うち" + documents.filter((d: DocumentEntry) => d.skipped).length + "件省略可）」と1行で伝える\n" +
         "2. 書類リストを簡潔な表で表示（☐ チェックボックス付き）\n" +
         "3. 即座に以下を実行（ユーザーに聞かずに）：\n" +
-        "   - generate_reason_letter(use_ai: true) → 理由書を生成\n" +
-        "   - generate_reference_form → テンプレート生成\n" +
-        "   - generate_intake_sheet → 入力シート生成\n" +
+        "   - suguvisa_reason_letter_generate(use_ai: true) → 理由書を生成\n" +
+        "   - suguvisa_reference_form_generate → テンプレート生成\n" +
+        "   - suguvisa_intake_sheet_generate → 入力シート生成\n" +
         "4. 省略条件は簡潔にメモ程度で\n\n" +
         "禁止：「次のステップとして○○を提案します」→ 提案じゃなく実行しろ";
 
@@ -244,27 +244,27 @@ export async function getRequiredDocumentsData(params: {
     download_url: "https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00030.html",
     _ai_instructions: aiInstructions,
     _next_actions: [
-      { tool: "generate_reason_letter", reason: "理由書をAI生成", params: { use_ai: true } },
-      { tool: "generate_reference_form", reason: "参考様式テンプレートを生成" },
-      { tool: "generate_intake_sheet", reason: "入力シートを生成" },
-      { tool: "pre_submission_checklist", reason: "提出前チェック" },
+      { tool: "suguvisa_reason_letter_generate", reason: "理由書をAI生成", params: { use_ai: true } },
+      { tool: "suguvisa_reference_form_generate", reason: "参考様式テンプレートを生成" },
+      { tool: "suguvisa_intake_sheet_generate", reason: "入力シートを生成" },
+      { tool: "suguvisa_submission_checklist_verify", reason: "提出前チェック" },
     ],
   };
 }
 
 export function registerRequiredDocuments(server: McpServer) {
   server.tool(
-    "get_required_documents",
+    "suguvisa_required_documents_list",
     "【必要書類リスト生成】申請パターンIDに基づき、入管提出に必要な全書類を一覧化。「2年以内の同一機関申請で省略可」「自社支援なら不要」等の省略条件を自動適用し、実際に準備が必要な書類だけを返す。カテゴリ別（申請人・所属機関・分野別）に整理し、各書類の入手方法・注意点も付記。 / Returns categorized document checklist with automatic skip-condition logic for 2-year rule, self-support exemptions, and more.",
     {
-      pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'）。ユーザーからパターンIDの直接指定がない場合は、まずは 'determine_application_type' を使って判定するか、対話で状況を引き出してください。"),
+      pattern_id: z.string().describe("申請パターンID（例: 'CHANGE_SSW1_C'）。ユーザーからパターンIDの直接指定がない場合は、まずは 'suguvisa_application_type_determine' を使って判定するか、対話で状況を引き出してください。"),
       support_type: z.enum(["self", "delegated"]).default("delegated").describe("支援体制（self=自社支援, delegated=登録支援機関へ委託）。ヒアリング時は『登録支援機関に支援を委託されますか？』と尋ねてください。"),
       is_same_employer_2year: z.boolean().default(false).describe("2年以内に同一機関から申請したか。不明な場合は『御社では過去2年以内に同じ分野の特定技能外国人を採用した実績はありますか？（あれば一部書類が免除されます）』と尋ねてください。"),
       is_domestic: z.boolean().default(true).describe("国内申請か海外からの呼び寄せ（認定）か。"),
       industry_field: z.string().optional().describe("特定産業分野の名前。指定がない場合、『例えば農業や建設など、どの分野で就労されますか？』と具体例を交えてヒアリングしてください。（例: '農業', '飲食料品製造業'）"),
       employer_type: z.enum(["corporate", "individual"]).default("corporate").describe("雇用主の法人形態。不明な場合は『雇用元は株式会社などの「法人」ですか、それとも個人農家などの「個人事業主」ですか？』と確認してください。"),
     },
-    { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    { title: "Get required documents", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     async (params) => {
       const result = await getRequiredDocumentsData(params);
       if ('message' in result) {

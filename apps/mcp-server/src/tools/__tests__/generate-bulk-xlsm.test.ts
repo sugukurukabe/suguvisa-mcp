@@ -2,14 +2,14 @@ import { describe, it, expect } from "vitest";
 import { generateBulkXlsmHandler } from "../generate-bulk-xlsm.js";
 
 /**
- * generate_bulk_xlsm ツールのユニットテスト
- * Unit tests for generate_bulk_xlsm tool
- * Unit test untuk alat generate_bulk_xlsm
+ * suguvisa_bulk_xlsm_generate ツールのユニットテスト
+ * Unit tests for suguvisa_bulk_xlsm_generate tool
+ * Unit test untuk alat suguvisa_bulk_xlsm_generate
  *
  * テンプレートファイル未存在のためXlsxPopulate部分はスキップ。
  * バリデーションとエラーハンドリングのテストを行う。
  */
-describe("generate_bulk_xlsm", () => {
+describe("suguvisa_bulk_xlsm_generate", () => {
   it("should return error if applicants array is empty", async () => {
     const result = await generateBulkXlsmHandler("3", []);
     const parsed = JSON.parse(
